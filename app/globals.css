@@ -1,26 +1,75 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 한지(ivory) 배경 + 먹색(ink) 텍스트 + 낙관 빨강(seal red) 포인트 */
+  --background: #f5f0e4;
+  --foreground: #2b2724;
+  --muted: #6b6156;
+  --border: #ddd4c2;
+  --card: #fbf8f0;
+  --accent: #b23a2e;
+  --accent-foreground: #fbf8f0;
+  /* 스와이프 방향(좋아요/싫어요)을 나타내는 색 — 브랜드 accent와는 별개 */
+  --like: #3f7d53;
+  --like-foreground: #fbf8f0;
+  --dislike: #b23a2e;
+  --dislike-foreground: #fbf8f0;
+  /* 판별 이벤트 카드에서 성현을 구분하는 테두리 색 */
+  --sage-confucius: #b23a2e;
+  --sage-laozi: #4b7a63;
+  --sage-sunzi: #3d5a80;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #211d1a;
+    --foreground: #f0e9d8;
+    --muted: #9b9080;
+    --border: #3a3430;
+    --card: #2a2521;
+    --accent: #d65a46;
+    --accent-foreground: #211d1a;
+    --like: #6fc48f;
+    --like-foreground: #211d1a;
+    --dislike: #d65a46;
+    --dislike-foreground: #211d1a;
+    --sage-confucius: #d65a46;
+    --sage-laozi: #7bb79c;
+    --sage-sunzi: #7093c2;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-like: var(--like);
+  --color-like-foreground: var(--like-foreground);
+  --color-dislike: var(--dislike);
+  --color-dislike-foreground: var(--dislike-foreground);
+  --color-sage-confucius: var(--sage-confucius);
+  --color-sage-laozi: var(--sage-laozi);
+  --color-sage-sunzi: var(--sage-sunzi);
+  --font-sans: var(--font-noto-sans-kr);
+  --font-serif: var(--font-noto-serif-kr);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
