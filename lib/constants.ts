@@ -25,10 +25,10 @@ export const STAGE_THRESHOLDS = {
 export const SKIP_REACTION_CHANCE = 0.25; // 넘김 반응 토스트 확률 (v1의 DISLIKE_REACTION_CHANCE와 동일)
 
 export const STAGE_LABEL: Record<"outside" | "entered" | "disciple" | "senior", string> = {
-  outside: "문외",
-  entered: "입문",
-  disciple: "제자",
-  senior: "고제",
+  outside: "씨앗",
+  entered: "새싹",
+  disciple: "나무",
+  senior: "고목",
 };
 
 // 결과 헤드라인 종류 -> 성현 대사 kind (§5.6). none이면 대사 없음.

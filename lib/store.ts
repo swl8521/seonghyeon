@@ -3,10 +3,10 @@
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 import { LINES, SAGE_IDS, VERSES, getSage, getVerse } from "./content";
-import { DEVOTION, HEAD_LINE_KIND, NOTE_INDICES, SKIP_REACTION_CHANCE } from "./constants";
+import { DEVOTION, HEAD_LINE_KIND, NOTE_INDICES, SKIP_REACTION_CHANCE, STAGE_LABEL } from "./constants";
+import { chooseCopyVerses, COPY_COUNTS, matchesCopy, nextGrowthStage, type PromotionChallenge } from "./promotion";
 import { track } from "./analytics";
 import {
-  advanceStage,
   applyPracticeSwipe,
   buildPracticeDeck,
   computeStage,
@@ -127,6 +127,10 @@ interface PlayStore {
   liveAddedVerseIds: string[];
   devotion: Record<SageId, number>;
   stage: Record<SageId, Stage>;
+  promotions: Partial<Record<SageId, PromotionChallenge>>;
+  refreshPromotions: () => void;
+  updatePromotionDraft: (sage: SageId, draft: string) => void;
+  submitPromotion: (sage: SageId) => boolean;
   dwellCredit: Record<SageId, { day: string; points: number; accMs: number }>;
   practicesDone: Record<SageId, number>;
   lastPracticeVerseIds: Record<SageId, string[]>;
@@ -164,6 +168,35 @@ export const usePlayStore = create<PlayStore>()(
       liveAddedVerseIds: [],
       devotion: zeroCounts(),
       stage: zeroStages(),
+      promotions: {},
+      refreshPromotions: () => {
+        for (const sage of SAGE_IDS) recalcStage(get, set, sage);
+      },
+      updatePromotionDraft: (sage, draft) => {
+        const challenge = get().promotions[sage];
+        if (!challenge) return;
+        set({ promotions: { ...get().promotions, [sage]: { ...challenge, draft } } });
+      },
+      submitPromotion: (sage) => {
+        const challenge = get().promotions[sage];
+        if (!challenge || nextGrowthStage(get().stage[sage], challenge.target) !== challenge.target) return false;
+        const verse = getVerse(challenge.verseIds[challenge.index]);
+        if (!verse || !matchesCopy(challenge.draft, verse.translation)) return false;
+        const index = challenge.index + 1;
+        if (index < challenge.verseIds.length) {
+          set({ promotions: { ...get().promotions, [sage]: { ...challenge, index, draft: "" } } });
+          return true;
+        }
+        const before = get().stage[sage];
+        set({
+          stage: { ...get().stage, [sage]: challenge.target },
+          promotions: { ...get().promotions, [sage]: undefined },
+          toast: { id: Date.now(), text: `${getSage(sage)?.name}와 함께 ${STAGE_LABEL[challenge.target]} 단계로 자랐어요!` },
+        });
+        track("stage_up", { sage, from: before, to: challenge.target, via: challenge.via });
+        recalcStage(get, set, sage, challenge.via);
+        return true;
+      },
       dwellCredit: zeroDwell(),
       practicesDone: zeroCounts(),
       lastPracticeVerseIds: { confucius: [], laozi: [], sunzi: [] },
@@ -419,6 +452,7 @@ export const usePlayStore = create<PlayStore>()(
         liveAddedVerseIds: state.liveAddedVerseIds,
         devotion: state.devotion,
         stage: state.stage,
+        promotions: state.promotions,
         dwellCredit: state.dwellCredit,
         practicesDone: state.practicesDone,
         lastPracticeVerseIds: state.lastPracticeVerseIds,
@@ -474,6 +508,7 @@ export const usePlayStore = create<PlayStore>()(
       },
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
+        state?.refreshPromotions();
       },
     }
   )
@@ -502,12 +537,7 @@ function finishPracticeInternal(
     [practice.sage]: Math.max(0, (devotion[practice.sage] ?? 0) + practice.devotionGain),
   };
 
-  const stageComputed = computeStage(
-    nextDevotion[practice.sage],
-    readCountFor(practice.sage, nextReadVerseIds),
-    flippedCountFor(practice.sage, nextFlippedVerseIds)
-  );
-  const stageAfter = advanceStage(practice.stageBefore, stageComputed);
+  const stageAfter = get().stage[practice.sage];
 
   let outcome = finalizePracticeOutcome(practice, stageAfter, VERSES);
   const lineKind = HEAD_LINE_KIND[outcome.headKind];
@@ -533,9 +563,7 @@ function finishPracticeInternal(
     lastPracticeVerseIds: nextLastPracticeVerseIds,
   });
 
-  if (stageAfter !== practice.stageBefore) {
-    track("stage_up", { sage: practice.sage, from: practice.stageBefore, to: stageAfter, via: "practice" });
-  }
+  recalcStage(get, set, practice.sage, "practice");
   trackReadMilestones(readVerseIds.length, nextReadVerseIds.length);
   track("practice_complete", {
     sage: practice.sage,
@@ -548,7 +576,7 @@ function finishPracticeInternal(
   return { ...practice, outcome };
 }
 
-function recalcStage(get: () => PlayStore, set: (partial: Partial<PlayStore>) => void, sage: SageId) {
+function recalcStage(get: () => PlayStore, set: (partial: Partial<PlayStore>) => void, sage: SageId, via: "practice" | "live" = "live") {
   const { devotion, readVerseIds, flippedVerseIds, stage } = get();
   const computed = computeStage(
     devotion[sage] ?? 0,
@@ -556,12 +584,9 @@ function recalcStage(get: () => PlayStore, set: (partial: Partial<PlayStore>) =>
     flippedCountFor(sage, flippedVerseIds)
   );
   const before = stage[sage];
-  const after = advanceStage(before, computed);
-  if (after !== before) {
-    set({
-      stage: { ...stage, [sage]: after },
-      toast: { id: Date.now(), text: `${getSage(sage)?.name} 문하${after === "entered" ? "에 들었습니다" : `의 ${after === "senior" ? "고제" : "제자"}가 되었습니다`}` },
-    });
-    track("stage_up", { sage, from: before, to: after, via: "live" });
-  }
+  const target = nextGrowthStage(before, computed);
+  if (!target || get().promotions[sage]) return;
+  const preferred = get().inventory.filter((item) => getVerse(item.verseId)?.sage === sage).map((item) => item.verseId);
+  const verseIds = chooseCopyVerses(VERSES.filter((verse) => verse.sage === sage), preferred, COPY_COUNTS[target]);
+  set({ promotions: { ...get().promotions, [sage]: { target, verseIds, index: 0, draft: "", via } } });
 }

@@ -11,6 +11,7 @@ import { StageCard } from "@/components/StageCard";
 import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
 import { useLive } from "@/lib/live";
+import { STAGE_LABEL } from "@/lib/constants";
 
 export function ResultScreen({ sage }: { sage: Sage }) {
   const sageId = sage.id;
@@ -63,13 +64,13 @@ export function ResultScreen({ sage }: { sage: Sage }) {
   const headline = (() => {
     switch (outcome.headKind) {
       case "enter":
-        return `${sage.hall}에서 ${sage.name} 문하에 들었습니다`;
+        return `${sage.name}와 함께 새싹 단계로 자랐어요`;
       case "promote":
-        return `${sage.name} 문하의 ${stage === "senior" ? "고제" : "제자"}가 되었습니다`;
+        return `${sage.name}와 함께 ${STAGE_LABEL[stage]} 단계로 자랐어요`;
       case "stay":
         return `오늘도 ${sage.name} 문하에서 수행했습니다`;
       case "front":
-        return `${sage.name} 문하 앞에 섰습니다`;
+        return `${sage.name}와 함께 배움의 씨앗을 심었어요`;
       case "none":
         return "아직 문이 열리지 않았습니다";
     }
@@ -202,6 +203,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
       </section>
 
       <StageCard
+        sage={sageId}
         stage={stage}
         devotion={devotion}
         readCount={readCount}

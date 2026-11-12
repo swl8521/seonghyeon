@@ -3,14 +3,16 @@
 import { motion } from "motion/react";
 import { nextRequirement, stageDevotionTarget, type NextRequirement } from "@/lib/practice";
 import { StageBadge } from "@/components/StageBadge";
-import type { Stage } from "@/lib/types";
+import { PromotionPractice } from "./PromotionPractice";
+import { STAGE_LABEL } from "@/lib/constants";
+import type { SageId, Stage } from "@/lib/types";
 
 const STAGE_ORDER: Stage[] = ["outside", "entered", "disciple", "senior"];
 const NEXT_STAGE_LABEL: Record<Stage, string> = {
   outside: "",
-  entered: "입문",
-  disciple: "제자",
-  senior: "고제",
+  entered: STAGE_LABEL.entered,
+  disciple: STAGE_LABEL.disciple,
+  senior: STAGE_LABEL.senior,
 };
 
 function requirementText(stage: Stage, req: NextRequirement | null): string | null {
@@ -22,6 +24,7 @@ function requirementText(stage: Stage, req: NextRequirement | null): string | nu
 }
 
 interface StageCardProps {
+  sage: SageId;
   stage: Stage;
   devotion: number;
   readCount: number;
@@ -31,6 +34,7 @@ interface StageCardProps {
 }
 
 export function StageCard({
+  sage,
   stage,
   devotion,
   readCount,
@@ -45,7 +49,7 @@ export function StageCard({
   return (
     <div className={`relative w-full max-w-[320px] rounded-xl border border-border bg-card p-4 ${className}`}>
       <div className="flex items-center justify-between">
-        <span className="font-sans text-sm text-foreground">내 문하</span>
+        <span className="font-sans text-sm text-foreground">나의 성장</span>
         <StageBadge stage={stage} />
       </div>
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-border">
@@ -58,6 +62,7 @@ export function StageCard({
         읽은 구절 {readCount}/20
       </p>
       {req && <p className="font-sans text-xs text-muted">{requirementText(stage, req)}</p>}
+      <PromotionPractice sage={sage} />
 
       {promoted && (
         <motion.span

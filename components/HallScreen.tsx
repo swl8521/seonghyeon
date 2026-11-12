@@ -171,7 +171,7 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
           수행하기
         </Link>
 
-        <StageCard stage={stage} devotion={devotion} readCount={readCount} flippedCount={flippedCount} />
+        <StageCard sage={sageId} stage={stage} devotion={devotion} readCount={readCount} flippedCount={flippedCount} />
 
         <details className="w-full max-w-[320px] text-center">
           <summary className="cursor-pointer font-sans text-xs text-muted underline underline-offset-4">

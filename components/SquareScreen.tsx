@@ -27,6 +27,7 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
   const seenIntro = usePlayStore((s) => s.seenIntro);
   const dismissIntro = usePlayStore((s) => s.dismissIntro);
   const stage = usePlayStore((s) => s.stage);
+  const promotions = usePlayStore((s) => s.promotions);
   const inventory = usePlayStore((s) => s.inventory);
   const addToInventory = usePlayStore((s) => s.addToInventory);
   const flipLiveVerse = usePlayStore((s) => s.flipLiveVerse);
@@ -155,6 +156,7 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
                 </span>
               )}
               <StageBadge stage={stage[sage.id]} />
+              {promotions[sage.id] && <span className="font-sans text-[11px] text-accent">따라쓰기 준비 완료</span>}
             </Link>
           ))}
         </div>
