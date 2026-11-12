@@ -59,4 +59,5 @@ export type PracticeHeadKind = "enter" | "promote" | "stay" | "front" | "none";
 export interface PracticeOutcome {
   headKind: PracticeHeadKind;
   pickedVerseId: string | null;
+  lineId: string | null; // 결과 화면에 보여줄 성현 대사 — 고를 때 한 번만 뽑고 고정한다
 }

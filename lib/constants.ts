@@ -30,3 +30,15 @@ export const STAGE_LABEL: Record<"outside" | "entered" | "disciple" | "senior", 
   disciple: "제자",
   senior: "고제",
 };
+
+// 결과 헤드라인 종류 -> 성현 대사 kind (§5.6). none이면 대사 없음.
+export const HEAD_LINE_KIND: Record<
+  "enter" | "promote" | "stay" | "front" | "none",
+  "admit" | "promote" | "stay" | null
+> = {
+  enter: "admit",
+  promote: "promote",
+  stay: "stay",
+  front: "stay",
+  none: null,
+};

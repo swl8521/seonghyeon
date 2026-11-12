@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 import { LINES, SAGE_IDS, VERSES, getSage, getVerse } from "./content";
-import { DEVOTION, NOTE_INDICES, SKIP_REACTION_CHANCE } from "./constants";
+import { DEVOTION, HEAD_LINE_KIND, NOTE_INDICES, SKIP_REACTION_CHANCE } from "./constants";
 import { track } from "./analytics";
 import {
   advanceStage,
@@ -471,7 +471,12 @@ function finishPracticeInternal(
   );
   const stageAfter = advanceStage(practice.stageBefore, stageComputed);
 
-  const outcome = finalizePracticeOutcome(practice, stageAfter, VERSES);
+  let outcome = finalizePracticeOutcome(practice, stageAfter, VERSES);
+  const lineKind = HEAD_LINE_KIND[outcome.headKind];
+  if (lineKind) {
+    const line = pickRandomLine(practice.sage, lineKind);
+    outcome = { ...outcome, lineId: line?.id ?? null };
+  }
 
   const nextStageMap = { ...get().stage, [practice.sage]: stageAfter };
   const nextPracticesDone = {

@@ -3,21 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "motion/react";
-import { getVerse } from "@/lib/content";
-import { usePlayStore, pickRandomLine, readCountFor, flippedCountFor } from "@/lib/store";
+import { LINES, getVerse } from "@/lib/content";
+import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
 import { track } from "@/lib/analytics";
-import type { PracticeHeadKind, Sage } from "@/lib/types";
+import type { Sage } from "@/lib/types";
 import { StageCard } from "@/components/StageCard";
 import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
-
-const HEAD_LINE_KIND: Record<PracticeHeadKind, "admit" | "promote" | "stay" | null> = {
-  enter: "admit",
-  promote: "promote",
-  stay: "stay",
-  front: "stay",
-  none: null,
-};
 
 export function ResultScreen({ sage }: { sage: Sage }) {
   const sageId = sage.id;
@@ -72,8 +64,9 @@ export function ResultScreen({ sage }: { sage: Sage }) {
     }
   })();
 
-  const lineKind = HEAD_LINE_KIND[outcome.headKind];
-  const line = lineKind ? pickRandomLine(sageId, lineKind) : undefined;
+  // outcome.lineId는 수행이 끝난 시점에 한 번만 뽑혀 고정된다 — 매 렌더마다
+  // 다시 뽑으면 새로고침하거나 다른 상태가 바뀔 때마다 대사가 바뀌어버린다.
+  const line = outcome.lineId ? LINES.find((l) => l.id === outcome.lineId) : undefined;
   const pickedVerse = outcome.pickedVerseId ? getVerse(outcome.pickedVerseId) : null;
 
   function handleShare() {

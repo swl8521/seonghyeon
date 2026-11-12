@@ -298,7 +298,9 @@ export function finalizePracticeOutcome(
 ): PracticeOutcome {
   const headKind = computeHeadKind(state.likedIds.length, state.stageBefore, stageAfter);
   const pickedVerseId = headKind === "none" ? null : pickHeadlineVerse(state, verses);
-  return { headKind, pickedVerseId };
+  // lineId는 LINES(콘텐츠 레이어)에 접근해야 해서 여기서는 비워두고, 호출하는
+  // 쪽(store)에서 채운다 — 한 번만 뽑고 outcome에 고정해 새로고침해도 같게 한다.
+  return { headKind, pickedVerseId, lineId: null };
 }
 
 export { pref, score };
