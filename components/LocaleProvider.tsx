@@ -4,15 +4,17 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { usePathname } from "next/navigation";
 import { isLocale, LOCALE_KEY, resolveLocale, translate, localeHref, type Locale } from "@/lib/locale";
 
-const LocaleContext = createContext<{ locale: Locale; setLocale: (locale: Locale) => void }>({ locale: "ko", setLocale: () => {} });
+const LocaleContext = createContext<{ locale: Locale; ready: boolean; setLocale: (locale: Locale) => void }>({ locale: "ko", ready: false, setLocale: () => {} });
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLanguage] = useState<Locale>("ko");
+  const [ready, setReady] = useState(false);
   const pathname = usePathname();
   useEffect(() => {
     function sync() {
       let saved: string | null = null;
       try { saved = localStorage.getItem(LOCALE_KEY); } catch {}
       setLanguage(resolveLocale(new URLSearchParams(window.location.search).get("lang"), saved, navigator.languages));
+      setReady(true);
     }
     sync();
     window.addEventListener("popstate", sync);
@@ -29,7 +31,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     const url = localeHref(`${window.location.pathname}${window.location.search}${window.location.hash}`, next);
     window.history.replaceState(null, "", url);
   }
-  return <LocaleContext.Provider value={{ locale, setLocale }}>{children}</LocaleContext.Provider>;
+  return <LocaleContext.Provider value={{ locale, ready, setLocale }}>{children}</LocaleContext.Provider>;
 }
 export function useLocale() {
   const context = useContext(LocaleContext);

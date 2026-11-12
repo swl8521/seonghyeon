@@ -1,8 +1,8 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
-import { getSage, getVerse } from "@/lib/content";
+import { localizedSage, localizedVerse } from "@/lib/localized-content";
 import { loadGoogleFont } from "@/lib/og-font";
-import { STAGE_LABEL } from "@/lib/constants";
+import { isLocale, stageLabel, translate } from "@/lib/locale";
 import type { SageId, Stage } from "@/lib/types";
 
 const SIZE = { width: 1080, height: 1920 };
@@ -13,9 +13,11 @@ export async function GET(
   { params }: { params: Promise<{ sage: string; verseId: string }> }
 ) {
   const { sage: sageParam, verseId } = await params;
-  const sage = getSage(sageParam as SageId);
-  const verse = getVerse(verseId);
-  if (!sage || !verse) {
+  const lang = request.nextUrl.searchParams.get("lang");
+  const locale = isLocale(lang) ? lang : "ko";
+  const sage = localizedSage(sageParam as SageId, locale);
+  const verse = localizedVerse(verseId, locale);
+  if (!sage || !verse || verse.sage !== sage.id) {
     return new Response(JSON.stringify({ error: "not found" }), { status: 404 });
   }
 
@@ -23,11 +25,12 @@ export async function GET(
   const stageParam = searchParams.get("stage");
   const stage = (STAGES as string[]).includes(stageParam ?? "") ? (stageParam as Stage) : null;
 
-  const header = `${sage.hanja} 門下`;
-  const stageText = stage ? STAGE_LABEL[stage] : "";
+  const header = sage.hall;
+  const stageText = stage ? stageLabel(stage, locale) : "";
+  const brand = translate(locale, "성현 문하");
   const subsetText = Array.from(
     new Set(
-      `성현 문하${header}${stageText}${verse.original}${verse.reading}${verse.translation}${verse.source}`.split(
+      `${brand}${header}${stageText}${verse.original}${verse.reading}${verse.translation}${verse.source}`.split(
         ""
       )
     )
@@ -60,7 +63,7 @@ export async function GET(
             gap: 20,
           }}
         >
-          <p style={{ fontSize: 44, color: "#8b8a7c", margin: 0 }}>{header}</p>
+          <p style={{ fontSize: locale === "en" ? 36 : 44, color: "#8b8a7c", margin: 0 }}>{header}</p>
           {stage && (
             <p
               style={{
@@ -123,7 +126,7 @@ export async function GET(
           }}
         >
           <p style={{ fontSize: 32, color: "#8b8a7c", margin: 0 }}>{verse.source}</p>
-          <p style={{ fontSize: 24, color: "#5c5b50", margin: 0 }}>성현 문하</p>
+          <p style={{ fontSize: 24, color: "#5c5b50", margin: 0 }}>{brand}</p>
         </div>
       </div>
     ),

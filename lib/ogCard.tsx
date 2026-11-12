@@ -73,7 +73,7 @@ export function VerseOgCard({
       </p>
       <p
         style={{
-          fontSize: 36,
+          fontSize: translation.length > 100 ? 28 : 36,
           color: MUTED_TEXT,
           margin: 0,
           marginTop: 32,
