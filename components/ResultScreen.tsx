@@ -57,7 +57,6 @@ export function ResultScreen({ sage }: { sage: Sage }) {
   if (!practice || practice.sage !== sageId || !practice.outcome) return null;
   const outcome = practice.outcome;
 
-  const promoted = practice.stageBefore !== stage;
   const readCount = readCountFor(sageId, readVerseIds);
   const flippedCount = flippedCountFor(sageId, flippedVerseIds);
 
@@ -208,7 +207,6 @@ export function ResultScreen({ sage }: { sage: Sage }) {
         devotion={devotion}
         readCount={readCount}
         flippedCount={flippedCount}
-        promoted={promoted}
         className="mx-auto"
       />
 

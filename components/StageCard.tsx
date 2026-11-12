@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { nextRequirement, stageDevotionTarget, type NextRequirement } from "@/lib/practice";
 import { StageBadge } from "@/components/StageBadge";
 import { PromotionPractice } from "./PromotionPractice";
@@ -29,7 +28,6 @@ interface StageCardProps {
   devotion: number;
   readCount: number;
   flippedCount: number;
-  promoted?: boolean;
   className?: string;
 }
 
@@ -39,7 +37,6 @@ export function StageCard({
   devotion,
   readCount,
   flippedCount,
-  promoted,
   className = "",
 }: StageCardProps) {
   const req = nextRequirement(stage, devotion, readCount, flippedCount);
@@ -64,16 +61,6 @@ export function StageCard({
       {req && <p className="font-sans text-xs text-muted">{requirementText(stage, req)}</p>}
       <PromotionPractice sage={sage} />
 
-      {promoted && (
-        <motion.span
-          initial={{ opacity: 0, scale: 1.4, rotate: 8 }}
-          animate={{ opacity: 1, scale: 1, rotate: -12 }}
-          transition={{ duration: 0.4 }}
-          className="absolute -right-2 -top-3 rounded-lg border-4 border-accent bg-card px-2 py-1 font-sans text-sm font-bold text-accent"
-        >
-          승급!
-        </motion.span>
-      )}
     </div>
   );
 }
