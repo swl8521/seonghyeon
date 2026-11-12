@@ -1,0 +1,5 @@
+{
+  "confucius": { "name": "Confucius", "book": "Analects", "hall": "Learn with Confucius", "intro": "Confucius taught the joy of learning and the importance of treating others well.\nHis idea of ren is about growing a caring, humane heart.", "reviewed": false },
+  "laozi": { "name": "Laozi", "book": "Dao De Jing", "hall": "Learn with Laozi", "intro": "Laozi invites us to stop forcing things and notice the flow of nature.\nHe shows how gentleness and humility can last longer than force.", "reviewed": false },
+  "sunzi": { "name": "Sun Tzu", "book": "The Art of War", "hall": "Learn with Sun Tzu", "intro": "Sun Tzu teaches us to understand a situation before taking action.\nHis lessons explore preparation, flexibility and avoiding needless conflict.", "reviewed": false }
+}
