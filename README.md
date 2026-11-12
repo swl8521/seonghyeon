@@ -66,4 +66,7 @@ scripts/    콘텐츠 검증 스크립트
 
 ## 배포
 
+Vercel에서 자체 서버로 옮기는 운영 절차와 점검 목록은
+[`server/SELF_HOSTING.md`](server/SELF_HOSTING.md)를 참고합니다.
+
 ## 역할

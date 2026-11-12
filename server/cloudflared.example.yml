@@ -1,0 +1,11 @@
+# /etc/cloudflared/config.yml 예시
+# 실제 터널 ID와 인증 파일 경로로 바꾼 뒤 사용한다.
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /etc/cloudflared/YOUR_TUNNEL_ID.json
+
+ingress:
+  - hostname: munha.yeoul.dev
+    service: http://127.0.0.1:3000
+  - hostname: live-munha.yeoul.dev
+    service: http://127.0.0.1:4000
+  - service: http_status:404
