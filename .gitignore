@@ -48,3 +48,10 @@ docs/
 # one-off sticker generation output, not part of the app
 /output/
 scripts/*.py
+
+
+# 실시간 서버
+server/node_modules/
+server/logs/
+server/.env
+!server/.env.example
