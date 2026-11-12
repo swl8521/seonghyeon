@@ -38,7 +38,7 @@ export function JudgmentCard({
       className={`relative flex min-h-[440px] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border-2 ${SAGE_BORDER_CLASS[sage.id]} bg-card p-6 text-center`}
     >
       <span
-        className={`absolute right-5 top-5 rotate-12 rounded-lg border-4 px-3 py-1 font-sans text-lg font-bold ${
+        className={`self-end rounded-full border px-3 py-1 font-sans text-xs font-bold ${
           isNod ? "border-accent text-accent" : "border-sage-laozi text-sage-laozi"
         }`}
       >
@@ -55,7 +55,7 @@ export function JudgmentCard({
         <p className="font-serif text-base text-muted">{t("이것도 읽어보게 — {quote}", { quote: recommendedOriginal })}</p>
       )}
 
-      <div className="mt-4 flex items-center gap-3">
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
         {recommendedOriginal && onAccept && (
           <button
             type="button"

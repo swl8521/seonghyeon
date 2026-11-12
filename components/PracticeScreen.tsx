@@ -169,8 +169,8 @@ export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
 
         {!pendingNote && !done && verse && (
           <>
-            <div className="pointer-events-none absolute inset-x-0 mx-auto aspect-[3/4] w-full max-w-[320px] origin-bottom translate-y-4 scale-[0.94] rounded-2xl border border-border bg-card opacity-60 shadow-md shadow-black/5" />
-            <div className="pointer-events-none absolute inset-x-0 mx-auto aspect-[3/4] w-full max-w-[320px] origin-bottom translate-y-2 scale-[0.97] rounded-2xl border border-border bg-card opacity-85 shadow-md shadow-black/5" />
+            <div className="pointer-events-none absolute inset-0 mx-auto w-full max-w-[320px] origin-bottom translate-y-4 scale-[0.94] rounded-2xl border border-border bg-card opacity-60 shadow-md shadow-black/5" />
+            <div className="pointer-events-none absolute inset-0 mx-auto w-full max-w-[320px] origin-bottom translate-y-2 scale-[0.97] rounded-2xl border border-border bg-card opacity-85 shadow-md shadow-black/5" />
           </>
         )}
 

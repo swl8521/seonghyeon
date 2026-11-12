@@ -117,14 +117,23 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: enterDuration }}
-        className={`relative z-10 h-[560px] sm:h-[580px] w-full max-w-[320px] touch-none select-none [perspective:1200px] ${exiting ? "pointer-events-none" : ""}`}
+        className={`relative z-10 w-full max-w-[320px] touch-pan-y select-none [perspective:1200px] ${exiting ? "pointer-events-none" : ""}`}
       >
         <motion.div
           animate={{ rotateY: flipped ? 180 : 0 }}
           transition={{ duration: flipDuration }}
-          className="relative h-full w-full cursor-grab [transform-style:preserve-3d] active:cursor-grabbing"
+          role="button"
+          tabIndex={0}
+          aria-label={t(flipped ? "원문 보기" : "해설 보기")}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              handleTap();
+            }
+          }}
+          className="relative grid min-h-[480px] w-full cursor-grab rounded-2xl [transform-style:preserve-3d] active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          <div className="absolute inset-0 flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/10 [backface-visibility:hidden]">
+          <div aria-hidden={flipped} inert={flipped} className="relative flex min-w-0 flex-col justify-between gap-4 rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/10 [grid-area:1/1] [backface-visibility:hidden]">
             <motion.span
               style={{ opacity: likeOpacity }}
               className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-xl border-4 border-like px-4 py-2 text-2xl font-bold text-like"
@@ -148,7 +157,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
               <MonkeyCharacter pose={getVersePose(verse)} size={72} />
               <div className="flex flex-col gap-1.5">
                 <p className="font-serif text-3xl leading-snug tracking-wide">{verse.original}</p>
-                <p className="font-sans text-sm text-muted">{verse.reading}</p>
+                {verse.reading && <p className="font-sans text-sm text-muted">{verse.reading}</p>}
               </div>
               <p className="font-sans text-lg leading-relaxed">{verse.translation}</p>
             </div>
@@ -156,10 +165,10 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
             <p className="text-right text-xs text-muted">{verse.source}</p>
           </div>
 
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-card p-6 text-center shadow-lg shadow-black/10 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <div aria-hidden={!flipped} inert={!flipped} className="relative flex min-w-0 flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-card p-6 text-center shadow-lg shadow-black/10 [grid-area:1/1] [backface-visibility:hidden] [transform:rotateY(180deg)]">
             <MonkeyCharacter pose="think" size={96} />
             <p className="font-sans text-sm text-muted">{sageName}</p>
-            <p className="max-h-full overflow-y-auto font-serif text-base leading-relaxed">{verse.note}</p>
+            <p className="font-serif text-base leading-relaxed">{verse.note}</p>
           </div>
         </motion.div>
       </motion.div>
