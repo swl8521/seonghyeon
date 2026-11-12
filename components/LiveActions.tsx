@@ -2,7 +2,9 @@
 
 import { useLocale } from "@/components/LocaleProvider";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePlayStore } from "@/lib/store";
+import { playSingingBowl, stopSingingBowl } from "@/lib/sound";
 import { Icon } from "./Icon";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
@@ -24,10 +26,17 @@ export function LiveActions({
   const { t } = useLocale();
   const shouldReduceMotion = useReducedMotion();
   const [sparks, setSparks] = useState<number[]>([]);
+  const soundOn = usePlayStore((s) => s.soundOn);
+
+  useEffect(() => {
+    if (!soundOn) stopSingingBowl();
+    return stopSingingBowl;
+  }, [soundOn]);
 
   function handleBow() {
     if (disabled) return;
     onBow();
+    if (soundOn) void playSingingBowl(() => usePlayStore.getState().soundOn);
     const id = Date.now() + Math.random();
     setSparks((prev) => [...prev, id]);
   }

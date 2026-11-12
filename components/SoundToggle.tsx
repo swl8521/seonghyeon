@@ -14,7 +14,7 @@ export function SoundToggle() {
     <button
       type="button"
       onClick={toggleSound}
-      aria-label={soundOn ? t("목탁 소리 끄기") : t("목탁 소리 켜기")}
+      aria-label={soundOn ? t("소리 끄기") : t("소리 켜기")}
       aria-pressed={soundOn}
       className="text-lg leading-none"
     >
