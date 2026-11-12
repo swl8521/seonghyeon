@@ -11,9 +11,11 @@ import {
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import type { SwipeDirection } from "@/lib/judge";
 import type { Verse } from "@/lib/types";
+import { getVersePose } from "@/lib/monkey";
+import { MonkeyCharacter } from "@/components/MonkeyCharacter";
 
-const SWIPE_THRESHOLD = 100;
-const SWIPE_VELOCITY = 500;
+const SWIPE_THRESHOLD = 60;
+const SWIPE_VELOCITY = 300;
 const FLY_OFF_DISTANCE = 600;
 const FLY_OFF_DURATION = 0.25;
 
@@ -44,6 +46,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
   const enterDuration = shouldReduceMotion ? 0 : 0.2;
 
   const hasTriggeredRef = useRef(false);
+  const draggedRef = useRef(false);
   const [exiting, setExiting] = useState(false);
 
   function flyOff(dir: SwipeDirection, method: SwipeMethod) {
@@ -63,11 +66,20 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
 
   useImperativeHandle(ref, () => ({ flyOff }));
 
+  function handleTap() {
+    if (exiting || draggedRef.current) return;
+    onFlip();
+  }
+
   function handleDragEnd(_event: PointerEvent, info: PanInfo) {
     if (info.offset.x > SWIPE_THRESHOLD || info.velocity.x > SWIPE_VELOCITY) {
       flyOff("like", "drag");
     } else if (info.offset.x < -SWIPE_THRESHOLD || info.velocity.x < -SWIPE_VELOCITY) {
       flyOff("dislike", "drag");
+    } else {
+      // dragMomentum이 꺼져 있어 기준치에 못 미치면 Framer가 자동으로
+      // 가운데로 되돌리지 않는다 — 직접 되돌려줘야 한다.
+      animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
     }
   }
 
@@ -85,16 +97,23 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
       />
 
       <motion.div
-        drag={exiting ? false : "x"}
+        drag="x"
         style={{ x, rotate }}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={1}
+        dragMomentum={false}
+        onPointerDown={() => {
+          draggedRef.current = false;
+        }}
+        onDragStart={() => {
+          draggedRef.current = true;
+        }}
         onDragEnd={handleDragEnd}
-        onTap={exiting ? undefined : onFlip}
+        onTap={handleTap}
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: enterDuration }}
-        className="relative z-10 aspect-[3/4] w-full max-w-[320px] touch-none select-none [perspective:1200px]"
+        className={`relative z-10 aspect-[3/4] w-full max-w-[320px] touch-none select-none [perspective:1200px] ${exiting ? "pointer-events-none" : ""}`}
       >
         <motion.div
           animate={{ rotateY: flipped ? 180 : 0 }}
@@ -104,29 +123,32 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
           <div className="absolute inset-0 flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/10 [backface-visibility:hidden]">
             <motion.span
               style={{ opacity: likeOpacity }}
-              className="absolute right-4 top-4 rounded border-2 border-like px-2 py-1 text-sm font-bold text-like"
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-xl border-4 border-like px-4 py-2 text-2xl font-bold text-like"
             >
               좋아요
             </motion.span>
             <motion.span
               style={{ opacity: dislikeOpacity }}
-              className="absolute left-4 top-4 rounded border-2 border-dislike px-2 py-1 text-sm font-bold text-dislike"
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-12 rounded-xl border-4 border-dislike px-4 py-2 text-2xl font-bold text-dislike"
             >
               싫어요
             </motion.span>
 
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-              <p className="font-serif text-3xl leading-snug">{verse.original}</p>
-              <p className="font-sans text-sm text-muted">{verse.reading}</p>
-              <p className="font-sans text-base leading-relaxed">{verse.translation}</p>
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+              <MonkeyCharacter pose={getVersePose(verse)} size={72} />
+              <div className="flex flex-col gap-1.5">
+                <p className="font-serif text-3xl leading-snug tracking-wide">{verse.original}</p>
+                <p className="font-sans text-sm text-muted">{verse.reading}</p>
+              </div>
+              <p className="font-sans text-lg leading-relaxed">{verse.translation}</p>
             </div>
-
-            <p className="text-right text-xs text-muted">{verse.source}</p>
           </div>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-card p-6 text-center shadow-lg shadow-black/10 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+            <MonkeyCharacter pose="think" size={96} />
             <p className="font-sans text-sm text-muted">{sageName}</p>
-            <p className="font-serif text-lg leading-relaxed">{verse.note}</p>
+            <p className="font-serif text-lg leading-loose">{verse.note}</p>
+            <p className="text-xs text-muted">{verse.source}</p>
           </div>
         </motion.div>
       </motion.div>

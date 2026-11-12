@@ -42,6 +42,9 @@ next-env.d.ts
 
 # local-only
 AGENTS.md
-content/
 docs/
 !.env.example
+
+# one-off sticker generation output, not part of the app
+/output/
+scripts/*.py

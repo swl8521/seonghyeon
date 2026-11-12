@@ -1,0 +1,29 @@
+[
+  {
+    "id": "confucius",
+    "name": "공자",
+    "hanja": "孔子",
+    "book": "논어",
+    "typeName": "공자형",
+    "typeTagline": "사람과 도리를 먼저 보는 사람",
+    "vec": { "ren": 0.9, "xue": 0.9, "dao": 0.2, "mou": 0.2, "rou": 0.4 }
+  },
+  {
+    "id": "laozi",
+    "name": "노자",
+    "hanja": "老子",
+    "book": "도덕경",
+    "typeName": "노자형",
+    "typeTagline": "흐름을 거스르지 않는 사람",
+    "vec": { "ren": 0.2, "xue": 0.1, "dao": 1.0, "mou": 0.2, "rou": 0.9 }
+  },
+  {
+    "id": "sunzi",
+    "name": "손자",
+    "hanja": "孫子",
+    "book": "손자병법",
+    "typeName": "손자형",
+    "typeTagline": "상황을 먼저 읽는 사람",
+    "vec": { "ren": 0.1, "xue": 0.3, "dao": 0.3, "mou": 1.0, "rou": 0.4 }
+  }
+]

@@ -12,6 +12,8 @@ import { Toast } from "@/components/Toast";
 import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { KakaoShareButton } from "@/components/KakaoShareButton";
 import { useDragScroll } from "@/lib/useDragScroll";
+import { MonkeyCharacter } from "@/components/MonkeyCharacter";
+import { getVersePose } from "@/lib/monkey";
 
 export default function ResultPage() {
   const router = useRouter();
@@ -23,6 +25,7 @@ export default function ResultPage() {
   const [copied, setCopied] = useState(false);
   const [savingImage, setSavingImage] = useState(false);
   const [saveError, setSaveError] = useState(false);
+  const [shareError, setShareError] = useState(false);
   const [moreTalkOpen, setMoreTalkOpen] = useState(false);
   const [moreTalkOptedIn, setMoreTalkOptedIn] = useState(false);
   const trackedRoundId = useRef<string | null>(null);
@@ -88,12 +91,26 @@ export default function ResultPage() {
       return;
     }
 
+    // navigator.share/clipboard는 https(또는 localhost) 같은 보안 컨텍스트에서만
+    // 쓸 수 있다 — 사내망 IP로 http 접속한 경우 등엔 둘 다 조용히 실패하므로
+    // execCommand 기반 폴백으로 최소한 복사는 되게 한다.
     try {
-      await navigator.clipboard.writeText(url);
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = url;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
       setCopied(true);
       track("share_click", { type: result.type, method: "copy" });
     } catch {
-      // 클립보드 접근이 막혀도 앱은 계속 동작해야 한다
+      setShareError(true);
     }
   }
 
@@ -101,10 +118,12 @@ export default function ResultPage() {
     if (savingImage) return;
     setSavingImage(true);
     try {
-      const params = new URLSearchParams({ type: result.type });
-      for (const sage of SAGES) {
-        params.set(`rel_${sage.id}`, result.relations[sage.id]);
-      }
+      const params = new URLSearchParams({
+        type: result.type,
+        intensityLabel: narrative.intensityLabel,
+        axisLine: narrative.axisLine,
+      });
+      if (narrative.closeLine) params.set("closeLine", narrative.closeLine);
       const res = await fetch(`/api/result-card?${params.toString()}`);
       if (!res.ok) throw new Error("failed to generate image");
       const blob = await res.blob();
@@ -169,13 +188,20 @@ export default function ResultPage() {
               ref={matchesRef}
               className="-mx-4 mt-3 flex cursor-grab gap-3 overflow-x-auto px-4 pb-1 select-none active:cursor-grabbing [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
-              {likedVerses.map((verse) => (
+              {likedVerses.map((verse, i) => (
                 <li
                   key={verse.id}
-                  className="min-h-[320px] w-72 shrink-0 rounded-lg border border-border bg-background p-5"
+                  className="relative min-h-[320px] w-72 shrink-0 rounded-lg border border-border bg-background p-5"
                 >
-                  <p className="font-serif text-xl">{verse.original}</p>
-                  <p className="mt-2 font-sans text-sm text-muted">{verse.translation}</p>
+                  <span className="absolute right-4 top-4 font-sans text-xs text-muted">
+                    {i + 1} / {likedVerses.length}
+                  </span>
+                  <MonkeyCharacter pose={getVersePose(verse)} size={56} />
+                  <p className="mt-2 font-serif text-xl leading-snug tracking-wide">
+                    {verse.original}
+                  </p>
+                  <p className="mt-1 font-sans text-xs text-muted">{verse.reading}</p>
+                  <p className="mt-3 font-sans text-sm leading-relaxed">{verse.translation}</p>
                   <p className="mt-2 text-xs text-muted">{verse.source}</p>
                 </li>
               ))}
@@ -184,31 +210,59 @@ export default function ResultPage() {
         </details>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <button
-          type="button"
-          onClick={handleShare}
-          className="w-full rounded-full bg-accent py-4 font-sans text-base font-bold text-accent-foreground"
-        >
-          공유하기
-        </button>
-
-        <div className="flex flex-wrap items-center justify-center gap-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-end justify-center gap-8">
           <button
             type="button"
             onClick={handleRestart}
-            className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground"
+            className="flex flex-col items-center gap-1.5 text-foreground"
           >
-            한 판 더 하기
+            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-border">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M20.49 15a9 9 0 0 1-14.85 3.36L1 14"
+                />
+              </svg>
+            </span>
+            <span className="font-sans text-xs text-muted">다시하기</span>
           </button>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="flex flex-col items-center gap-1.5"
+          >
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg shadow-black/10">
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <path strokeLinecap="round" d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98" />
+              </svg>
+            </span>
+            <span className="font-sans text-xs font-bold text-foreground">공유하기</span>
+          </button>
+
           <button
             type="button"
             onClick={handleSaveImage}
             disabled={savingImage}
-            className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground disabled:opacity-50"
+            className="flex flex-col items-center gap-1.5 text-foreground disabled:opacity-50"
           >
-            {savingImage ? "이미지 만드는 중..." : "이미지 저장"}
+            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-border">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+              </svg>
+            </span>
+            <span className="font-sans text-xs text-muted">
+              {savingImage ? "저장 중" : "이미지 저장"}
+            </span>
           </button>
+        </div>
+
+        <div className="flex justify-center">
           <KakaoShareButton
             title={`나는 ${typeSage.typeName} — 성현 판별`}
             description={typeSage.typeTagline}
@@ -231,6 +285,9 @@ export default function ResultPage() {
         {copied && <Toast text="복사됨" onDone={() => setCopied(false)} />}
         {saveError && (
           <Toast text="이미지 저장에 실패했습니다" onDone={() => setSaveError(false)} />
+        )}
+        {shareError && (
+          <Toast text="공유에 실패했습니다" onDone={() => setShareError(false)} />
         )}
       </AnimatePresence>
 

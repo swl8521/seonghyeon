@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import type { Sage } from "@/lib/types";
 import { SAGE_BORDER_CLASS } from "@/lib/sageColors";
+import { MonkeyCharacter } from "@/components/MonkeyCharacter";
 
 interface JudgmentCardProps {
   sage: Sage;
@@ -21,6 +22,7 @@ export function JudgmentCard({ sage, lineText, onContinue }: JudgmentCardProps) 
       transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
       className={`flex aspect-[3/4] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border-2 ${SAGE_BORDER_CLASS[sage.id]} bg-card p-6 text-center`}
     >
+      <MonkeyCharacter pose={sage.id === "confucius" ? "bow" : sage.id === "laozi" ? "meditate" : "point"} size={104} />
       <p className="font-sans text-sm text-muted">
         {sage.hanja} · {sage.name}
       </p>

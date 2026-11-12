@@ -58,9 +58,14 @@
   --font-serif: var(--font-noto-serif-kr);
 }
 
+html {
+  overscroll-behavior-x: none;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
+  overscroll-behavior-x: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
