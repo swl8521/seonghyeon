@@ -10,9 +10,9 @@
     "check:content": "tsx scripts/check-content.ts"
   },
   "dependencies": {
+    "firebase": "^13.3.0",
     "motion": "^14.12.0",
     "next": "16.4.6",
-    "posthog-js": "^1.447.10",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "zustand": "^5.1.0"
