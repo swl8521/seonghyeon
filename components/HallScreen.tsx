@@ -7,7 +7,7 @@ import { useLocale } from "@/components/LocaleProvider";
 import { useEffect, useRef, useState } from "react";
 import { useShareVerseId } from "@/lib/useShareVerseId";
 import Link from "@/components/LocaleLink";
-import { useLive, type VerseState } from "@/lib/live";
+import { useLive } from "@/lib/live";
 import { Toast } from "@/components/Toast";
 import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
 import { playWoodenClack } from "@/lib/sound";
@@ -21,7 +21,7 @@ import { StageCard } from "@/components/StageCard";
 const BOW_BATCH_MS = 5000;
 const DWELL_TICK_MS = 30_000;
 
-export function HallScreen({ sage: initialSage, initialVerse }: { sage: Sage; initialVerse?: VerseState | null }) {
+export function HallScreen({ sage: initialSage}: { sage: Sage }) {
   const shareVerseId = useShareVerseId();
   const { locale, t } = useLocale();
   const sage = localizedSage(initialSage.id, locale)!;
@@ -30,7 +30,7 @@ export function HallScreen({ sage: initialSage, initialVerse }: { sage: Sage; in
     ? `/z/${sageId}/practice?shareId=${shareVerseId}`
     : `/z/${sageId}/practice`;
 
-  const { status, verse, remainingMs, presence, bows, bow } = useLive(sageId, initialVerse);
+  const { status, verse, remainingMs, presence, bows, bow } = useLive(sageId);
   const soundOn = usePlayStore((s) => s.soundOn);
   const toast = usePlayStore((s) => s.toast);
   const dismissToast = usePlayStore((s) => s.dismissToast);

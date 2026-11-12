@@ -101,6 +101,23 @@ class LiveManager {
       this.join(zone);
     }
     // 아직 연결 안 됐으면 onConnect에서 현재 zone으로 join한다.
+
+    // 소켓 핸드셰이크(+join 왕복)가 끝나기 전에 화면 본문인 구절부터 띄운다.
+    // 같은 오리진이라 preconnect로 TLS가 이미 데워져 있고, GET 한 번이면 되므로
+    // 보통 join ack보다 먼저 도착한다. 소켓이 먼저 답하면 seedVerse가 무시한다.
+    void this.primeVerse(zone);
+  }
+
+  /** 입장 직후 현재 구절을 HTTP로 한 번 당겨온다 (§9의 /now). 실패는 무시한다. */
+  private async primeVerse(zone: Zone) {
+    try {
+      const res = await fetch(`${LIVE_URL}/now?zone=${zone}`, { cache: "no-store" });
+      if (!res.ok) return;
+      const state = (await res.json()) as VerseState;
+      if (this.zone === zone) this.seedVerse(state);
+    } catch {
+      // 소켓이나 폴백 폴링이 이어서 처리한다.
+    }
   }
 
   bow() {
@@ -292,13 +309,8 @@ export interface UseLiveResult {
   bow: () => void;
 }
 
-/**
- * 라우트에 따라 zone을 바꿔가며 방에 들어가는 훅 (§6). zone이 null이면 leave.
- *
- * initialVerse는 SSR이 미리 받아둔 구절이다. 소켓이 응답하기 전까지 이 값을
- * 그대로 쓰므로 서버 HTML과 첫 클라이언트 렌더가 어긋나지 않는다.
- */
-export function useLive(zone: Zone | null, initialVerse?: VerseState | null): UseLiveResult {
+/** 라우트에 따라 zone을 바꿔가며 방에 들어가는 훅 (§6). zone이 null이면 leave. */
+export function useLive(zone: Zone | null): UseLiveResult {
   const [snapshot, setSnapshot] = useState<LiveSnapshot>(liveManager.getSnapshot());
 
   useEffect(() => {
@@ -312,15 +324,7 @@ export function useLive(zone: Zone | null, initialVerse?: VerseState | null): Us
     };
   }, [zone]);
 
-  // 매니저에도 심어둬야 카운트다운 타이머가 초기 구절부터 돌기 시작한다.
-  useEffect(() => {
-    if (initialVerse) liveManager.seedVerse(initialVerse);
-  }, [initialVerse]);
-
   const bow = useCallback(() => liveManager.bow(), []);
 
-  const verse = snapshot.verse ?? initialVerse ?? null;
-  const remainingMs = snapshot.verse ? snapshot.remainingMs : (initialVerse?.remainingMs ?? 0);
-
-  return { ...snapshot, verse, remainingMs, bow };
+  return { ...snapshot, bow };
 }
