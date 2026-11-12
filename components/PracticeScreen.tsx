@@ -167,13 +167,6 @@ export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
           )}
         </AnimatePresence>
 
-        {!pendingNote && !done && verse && (
-          <>
-            <div className="pointer-events-none absolute inset-0 mx-auto w-full max-w-[320px] origin-bottom translate-y-4 scale-[0.94] rounded-2xl border border-border bg-card opacity-60 shadow-md shadow-black/5" />
-            <div className="pointer-events-none absolute inset-0 mx-auto w-full max-w-[320px] origin-bottom translate-y-2 scale-[0.97] rounded-2xl border border-border bg-card opacity-85 shadow-md shadow-black/5" />
-          </>
-        )}
-
         {pendingNote ? (
           <JudgmentCard
             sage={sage}
@@ -191,6 +184,9 @@ export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
             onContinue={dismissNote}
           />
         ) : done || !verse ? null : (
+          <div className="relative my-5 w-full max-w-[320px] shrink-0">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 origin-bottom translate-y-4 scale-[0.94] rounded-2xl border border-border bg-card shadow-md shadow-black/5" />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 origin-bottom translate-y-2 scale-[0.97] rounded-2xl border border-border bg-card shadow-md shadow-black/5" />
           <SwipeCard
             key={verse.id}
             ref={cardRef}
@@ -203,6 +199,7 @@ export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
               swipePractice(dir, method, Date.now() - cardShownAtRef.current)
             }
           />
+          </div>
         )}
       </div>
 
