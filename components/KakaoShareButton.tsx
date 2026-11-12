@@ -4,6 +4,7 @@ import { useLocale } from "@/components/LocaleProvider";
 
 import { useState } from "react";
 import Script from "next/script";
+import Image from "next/image";
 import { KAKAO_SDK_SRC, ensureKakaoInit, shareKakaoFeed } from "@/lib/kakao";
 
 interface KakaoShareButtonProps {
@@ -67,8 +68,9 @@ export function KakaoShareButton({
         type="button"
         onClick={handleClick}
         disabled={!ready}
-        className="rounded-full bg-[#FEE500] px-5 py-2 font-sans text-sm text-[#191919] disabled:opacity-50"
+        className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FEE500] px-5 py-2 font-sans text-sm text-[#191919] disabled:opacity-50"
       >
+        <Image src="/icons/kakaotalk-share.png" alt="" width={34} height={35} unoptimized className="h-auto w-6 shrink-0 object-contain" />
         {t("카카오톡 공유")}
       </button>
       {failed && <p role="status" className="text-xs text-muted">{t("카카오톡 공유를 열지 못했어요. 보내기 버튼을 이용해 주세요.")}</p>}
