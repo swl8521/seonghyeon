@@ -72,9 +72,10 @@ for (const id of SAGE_IDS) {
 
 // --- verses.json ---
 const versesTyped = verses as Verse[];
-if (versesTyped.length !== 60) {
-  fail(`verses.json: 총 60개여야 하는데 ${versesTyped.length}개임`);
-}
+// 총 개수와 성현별 개수는 고정하지 않는다 — 구절은 계속 늘어난다.
+// 하한만 지킨다: 실시간 서버의 buildPools가 구역당 3개 미만이면 기동에 실패한다
+// (server/src/schedule.js). 광장 풀은 전체 구절이므로 성현별 하한만 보면 된다.
+const MIN_VERSES_PER_SAGE = 3;
 
 const verseIds = new Set<string>();
 const countBySage: Record<string, number> = {};
@@ -98,8 +99,12 @@ for (const v of versesTyped) {
 }
 
 for (const id of SAGE_IDS) {
-  if (countBySage[id] !== 20) {
-    fail(`verses.json: "${id}" 구절이 20개여야 하는데 ${countBySage[id] ?? 0}개임`);
+  const count = countBySage[id] ?? 0;
+  if (count < MIN_VERSES_PER_SAGE) {
+    fail(
+      `verses.json: "${id}" 구절이 최소 ${MIN_VERSES_PER_SAGE}개는 있어야 하는데 ${count}개임 ` +
+        `(실시간 서버가 구역당 3개 미만이면 기동하지 못함)`
+    );
   }
 }
 
