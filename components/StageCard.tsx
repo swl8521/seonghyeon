@@ -28,6 +28,7 @@ interface StageCardProps {
   devotion: number;
   readCount: number;
   flippedCount: number;
+  fullWidth?: boolean;
   className?: string;
 }
 
@@ -37,6 +38,7 @@ export function StageCard({
   devotion,
   readCount,
   flippedCount,
+  fullWidth = false,
   className = "",
 }: StageCardProps) {
   const req = nextRequirement(stage, devotion, readCount, flippedCount);
@@ -44,7 +46,7 @@ export function StageCard({
   const gaugeFraction = target ? Math.min(1, devotion / target) : 1;
 
   return (
-    <div className={`relative w-full max-w-[320px] rounded-xl border border-border bg-card p-4 ${className}`}>
+    <div className={`relative w-full ${fullWidth ? "" : "max-w-[320px]"} rounded-xl border border-border bg-card p-4 ${className}`}>
       <div className="flex items-center justify-between">
         <span className="font-sans text-sm text-foreground">나의 성장</span>
         <StageBadge stage={stage} />

@@ -202,6 +202,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
       </section>
 
       <StageCard
+        fullWidth
         sage={sageId}
         stage={stage}
         devotion={devotion}
