@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "./Icon";
 
 import { localizedSage, localizedVerse } from "@/lib/localized-content";
 import { translate, type Locale } from "@/lib/locale";
@@ -89,8 +90,8 @@ export function InventoryScreen() {
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-8">
       <div className="flex flex-col gap-1">
-        <Link href="/" className="font-sans text-xs text-muted">
-          {t("← 광장")}
+        <Link href="/" className="inline-flex items-center gap-1 font-sans text-xs text-muted">
+          <Icon name="back" width={16} height={16} />{t("광장")}
         </Link>
         <h1 className="font-serif text-2xl font-bold">{t("모아둔 구절")}</h1>
         <p className="font-sans text-sm text-muted">{t("마음에 든 구절을 모아 보세요")}</p>

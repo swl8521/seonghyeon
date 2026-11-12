@@ -11,6 +11,7 @@ import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import type { Sage } from "@/lib/types";
 import { StageCard } from "@/components/StageCard";
+import { Icon } from "./Icon";
 import { KakaoShareButton } from "@/components/KakaoShareButton";
 import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
@@ -257,7 +258,7 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
                       aria-label={t("이 구절을 대표로")}
                       className={`shrink-0 text-lg ${isPicked ? "text-accent" : "text-muted"}`}
                     >
-                      {isPicked ? "★" : "☆"}
+                      <Icon name="star" filled={isPicked} />
                     </button>
                   )}
                 </div>

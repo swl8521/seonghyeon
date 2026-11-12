@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "./Icon";
 
 import { localizedSage } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
@@ -114,8 +115,8 @@ export function HallScreen({ sage: initialSage, shareVerseId }: { sage: Sage; sh
       <TopBar
         left={
           <>
-            <Link href="/" className="text-muted">
-              {t("← 광장")}
+            <Link href="/" className="inline-flex items-center gap-1 text-muted">
+              <Icon name="back" width={16} height={16} />{t("광장")}
             </Link>
             <span className="font-semibold">{sage.hall}</span>
             {status !== "fallback" && status !== "closed" && (

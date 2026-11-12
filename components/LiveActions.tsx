@@ -3,6 +3,7 @@
 import { useLocale } from "@/components/LocaleProvider";
 
 import { useState } from "react";
+import { Icon } from "./Icon";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 interface LiveActionsProps {
@@ -39,7 +40,7 @@ export function LiveActions({
         disabled={disabled}
         className="relative flex items-center gap-2 rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground disabled:opacity-50"
       >
-        <span aria-hidden>🙏</span>
+        <Icon name="bow" />
         <span>{t("함께 합장")} {bows}</span>
         <AnimatePresence>
           {sparks.map((id) => (

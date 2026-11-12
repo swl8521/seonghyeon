@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "./Icon";
 
 import { localizedSage, localizedVerse, localizedLine } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
@@ -129,8 +130,8 @@ export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
       <TopBar
         left={
           <>
-            <Link href={`/z/${sageId}`} className="text-muted">
-              ← {sage.hall}
+            <Link href={`/z/${sageId}`} className="inline-flex items-center gap-1 text-muted">
+              <Icon name="back" width={16} height={16} />{sage.hall}
             </Link>
             <span className="text-muted">{t("지금 {count}명", { count: presence?.[sageId] ?? 0 })}</span>
           </>

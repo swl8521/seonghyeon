@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "./Icon";
 
 import { createContext, Suspense, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -43,5 +44,5 @@ export function useLocale() {
 }
 export function LanguagePicker() {
   const { locale, setLocale } = useLocale();
-  return <div className="flex justify-end px-6 pt-3"><label className="flex items-center gap-2 text-xs text-muted"><span aria-hidden>🌐</span><select aria-label="Language / 언어" value={locale} onChange={(event) => setLocale(event.target.value as Locale)} className="max-w-full rounded-lg border border-border bg-card px-2 py-1.5 text-foreground"><option value="ko">한국어</option><option value="en">English</option></select></label></div>;
+  return <div className="flex justify-end px-6 pt-3"><label className="flex items-center gap-2 text-xs text-muted"><Icon name="globe" width={16} height={16} /><select aria-label="Language / 언어" value={locale} onChange={(event) => setLocale(event.target.value as Locale)} className="max-w-full rounded-lg border border-border bg-card px-2 py-1.5 text-foreground"><option value="ko">한국어</option><option value="en">English</option></select></label></div>;
 }
