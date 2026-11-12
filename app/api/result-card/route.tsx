@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   const title = "성현 판별";
   const subsetText = Array.from(
     new Set(
-      `${title}${typeSage.hanja}${intensityLabel}${typeSage.typeName}${typeSage.typeTagline}${axisLine}${closeLine ?? ""}`.split(
+      `${title}${typeSage.hanja}${intensityLabel}${typeSage.name}${typeSage.intro}${axisLine}${closeLine ?? ""}`.split(
         ""
       )
     )
@@ -86,10 +86,10 @@ export async function GET(request: NextRequest) {
             }}
           >
             {intensityLabel}
-            {typeSage.typeName}
+            {typeSage.name} 문하
           </p>
           <p style={{ fontSize: 40, color: "#6b6156", margin: 0, marginTop: 24 }}>
-            {typeSage.typeTagline}
+            {typeSage.intro}
           </p>
         </div>
 

@@ -76,8 +76,8 @@ export default function ResultPage() {
   async function handleShare() {
     const url = `${window.location.origin}/r/${result.type}?ref=share`;
     const shareData = {
-      title: `나는 ${typeSage.typeName} — 성현 판별`,
-      text: typeSage.typeTagline,
+      title: `${typeSage.name} 문하 — 성현 문하`,
+      text: typeSage.intro,
       url,
     };
 
@@ -163,9 +163,9 @@ export default function ResultPage() {
           <p className="font-sans text-sm text-muted">이번 판의 대표 유형</p>
           <h1 className="font-serif text-4xl font-bold">
             {narrative.intensityLabel}
-            {typeSage.typeName}
+            {typeSage.name} 문하
           </h1>
-          <p className="font-sans text-base text-muted">{typeSage.typeTagline}</p>
+          <p className="font-sans text-base text-muted">{typeSage.intro}</p>
           <p className="font-sans text-sm text-muted">{narrative.axisLine}</p>
           {narrative.closeLine && (
             <p className="font-sans text-sm text-muted">{narrative.closeLine}</p>
@@ -264,8 +264,8 @@ export default function ResultPage() {
 
         <div className="flex justify-center">
           <KakaoShareButton
-            title={`나는 ${typeSage.typeName} — 성현 판별`}
-            description={typeSage.typeTagline}
+            title={`${typeSage.name} 문하 — 성현 문하`}
+            description={typeSage.intro}
             imagePath={`/r/${result.type}/opengraph-image`}
             sharePath={`/r/${result.type}?ref=kakao`}
             onShared={() => track("share_click", { type: result.type, method: "kakao" })}

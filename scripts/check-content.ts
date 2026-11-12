@@ -5,7 +5,26 @@ import type { Axis, SageId, SageLine, Sage, Verse } from "../lib/types";
 
 const AXES: Axis[] = ["ren", "xue", "dao", "mou", "rou"];
 const SAGE_IDS: SageId[] = ["confucius", "laozi", "sunzi"];
-const KINDS: SageLine["kind"][] = ["accept", "reject", "dislike"];
+const KINDS: SageLine["kind"][] = ["nod", "nudge", "skip", "admit", "promote", "stay"];
+const KIND_COUNTS: Record<SageLine["kind"], number> = {
+  nod: 5,
+  nudge: 5,
+  skip: 5,
+  admit: 3,
+  promote: 3,
+  stay: 3,
+};
+const FORBIDDEN_WORDS = [
+  "매칭",
+  "인연",
+  "짝",
+  "사랑",
+  "연애",
+  "거절",
+  "수락",
+  "판별",
+  "유형",
+];
 
 const errors: string[] = [];
 
@@ -32,14 +51,17 @@ if (sagesTyped.length !== SAGE_IDS.length) {
   fail(`sages.json: 성현 수가 ${SAGE_IDS.length}이어야 하는데 ${sagesTyped.length}개임`);
 }
 for (const id of SAGE_IDS) {
-  const found = sagesTyped.find((s) => s.id === id);
+  const found = sagesTyped.find((s) => s.id === id) as (Sage & Record<string, unknown>) | undefined;
   if (!found) {
     fail(`sages.json: "${id}" 성현이 없음`);
     continue;
   }
   checkVec(`sages.json[${id}].vec`, found.vec);
-  for (const field of ["name", "hanja", "book", "typeName", "typeTagline"] as const) {
+  for (const field of ["name", "hanja", "book", "intro"] as const) {
     if (!found[field]) fail(`sages.json[${id}]: 필드 "${field}"가 비어있음`);
+  }
+  for (const banned of ["typeName", "typeTagline"]) {
+    if (banned in found) fail(`sages.json[${id}]: 삭제했어야 할 필드 "${banned}"가 남아있음`);
   }
 }
 
@@ -78,8 +100,9 @@ for (const id of SAGE_IDS) {
 
 // --- lines.json ---
 const linesTyped = lines as SageLine[];
-if (linesTyped.length !== 45) {
-  fail(`lines.json: 총 45개여야 하는데 ${linesTyped.length}개임`);
+const expectedTotal = SAGE_IDS.length * Object.values(KIND_COUNTS).reduce((a, b) => a + b, 0);
+if (linesTyped.length !== expectedTotal) {
+  fail(`lines.json: 총 ${expectedTotal}개여야 하는데 ${linesTyped.length}개임`);
 }
 
 const countByKey: Record<string, number> = {};
@@ -88,6 +111,15 @@ for (const [i, l] of linesTyped.entries()) {
   if (!SAGE_IDS.includes(l.sage)) fail(`lines.json[${i}]: 알 수 없는 sage "${l.sage}"`);
   if (!KINDS.includes(l.kind)) fail(`lines.json[${i}]: 알 수 없는 kind "${l.kind}"`);
   if (!l.text) fail(`lines.json[${i}]: text가 비어있음`);
+  if (l.reviewed !== false) {
+    fail(`lines.json[${i}]: reviewed는 생성 시 false여야 함 (현재 ${l.reviewed})`);
+  }
+
+  for (const word of FORBIDDEN_WORDS) {
+    if (l.text.includes(word)) {
+      fail(`lines.json[${i}]: 금지 어휘 "${word}"가 text에 있음 ("${l.text}")`);
+    }
+  }
 
   const key = `${l.sage}:${l.kind}`;
   countByKey[key] = (countByKey[key] ?? 0) + 1;
@@ -96,8 +128,9 @@ for (const [i, l] of linesTyped.entries()) {
 for (const id of SAGE_IDS) {
   for (const kind of KINDS) {
     const key = `${id}:${kind}`;
-    if (countByKey[key] !== 5) {
-      fail(`lines.json: "${id}"의 "${kind}" 대사가 5개여야 하는데 ${countByKey[key] ?? 0}개임`);
+    const expected = KIND_COUNTS[kind];
+    if (countByKey[key] !== expected) {
+      fail(`lines.json: "${id}"의 "${kind}" 대사가 ${expected}개여야 하는데 ${countByKey[key] ?? 0}개임`);
     }
   }
 }

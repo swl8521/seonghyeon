@@ -8,8 +8,7 @@ export interface Sage {
   name: string; // "공자"
   hanja: string; // "孔子"
   book: string; // "논어"
-  typeName: string; // "공자형" 결과 유형명
-  typeTagline: string; // 결과 한 줄 설명
+  intro: string; // 성현 소개 2줄 (책 이름, 핵심 사상)
   vec: Vec;
 }
 
@@ -27,7 +26,8 @@ export interface Verse {
 
 export interface SageLine {
   sage: SageId;
-  kind: "accept" | "reject" | "dislike";
+  kind: "nod" | "nudge" | "skip" | "admit" | "promote" | "stay";
   original?: string; // 고전에서 따온 구절이면 원문
   text: string; // 화면에 보일 한국어 대사
+  reviewed: boolean; // 사람 검수 여부, 생성 시 false
 }

@@ -15,7 +15,7 @@ export default async function Image({ params }: { params: Promise<{ sage: string
   const { sage: sageParam } = await params;
   const sage = getSage(sageParam as SageId) ?? SAGES[0];
 
-  const subsetText = Array.from(new Set(`${sage.hanja}${sage.typeName}`.split(""))).join("");
+  const subsetText = Array.from(new Set(`${sage.hanja}${sage.name}문하`.split(""))).join("");
   const fontData = await loadGoogleFont("Noto Serif KR", subsetText);
 
   return new ImageResponse(
@@ -56,7 +56,7 @@ export default async function Image({ params }: { params: Promise<{ sage: string
             marginTop: 32,
           }}
         >
-          {sage.typeName}
+          {sage.name} 문하
         </p>
       </div>
     ),

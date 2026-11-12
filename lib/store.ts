@@ -175,7 +175,7 @@ export const usePlayStore = create<PlayStore>()(
           );
           nextRound = stateWithEvent;
 
-          const line = pickRandomLine(event.sage, event.result);
+          const line = pickRandomLine(event.sage, event.result === "accept" ? "nod" : "nudge");
           nextPendingJudgment = { ...event, lineText: line?.text ?? "" };
           track("judgment_shown", {
             roundId: round.roundId,
@@ -188,7 +188,7 @@ export const usePlayStore = create<PlayStore>()(
         let nextToast = get().toast;
         let nextUsedDislikeLines = usedDislikeLines;
         if (dir === "dislike" && Math.random() < DISLIKE_REACTION_CHANCE) {
-          const line = pickUnusedLine(verse.sage, "dislike", nextUsedDislikeLines);
+          const line = pickUnusedLine(verse.sage, "skip", nextUsedDislikeLines);
           if (line) {
             nextToast = { id: Date.now(), text: line.text };
             nextUsedDislikeLines = [...nextUsedDislikeLines, line.text];
