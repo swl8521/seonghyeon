@@ -22,7 +22,7 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
     ? `/z/${sageId}/practice?shareId=${shareVerseId}`
     : `/z/${sageId}/practice`;
 
-  const { status, verse, presence, bows, bow } = useLive(sageId);
+  const { status, verse, remainingMs, presence, bows, bow } = useLive(sageId);
   const soundOn = usePlayStore((s) => s.soundOn);
   const toast = usePlayStore((s) => s.toast);
   const dismissToast = usePlayStore((s) => s.dismissToast);
@@ -147,6 +147,7 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
           <>
             <LiveVerseCard
               verseState={verse}
+              remainingMs={remainingMs}
               flipped={flipped}
               onFlip={() => {
                 const next = !flipped;

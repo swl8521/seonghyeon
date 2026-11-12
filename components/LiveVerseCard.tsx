@@ -4,14 +4,17 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { getSage, getVerse } from "@/lib/content";
 import type { VerseState } from "@/lib/live";
 import { CountdownRing } from "@/components/CountdownRing";
+import { MonkeyCharacter } from "@/components/MonkeyCharacter";
+import { getVersePose } from "@/lib/monkey";
 
 interface LiveVerseCardProps {
   verseState: VerseState;
+  remainingMs: number;
   flipped: boolean;
   onFlip: () => void;
 }
 
-export function LiveVerseCard({ verseState, flipped, onFlip }: LiveVerseCardProps) {
+export function LiveVerseCard({ verseState, remainingMs, flipped, onFlip }: LiveVerseCardProps) {
   const shouldReduceMotion = useReducedMotion();
   const verse = getVerse(verseState.verseId);
   const sage = verse ? getSage(verse.sage) : undefined;
@@ -45,6 +48,7 @@ export function LiveVerseCard({ verseState, flipped, onFlip }: LiveVerseCardProp
                   {sage.hanja} · {sage.name}
                 </p>
                 <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+                  <MonkeyCharacter pose={getVersePose(verse)} size={72} />
                   <p className="font-serif text-3xl leading-snug tracking-wide">{verse.original}</p>
                   <p className="font-sans text-sm text-muted">{verse.reading}</p>
                   <p className="font-sans text-lg leading-relaxed">{verse.translation}</p>
@@ -53,6 +57,7 @@ export function LiveVerseCard({ verseState, flipped, onFlip }: LiveVerseCardProp
               </div>
 
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-card p-6 text-center shadow-lg shadow-black/10 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                <MonkeyCharacter pose="think" size={96} />
                 <p className="font-sans text-sm text-muted">
                   {sage.hanja} · {sage.name}
                 </p>
@@ -63,7 +68,7 @@ export function LiveVerseCard({ verseState, flipped, onFlip }: LiveVerseCardProp
         </AnimatePresence>
       </div>
 
-      <CountdownRing remainingMs={verseState.remainingMs} periodMs={verseState.periodMs} />
+      <CountdownRing remainingMs={remainingMs} periodMs={verseState.periodMs} />
     </div>
   );
 }

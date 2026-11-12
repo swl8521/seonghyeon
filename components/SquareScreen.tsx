@@ -20,7 +20,7 @@ import { SAGE_BORDER_CLASS } from "@/lib/sageColors";
 const BOW_BATCH_MS = 5000;
 
 export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
-  const { status, verse, presence, bows, bow } = useLive("hall");
+  const { status, verse, remainingMs, presence, bows, bow } = useLive("hall");
   const soundOn = usePlayStore((s) => s.soundOn);
   const toast = usePlayStore((s) => s.toast);
   const dismissToast = usePlayStore((s) => s.dismissToast);
@@ -122,6 +122,7 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
           <>
             <LiveVerseCard
               verseState={verse}
+              remainingMs={remainingMs}
               flipped={flipped}
               onFlip={() => {
                 const next = !flipped;
