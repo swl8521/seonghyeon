@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import { PageViewTracker } from "@/components/PageViewTracker";
+import { LocaleProvider, LanguagePicker } from "@/components/LocaleProvider";
 import "./globals.css";
 
 // 한글 폰트는 굵기마다 전체 유니코드 서브셋 @font-face 선언이 추가되어 렌더링 차단 CSS가
@@ -37,10 +38,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${notoSansKR.variable} ${notoSerifKR.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col overflow-x-hidden font-sans">
+        <LocaleProvider>
         <PageViewTracker />
         <div className="flex flex-1 flex-col mx-auto w-full max-w-[480px]">
+          <LanguagePicker />
           {children}
         </div>
+        </LocaleProvider>
       </body>
     </html>
   );
