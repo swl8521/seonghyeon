@@ -154,8 +154,9 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
         )}
 
         {pickedVerse && (
-          <div className="mt-3 flex w-full flex-col items-center gap-2">
+          <div className={`mt-3 grid w-full items-stretch gap-2 ${process.env.NEXT_PUBLIC_KAKAO_JS_KEY ? "grid-cols-2" : "grid-cols-1"}`}>
             <KakaoShareButton
+              fullWidth
               title={t("{name}와 함께 읽은 구절", { name: sage.name })}
               description={pickedVerse.translation}
               imagePath={`/s/${sageId}/${pickedVerse.id}/opengraph-image`}
@@ -165,7 +166,7 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
             <button
               type="button"
               onClick={handleShare}
-              className="w-full rounded-full bg-accent py-3 font-sans text-sm font-bold text-accent-foreground"
+              className="row-start-1 min-h-12 w-full min-w-0 rounded-full bg-accent px-2 py-3 font-sans text-sm font-bold text-accent-foreground"
             >
               {t("보내기")}
             </button>
