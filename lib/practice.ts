@@ -207,6 +207,14 @@ export function advanceStage(current: Stage, computed: Stage): Stage {
   return stageRank(computed) > stageRank(current) ? computed : current;
 }
 
+/** 다음 단계까지 필요한 정진 점수 (게이지용). 이미 최고 단계면 null. */
+export function stageDevotionTarget(stage: Stage): number | null {
+  if (stage === "outside") return STAGE_THRESHOLDS.entered.devotion;
+  if (stage === "entered") return STAGE_THRESHOLDS.disciple.devotion;
+  if (stage === "disciple") return STAGE_THRESHOLDS.senior.devotion;
+  return null;
+}
+
 export interface NextRequirement {
   kind: "devotion" | "read" | "flipped";
   remaining: number;

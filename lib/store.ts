@@ -101,11 +101,11 @@ function zeroDwell(): Record<SageId, { day: string; points: number; accMs: numbe
   return out;
 }
 
-function readCountFor(sage: SageId, readVerseIds: string[]): number {
+export function readCountFor(sage: SageId, readVerseIds: string[]): number {
   return readVerseIds.filter((id) => getVerse(id)?.sage === sage).length;
 }
 
-function flippedCountFor(sage: SageId, flippedVerseIds: string[]): number {
+export function flippedCountFor(sage: SageId, flippedVerseIds: string[]): number {
   return flippedVerseIds.filter((id) => getVerse(id)?.sage === sage).length;
 }
 
@@ -135,6 +135,7 @@ interface PlayStore {
   acceptRecommendation: () => void;
   addToInventory: (verseId: string, source: InventoryItem["source"], zone: Zone) => void;
   removeFromInventory: (verseId: string) => void;
+  flipLiveVerse: (verseId: string, zone: Zone) => void;
   tickDwellCredit: (sage: SageId, deltaMs: number) => void;
   toggleSound: () => void;
   dismissIntro: () => void;
@@ -307,6 +308,21 @@ export const usePlayStore = create<PlayStore>()(
           inventory: state.inventory.filter((i) => i.verseId !== verseId),
         }));
         track("inventory_remove", { verseId });
+      },
+
+      flipLiveVerse: (verseId, zone) => {
+        const { flippedVerseIds, readVerseIds, devotion } = get();
+        if (flippedVerseIds.includes(verseId)) return; // 구절당 1회
+        const verse = getVerse(verseId);
+        if (!verse) return;
+
+        set({
+          readVerseIds: readVerseIds.includes(verseId) ? readVerseIds : [...readVerseIds, verseId],
+          flippedVerseIds: [...flippedVerseIds, verseId],
+          devotion: { ...devotion, [verse.sage]: (devotion[verse.sage] ?? 0) + DEVOTION.liveFlip },
+        });
+        recalcStage(get, set, verse.sage);
+        track("live_flip", { zone, verseId });
       },
 
       tickDwellCredit: (sage, deltaMs) => {
