@@ -1,4 +1,4 @@
-// /s, /v의 공유 OG 이미지(1200x630)와 이미지 저장(1080x1920)이 공유하는 카드 레이아웃.
+// /s, /v의 공유 미리보기 이미지(1200x630) 카드 레이아웃.
 // next/og(ImageResponse)는 일반 CSS 서브셋만 지원하므로 inline style만 쓴다.
 
 const NIGHT_BG = "#10141f";
