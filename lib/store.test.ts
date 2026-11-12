@@ -2,10 +2,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("./analytics", () => ({ track: vi.fn() }));
 import { usePlayStore } from "./store";
 import { track } from "./analytics";
-import { getVerse, VERSES } from "./content";
-import { localizedVerse } from "./localized-content";
+import { getVerse, LINES, SAGES, VERSES } from "./content";
+import { localizedLine, localizedSage, localizedVerse } from "./localized-content";
+import { installContent } from "./client-content";
 
 beforeEach(() => {
+  installContent({
+    sages: SAGES.map((sage) => ({ ko: sage, en: localizedSage(sage.id, "en")! })),
+    verses: VERSES.map((verse) => ({ ko: verse, en: localizedVerse(verse.id, "en")! })),
+    lines: LINES.map((line) => ({ ko: line, en: { ...line, text: localizedLine(line.id, "en") } })),
+  });
   usePlayStore.setState(usePlayStore.getInitialState(), true);
   vi.clearAllMocks();
 });

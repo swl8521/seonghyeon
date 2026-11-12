@@ -1,7 +1,7 @@
 "use client";
 import { Icon } from "./Icon";
 
-import { localizedSage, localizedVerse } from "@/lib/localized-content";
+import { clientSage, clientVerse, loadContent } from "@/lib/client-content";
 import { translate, type Locale } from "@/lib/locale";
 import { useLocale } from "@/components/LocaleProvider";
 
@@ -10,7 +10,7 @@ import Link from "@/components/LocaleLink";
 import { AnimatePresence } from "motion/react";
 import { usePlayStore } from "@/lib/store";
 import { track } from "@/lib/analytics";
-import type { SageId } from "@/lib/types";
+import type { SageId, Verse } from "@/lib/types";
 import { Toast } from "@/components/Toast";
 import { KakaoShareButton } from "@/components/KakaoShareButton";
 
@@ -23,7 +23,7 @@ const FILTERS: { id: SageId | "all"; label: string }[] = [
 
 function zoneLabel(zone: string, source: "live" | "practice", locale: Locale): string {
   if (zone === "hall") return translate(locale, "광장");
-  const hall = localizedSage(zone as SageId, locale)?.hall ?? zone;
+  const hall = clientSage(zone as SageId, locale)?.hall ?? zone;
   return source === "practice" ? `${hall} · ${translate(locale, "읽기")}` : hall;
 }
 
@@ -38,6 +38,17 @@ export function InventoryScreen() {
   const removeFromInventory = usePlayStore((s) => s.removeFromInventory);
   const [filter, setFilter] = useState<SageId | "all">("all");
   const [copied, setCopied] = useState(false);
+  const [, setContentRevision] = useState(0);
+
+  const inventoryKey = inventory.map((item) => item.verseId).sort().join(",");
+  useEffect(() => {
+    if (!inventoryKey) return;
+    let active = true;
+    loadContent(inventoryKey.split(","))
+      .then(() => { if (active) setContentRevision((value) => value + 1); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [inventoryKey]);
 
   useEffect(() => {
     track("saved_view", { count: inventory.length });
@@ -45,8 +56,8 @@ export function InventoryScreen() {
   }, []);
 
   const items = inventory
-    .map((item) => ({ item, verse: localizedVerse(item.verseId, locale) }))
-    .filter((row): row is { item: (typeof inventory)[number]; verse: NonNullable<ReturnType<typeof localizedVerse>> } =>
+    .map((item) => ({ item, verse: clientVerse(item.verseId, locale) }))
+    .filter((row): row is { item: (typeof inventory)[number]; verse: Verse } =>
       Boolean(row.verse)
     )
     .filter((row) => filter === "all" || row.verse.sage === filter)

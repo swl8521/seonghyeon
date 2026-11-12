@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { usePlayStore } from "@/lib/store";
-import { localizedVerse } from "@/lib/localized-content";
+import { clientVerse } from "@/lib/client-content";
 import { matchesCopy, normalizeCopy } from "@/lib/promotion";
 import { stageLabel } from "@/lib/locale";
 import { useLocale } from "./LocaleProvider";
@@ -21,7 +21,7 @@ export function PromotionPractice({ sage }: { sage: SageId }) {
   const [isComposing, setIsComposing] = useState(false);
   if (!challenge) return celebration ? <div className="mt-4 flex flex-col items-center gap-2" role="status"><MonkeyCharacter pose="cheer" size={88} /><p className="text-sm">{t("{stage} 단계로 자랐어요!", { stage: stageLabel(celebration, locale) })}</p></div> : null;
   const challengeLocale = challenge.locale ?? "ko";
-  const verse = localizedVerse(challenge.verseIds[challenge.index], challengeLocale);
+  const verse = clientVerse(challenge.verseIds[challenge.index], challengeLocale);
   if (!verse) return null;
   const correct = matchesCopy(challenge.draft, verse.translation, challengeLocale);
   const typed = Array.from(normalizeCopy(challenge.draft, challengeLocale));

@@ -19,6 +19,8 @@ async function ShareLoader({ params, searchParams }: Props) {
   const values = await params;
   const { lang } = await searchParams;
   const locale = isLocale(lang) ? lang : "ko";
-  if (!resolveShare(values.verseId, locale)) notFound();
-  return <ShareScreen verseId={values.verseId} initialLocale={locale} />;
+  const ko = resolveShare(values.verseId, "ko");
+  const en = resolveShare(values.verseId, "en");
+  if (!ko || !en) notFound();
+  return <ShareScreen data={{ ko, en }} initialLocale={locale} />;
 }

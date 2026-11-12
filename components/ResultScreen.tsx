@@ -1,12 +1,10 @@
 "use client";
 
-import { localizedSage, localizedVerse, localizedLine } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "motion/react";
-import { LINES } from "@/lib/content";
 import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import type { Sage } from "@/lib/types";
@@ -17,10 +15,12 @@ import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
 import { useLive } from "@/lib/live";
 import { activeLocale, localeHref, stageLabel } from "@/lib/locale";
+import { clientLine, clientSage, clientVerse, installContent, type ContentPayload } from "@/lib/client-content";
 
-export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
+export function ResultScreen({ sage: initialSage, content }: { sage: Sage; content: ContentPayload }) {
+  installContent(content);
   const { locale, t, href, ready } = useLocale();
-  const sage = localizedSage(initialSage.id, locale)!;
+  const sage = clientSage(initialSage.id, locale)!;
   const sageId = sage.id;
   useLive(sageId);
   const router = useRouter();
@@ -74,8 +74,8 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
 
   // outcome.lineId는 수행이 끝난 시점에 한 번만 뽑혀 고정된다 — 매 렌더마다
   // 다시 뽑으면 새로고침하거나 다른 상태가 바뀔 때마다 대사가 바뀌어버린다.
-  const line = outcome.lineId ? LINES.find((l) => l.id === outcome.lineId) : undefined;
-  const pickedVerse = outcome.pickedVerseId ? localizedVerse(outcome.pickedVerseId, locale) : null;
+  const line = outcome.lineId ? clientLine(outcome.lineId, locale) : undefined;
+  const pickedVerse = outcome.pickedVerseId ? clientVerse(outcome.pickedVerseId, locale) : null;
 
   function handleShare() {
     if (!pickedVerse) return;
@@ -129,7 +129,7 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
         {line && (
           <div className="flex flex-col gap-1">
             {line.original && <p className="font-serif text-sm text-muted">{line.original}</p>}
-            <p className="font-serif text-base leading-relaxed">{localizedLine(line.id, locale)}</p>
+            <p className="font-serif text-base leading-relaxed">{line.text}</p>
           </div>
         )}
 
@@ -190,7 +190,7 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
         </summary>
         <ul className="mt-3 flex flex-col gap-2">
           {practice.deck.map((verseId) => {
-            const v = localizedVerse(verseId, locale);
+            const v = clientVerse(verseId, locale);
             if (!v) return null;
             const liked = practice.likedIds.includes(verseId);
             const isPicked = outcome.pickedVerseId === verseId;

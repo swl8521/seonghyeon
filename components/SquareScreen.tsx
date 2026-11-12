@@ -1,12 +1,11 @@
 "use client";
 
-import { localizedSage } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
 
 import { useEffect, useRef, useState } from "react";
 import { useShareVerseId } from "@/lib/useShareVerseId";
 import Link from "@/components/LocaleLink";
-import { SAGES } from "@/lib/content";
+import { clientSage, installContent, type ContentPayload } from "@/lib/client-content";
 import { useLive } from "@/lib/live";
 import { Toast } from "@/components/Toast";
 import { usePlayStore } from "@/lib/store";
@@ -25,7 +24,10 @@ import type { VerseState } from "@/lib/live-state";
 
 const BOW_BATCH_MS = 5000;
 
-export function SquareScreen({ initialVerse }: { initialVerse: VerseState | null }) {
+const SAGE_IDS = ["confucius", "laozi", "sunzi"] as const;
+
+export function SquareScreen({ initialVerse, content }: { initialVerse: VerseState | null; content: ContentPayload }) {
+  installContent(content);
   const shareVerseId = useShareVerseId();
   const { locale, t } = useLocale();
   const { status, verse, remainingMs, presence, bows, bow } = useLive("hall");
@@ -153,7 +155,7 @@ export function SquareScreen({ initialVerse }: { initialVerse: VerseState | null
 
         </div>
         <div className="grid w-full grid-cols-3 gap-3">
-          {SAGES.map((originalSage) => localizedSage(originalSage.id, locale)!).map((sage) => (
+          {SAGE_IDS.map((id) => clientSage(id, locale)!).map((sage) => (
             <Link
               key={sage.id}
               href={shareVerseId ? `/z/${sage.id}?from=share&id=${shareVerseId}` : `/z/${sage.id}`}

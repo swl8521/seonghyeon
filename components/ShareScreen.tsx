@@ -1,16 +1,19 @@
 "use client";
 import { useLocale } from "./LocaleProvider";
-import { resolveShare } from "@/lib/share";
 import { localeHref, translate, type Locale } from "@/lib/locale";
 import Link from "./LocaleLink";
 import { ShareLandingTracker } from "./ShareLandingTracker";
+import type { Sage, Verse } from "@/lib/types";
 
-export function ShareScreen({ verseId, sageId, initialLocale }: { verseId: string; sageId?: string; initialLocale: Locale }) {
+export interface ShareScreenData {
+  ko: { verse: Verse; sage: Sage };
+  en: { verse: Verse; sage: Sage };
+}
+
+export function ShareScreen({ data, sageId, initialLocale }: { data: ShareScreenData; sageId?: string; initialLocale: Locale }) {
   const context = useLocale();
   const locale = context.ready ? context.locale : initialLocale;
-  const data = resolveShare(verseId, locale, sageId);
-  if (!data) return null;
-  const { verse, sage } = data;
+  const { verse, sage } = data[locale];
   const t = (key: string, values?: Record<string, string | number>) => translate(locale, key, values);
   return <main lang={locale} className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-16 text-center">
     <ShareLandingTracker kind={sageId ? "sage_verse" : "verse"} sage={sageId ? sage.id : undefined} verseId={verse.id} />

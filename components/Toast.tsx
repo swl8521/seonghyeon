@@ -3,8 +3,7 @@
 import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { useLocale } from "./LocaleProvider";
-import { LINES } from "@/lib/content";
-import { localizedLine } from "@/lib/localized-content";
+import { localizedClientLineByKoreanText } from "@/lib/client-content";
 
 const TOAST_DURATION_MS = 2500;
 
@@ -15,8 +14,8 @@ interface ToastProps {
 
 export function Toast({ text, onDone }: ToastProps) {
   const { locale, t } = useLocale();
-  const line = LINES.find((line) => line.text === text);
-  const message = line ? localizedLine(line.id, locale) : t(text);
+  const localized = localizedClientLineByKoreanText(text, locale);
+  const message = localized === text ? t(text) : localized;
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {

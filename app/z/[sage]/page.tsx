@@ -5,10 +5,11 @@ import type { SageId } from "@/lib/types";
 import { getInitialVerse } from "@/lib/live-server";
 import type { Sage } from "@/lib/types";
 import { Suspense } from "react";
+import { sageContentPayload } from "@/lib/content-payload";
 
 async function CurrentHall({ sage }: { sage: Sage }) {
   const initialVerse = await getInitialVerse(sage.id);
-  return <HallScreen sage={sage} initialVerse={initialVerse} />;
+  return <HallScreen sage={sage} initialVerse={initialVerse} content={sageContentPayload(sage.id)} />;
 }
 
 export function generateStaticParams() {
@@ -22,7 +23,7 @@ export default async function HallPage({ params }: PageProps<"/z/[sage]">) {
   if (!sage) notFound();
 
   return (
-    <Suspense fallback={<HallScreen sage={sage} initialVerse={null} />}>
+    <Suspense fallback={<HallScreen sage={sage} initialVerse={null} content={sageContentPayload(sage.id)} />}>
       <CurrentHall sage={sage} />
     </Suspense>
   );

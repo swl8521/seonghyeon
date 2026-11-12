@@ -2,10 +2,9 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
-import { LINES, SAGE_IDS, VERSES, getSage, getVerse } from "./content";
 import { DEVOTION, HEAD_LINE_KIND, NOTE_INDICES, SKIP_REACTION_CHANCE } from "./constants";
 import { activeLocale } from "./locale";
-import { localizedVerse } from "./localized-content";
+import { clientLines, clientSage, clientVerse, clientVerses } from "./client-content";
 import { chooseCopyVerses, COPY_COUNTS, matchesCopy, nextGrowthStage, type PromotionChallenge } from "./promotion";
 import { track } from "./analytics";
 import {
@@ -25,6 +24,12 @@ import {
 import type { InventoryItem, SageId, SageLine, Stage, Zone } from "./types";
 
 const READ_MILESTONES = [20, 40, 60];
+const SAGE_IDS: SageId[] = ["confucius", "laozi", "sunzi"];
+
+function sageForVerseId(id: string): SageId | undefined {
+  const sage = id.split("-", 1)[0];
+  return SAGE_IDS.includes(sage as SageId) ? (sage as SageId) : undefined;
+}
 
 function trackReadMilestones(beforeCount: number, afterCount: number) {
   for (const m of READ_MILESTONES) {
@@ -40,7 +45,7 @@ function todayKey(): string {
 }
 
 export function pickRandomLine(sage: SageId, kind: SageLine["kind"]): SageLine | undefined {
-  const pool = LINES.filter((l) => l.sage === sage && l.kind === kind);
+  const pool = clientLines(sage).filter((l) => l.kind === kind);
   if (pool.length === 0) return undefined;
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -50,7 +55,7 @@ function pickUnusedLine(
   kind: SageLine["kind"],
   usedIds: string[]
 ): SageLine | undefined {
-  const pool = LINES.filter((l) => l.sage === sage && l.kind === kind);
+  const pool = clientLines(sage).filter((l) => l.kind === kind);
   const unused = pool.filter((l) => !usedIds.includes(l.id));
   const source = unused.length > 0 ? unused : pool;
   if (source.length === 0) return undefined;
@@ -114,11 +119,11 @@ function zeroDwell(): Record<SageId, { day: string; points: number; accMs: numbe
 }
 
 export function readCountFor(sage: SageId, readVerseIds: string[]): number {
-  return readVerseIds.filter((id) => getVerse(id)?.sage === sage).length;
+  return readVerseIds.filter((id) => sageForVerseId(id) === sage).length;
 }
 
 export function flippedCountFor(sage: SageId, flippedVerseIds: string[]): number {
-  return flippedVerseIds.filter((id) => getVerse(id)?.sage === sage).length;
+  return flippedVerseIds.filter((id) => sageForVerseId(id) === sage).length;
 }
 
 interface PlayStore {
@@ -183,7 +188,7 @@ export const usePlayStore = create<PlayStore>()(
         const challenge = get().promotions[sage];
         if (!challenge || nextGrowthStage(get().stage[sage], challenge.target) !== challenge.target) return false;
         const locale = challenge.locale ?? "ko";
-        const verse = localizedVerse(challenge.verseIds[challenge.index], locale);
+        const verse = clientVerse(challenge.verseIds[challenge.index], locale);
         if (!verse || !matchesCopy(challenge.draft, verse.translation, locale)) return false;
         const index = challenge.index + 1;
         if (index < challenge.verseIds.length) {
@@ -216,7 +221,7 @@ export const usePlayStore = create<PlayStore>()(
         const inventoryVerseIds = inventory.map((i) => i.verseId);
         const deck = buildPracticeDeck(
           sage,
-          VERSES,
+          clientVerses(sage),
           readVerseIds,
           inventoryVerseIds,
           lastPracticeVerseIds[sage] ?? [],
@@ -237,7 +242,7 @@ export const usePlayStore = create<PlayStore>()(
 
         const swipeIndex = practice.index;
         const verseId = practice.deck[swipeIndex];
-        const verse = getVerse(verseId);
+        const verse = clientVerse(verseId);
         if (!verse) return;
         const flipped = practice.flippedIds.includes(verseId);
 
@@ -254,12 +259,12 @@ export const usePlayStore = create<PlayStore>()(
         let next = applyPracticeSwipe(practice, verse, dir);
 
         let nextPendingNote: PendingNote | null = null;
-        const sageDef = getSage(next.sage)!;
+        const sageDef = clientSage(next.sage)!;
         if ((NOTE_INDICES as readonly number[]).includes(next.index)) {
           const verdict = judgeTeacherNote(next, sageDef.vec);
           const line = pickRandomLine(next.sage, verdict.kind);
           const recommendedVerseId =
-            verdict.kind === "nod" ? pickRecommendedVerse(next, VERSES, get().readVerseIds) : null;
+            verdict.kind === "nod" ? pickRecommendedVerse(next, clientVerses(next.sage), get().readVerseIds) : null;
           if (verdict.kind === "nod") {
             next = { ...next, devotionGain: next.devotionGain + DEVOTION.nod };
           }
@@ -340,8 +345,8 @@ export const usePlayStore = create<PlayStore>()(
       addToInventory: (verseId, source, zone) => {
         const { inventory, readVerseIds, devotion, liveAddedVerseIds } = get();
         if (inventory.some((i) => i.verseId === verseId)) return;
-        const verse = getVerse(verseId);
-        if (!verse) return;
+        const sage = sageForVerseId(verseId);
+        if (!sage) return;
 
         const item: InventoryItem = { verseId, source, zone, at: Date.now() };
         const nextReadVerseIds = readVerseIds.includes(verseId)
@@ -350,7 +355,7 @@ export const usePlayStore = create<PlayStore>()(
         const nextDevotion = { ...devotion };
         const awardLiveAdd = source === "live" && !liveAddedVerseIds.includes(verseId);
         if (awardLiveAdd) {
-          nextDevotion[verse.sage] = (nextDevotion[verse.sage] ?? 0) + DEVOTION.liveAdd;
+          nextDevotion[sage] = (nextDevotion[sage] ?? 0) + DEVOTION.liveAdd;
         }
 
         set({
@@ -359,7 +364,7 @@ export const usePlayStore = create<PlayStore>()(
           readVerseIds: nextReadVerseIds,
           devotion: nextDevotion,
         });
-        recalcStage(get, set, verse.sage);
+        recalcStage(get, set, sage);
         trackReadMilestones(readVerseIds.length, nextReadVerseIds.length);
         track("inventory_add", { source, zone, verse_id: verseId });
       },
@@ -374,8 +379,8 @@ export const usePlayStore = create<PlayStore>()(
       flipLiveVerse: (verseId, zone) => {
         const { flippedVerseIds, readVerseIds, devotion } = get();
         if (flippedVerseIds.includes(verseId)) return; // 구절당 1회
-        const verse = getVerse(verseId);
-        if (!verse) return;
+        const sage = sageForVerseId(verseId);
+        if (!sage) return;
 
         const nextReadVerseIds = readVerseIds.includes(verseId)
           ? readVerseIds
@@ -383,9 +388,9 @@ export const usePlayStore = create<PlayStore>()(
         set({
           readVerseIds: nextReadVerseIds,
           flippedVerseIds: [...flippedVerseIds, verseId],
-          devotion: { ...devotion, [verse.sage]: (devotion[verse.sage] ?? 0) + DEVOTION.liveFlip },
+          devotion: { ...devotion, [sage]: (devotion[sage] ?? 0) + DEVOTION.liveFlip },
         });
-        recalcStage(get, set, verse.sage);
+        recalcStage(get, set, sage);
         trackReadMilestones(readVerseIds.length, nextReadVerseIds.length);
         track("live_flip", { zone, verse_id: verseId });
       },
@@ -477,16 +482,16 @@ export const usePlayStore = create<PlayStore>()(
         const now = Date.now();
         const inventory: InventoryItem[] = likedVerseIds
           .map((verseId): InventoryItem | null => {
-            const verse = getVerse(verseId);
-            if (!verse) return null;
-            return { verseId, source: "practice", zone: verse.sage, at: now };
+            const sage = sageForVerseId(verseId);
+            if (!sage) return null;
+            return { verseId, source: "practice", zone: sage, at: now };
           })
           .filter((i): i is InventoryItem => i !== null);
 
         const devotion = zeroCounts();
         for (const id of likedVerseIds) {
-          const verse = getVerse(id);
-          if (verse) devotion[verse.sage] = (devotion[verse.sage] ?? 0) + 2;
+          const sage = sageForVerseId(id);
+          if (sage) devotion[sage] = (devotion[sage] ?? 0) + 2;
         }
 
         const stage = zeroStages();
@@ -542,7 +547,7 @@ function finishPracticeInternal(
 
   const stageAfter = get().stage[practice.sage];
 
-  let outcome = finalizePracticeOutcome(practice, stageAfter, VERSES);
+  let outcome = finalizePracticeOutcome(practice, stageAfter, clientVerses(practice.sage));
   const lineKind = HEAD_LINE_KIND[outcome.headKind];
   if (lineKind) {
     const line = pickRandomLine(practice.sage, lineKind);
@@ -589,9 +594,10 @@ function recalcStage(get: () => PlayStore, set: (partial: Partial<PlayStore>) =>
   const before = stage[sage];
   const target = nextGrowthStage(before, computed);
   if (!target || get().promotions[sage]) return;
-  const preferred = get().inventory.filter((item) => getVerse(item.verseId)?.sage === sage).map((item) => item.verseId);
+  const preferred = get().inventory.filter((item) => sageForVerseId(item.verseId) === sage).map((item) => item.verseId);
   const locale = activeLocale();
-  const pool = VERSES.filter((verse) => verse.sage === sage).map((verse) => localizedVerse(verse.id, locale)!);
+  const pool = clientVerses(sage, locale);
+  if (pool.length === 0) return;
   const verseIds = chooseCopyVerses(pool, preferred, COPY_COUNTS[target]);
   set({ promotions: { ...get().promotions, [sage]: { target, verseIds, index: 0, draft: "", via, locale } } });
 }

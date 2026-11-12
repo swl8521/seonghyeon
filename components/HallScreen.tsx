@@ -1,7 +1,6 @@
 "use client";
 import { Icon } from "./Icon";
 
-import { localizedSage } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
 
 import { useEffect, useRef, useState } from "react";
@@ -18,14 +17,16 @@ import { LiveVerseCard } from "@/components/LiveVerseCard";
 import { LiveActions } from "@/components/LiveActions";
 import { StageCard } from "@/components/StageCard";
 import type { VerseState } from "@/lib/live-state";
+import { clientSage, installContent, type ContentPayload } from "@/lib/client-content";
 
 const BOW_BATCH_MS = 5000;
 const DWELL_TICK_MS = 30_000;
 
-export function HallScreen({ sage: initialSage, initialVerse }: { sage: Sage; initialVerse: VerseState | null }) {
+export function HallScreen({ sage: initialSage, initialVerse, content }: { sage: Sage; initialVerse: VerseState | null; content: ContentPayload }) {
+  installContent(content);
   const shareVerseId = useShareVerseId();
   const { locale, t } = useLocale();
-  const sage = localizedSage(initialSage.id, locale)!;
+  const sage = clientSage(initialSage.id, locale)!;
   const sageId = sage.id;
   const practiceHref = shareVerseId
     ? `/z/${sageId}/practice?shareId=${shareVerseId}`
@@ -43,6 +44,7 @@ export function HallScreen({ sage: initialSage, initialVerse }: { sage: Sage; in
   const addToInventory = usePlayStore((s) => s.addToInventory);
   const flipLiveVerse = usePlayStore((s) => s.flipLiveVerse);
   const tickDwellCredit = usePlayStore((s) => s.tickDwellCredit);
+  const refreshPromotions = usePlayStore((s) => s.refreshPromotions);
 
   const [flipped, setFlipped] = useState(false);
   const lastTrackedSlot = useRef<number | null>(null);
@@ -52,6 +54,10 @@ export function HallScreen({ sage: initialSage, initialVerse }: { sage: Sage; in
   const lastStatusRef = useRef<string | null>(null);
   const activeVerse = verse ?? initialVerse;
   const activeRemainingMs = verse ? remainingMs : initialVerse?.remainingMs ?? 0;
+
+  useEffect(() => {
+    refreshPromotions();
+  }, [refreshPromotions]);
 
   useEffect(() => {
     if (status !== lastStatusRef.current) {

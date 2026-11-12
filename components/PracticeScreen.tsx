@@ -1,7 +1,6 @@
 "use client";
 import { Icon } from "./Icon";
 
-import { localizedSage, localizedVerse, localizedLine } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
 import { activeLocale, localeHref } from "@/lib/locale";
 
@@ -17,10 +16,12 @@ import { SwipeCard, type SwipeCardHandle } from "@/components/SwipeCard";
 import { JudgmentCard } from "@/components/JudgmentCard";
 import { Toast } from "@/components/Toast";
 import { TopBar } from "@/components/TopBar";
+import { clientLine, clientSage, clientVerse, installContent, type ContentPayload } from "@/lib/client-content";
 
-export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
+export function PracticeScreen({ sage: initialSage, content }: { sage: Sage; content: ContentPayload }) {
+  installContent(content);
   const { locale, t, ready } = useLocale();
-  const sage = localizedSage(initialSage.id, locale)!;
+  const sage = clientSage(initialSage.id, locale)!;
   const sageId = sage.id;
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -120,9 +121,9 @@ export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
   const index = Math.min(practice.index, total);
   const done = index >= total;
   const verseId = done ? undefined : practice.deck[index];
-  const verse = verseId ? localizedVerse(verseId, locale) : undefined;
+  const verse = verseId ? clientVerse(verseId, locale) : undefined;
   const recommendedVerse = pendingNote?.recommendedVerseId
-    ? localizedVerse(pendingNote.recommendedVerseId, locale)
+    ? clientVerse(pendingNote.recommendedVerseId, locale)
     : null;
 
   return (
@@ -171,7 +172,7 @@ export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
         {pendingNote ? (
           <JudgmentCard
             sage={sage}
-            lineText={localizedLine(pendingNote.lineId, locale)}
+            lineText={clientLine(pendingNote.lineId, locale)?.text ?? pendingNote.lineText}
             result={pendingNote.kind}
             recommendedOriginal={recommendedVerse?.original ?? null}
             onAccept={

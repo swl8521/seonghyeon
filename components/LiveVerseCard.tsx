@@ -1,13 +1,14 @@
 "use client";
 
-import { localizedSage, localizedVerse } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useEffect, useState } from "react";
 import type { VerseState } from "@/lib/live";
 import { CountdownRing } from "@/components/CountdownRing";
 import { MonkeyCharacter } from "@/components/MonkeyCharacter";
 import { getVersePose } from "@/lib/monkey";
+import { clientSage, clientVerse, loadContent } from "@/lib/client-content";
 
 interface LiveVerseCardProps {
   verseState: VerseState;
@@ -19,8 +20,19 @@ interface LiveVerseCardProps {
 export function LiveVerseCard({ verseState, remainingMs, flipped, onFlip }: LiveVerseCardProps) {
   const { locale, t } = useLocale();
   const shouldReduceMotion = useReducedMotion();
-  const verse = localizedVerse(verseState.verseId, locale);
-  const sage = verse ? localizedSage(verse.sage, locale) : undefined;
+  const [, setContentRevision] = useState(0);
+  const verse = clientVerse(verseState.verseId, locale);
+  const sage = verse ? clientSage(verse.sage, locale) : undefined;
+
+  useEffect(() => {
+    if (verse) return;
+    let active = true;
+    loadContent([verseState.verseId])
+      .then(() => { if (active) setContentRevision((value) => value + 1); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [verse, verseState.verseId]);
+
   if (!verse || !sage) return null;
 
   return (
