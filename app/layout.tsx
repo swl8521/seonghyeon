@@ -5,19 +5,20 @@ import { PageViewTracker } from "@/components/PageViewTracker";
 import { LocaleProvider, LanguagePicker } from "@/components/LocaleProvider";
 import "./globals.css";
 
-// UI는 가변 고딕, 한국어 구절·제목은 마루 부리로 자체 호스팅한다.
+// UI는 기본 굵기 고딕, 한국어 구절·제목은 마루 부리로 자체 호스팅한다.
 // Noto 명조는 한문 원문용으로 기본 굵기만 유지한다.
 const pretendard = localFont({
-  src: "../public/fonts/PretendardVariable.woff2",
+  src: "../public/fonts/Pretendard-Regular.woff2",
   variable: "--font-pretendard",
-  weight: "100 900",
-  display: "swap",
+  weight: "400",
+  display: "optional",
+  preload: false,
 });
 const maruBuri = localFont({
   src: "../public/fonts/MaruBuri-Regular.woff2",
   variable: "--font-maru-buri",
   weight: "400",
-  display: "swap",
+  display: "optional",
   preload: false,
 });
 
@@ -25,6 +26,8 @@ const notoSerifKR = Noto_Serif_KR({
   variable: "--font-noto-serif-kr",
   subsets: ["latin"],
   weight: ["400"],
+  display: "optional",
+  preload: false,
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL

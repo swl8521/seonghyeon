@@ -17,7 +17,7 @@ export function MonkeyCharacter({ pose, size = 88, className = "" }: MonkeyChara
       style={{
         width: size,
         height: size,
-        backgroundImage: "url('/characters/monkey-poses-v1.png')",
+        backgroundImage: "url('/characters/monkey-poses-v1.webp')",
         backgroundSize: "400% 400%",
         backgroundPosition: `${(index % 4) * 100 / 3}% ${Math.floor(index / 4) * 100 / 3}%`,
         backgroundRepeat: "no-repeat",

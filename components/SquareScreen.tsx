@@ -109,7 +109,7 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
         )}
 
         {status === "connecting" && (
-          <div className="flex aspect-[3/4] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
+          <div className="flex min-h-[580px] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
             <p className="font-sans text-sm text-muted">{t("법당 문을 여는 중…")}</p>
           </div>
         )}

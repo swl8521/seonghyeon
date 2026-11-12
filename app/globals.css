@@ -99,7 +99,8 @@ select:disabled,
 }
 
 .lantern-glow {
-  animation: lantern-breathe 4s ease-in-out infinite;
+  /* A static glow avoids repainting a large blurred shadow every frame. */
+  box-shadow: 0 0 24px 2px color-mix(in srgb, var(--lantern-glow) 25%, transparent);
 }
 
 /* 정각 전환: 이전 구절은 연기처럼 위로 흩어지고, 새 구절은 아래에서 떠오른다 (§4.2) */
