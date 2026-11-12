@@ -26,8 +26,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "성현 판별",
-  description: "구절을 고르면, 성현이 당신을 고릅니다.",
+  title: "성현 문하",
+  description: "모두가 같은 구절을 함께 보고, 전각에 들어가 수행하면 성현이 나를 제자로 들입니다.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

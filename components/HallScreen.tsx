@@ -14,8 +14,11 @@ import { StageCard } from "@/components/StageCard";
 const BOW_BATCH_MS = 5000;
 const DWELL_TICK_MS = 30_000;
 
-export function HallScreen({ sage }: { sage: Sage }) {
+export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: string }) {
   const sageId = sage.id;
+  const practiceHref = shareVerseId
+    ? `/z/${sageId}/practice?shareId=${shareVerseId}`
+    : `/z/${sageId}/practice`;
 
   const { status, verse, presence, bows, bow } = useLive(sageId);
   const devotion = usePlayStore((s) => s.devotion[sageId]);
@@ -113,7 +116,7 @@ export function HallScreen({ sage }: { sage: Sage }) {
               수행은 계속할 수 있습니다.
             </p>
             <Link
-              href={`/z/${sageId}/practice`}
+              href={practiceHref}
               className="rounded-full bg-accent px-6 py-2 font-sans text-sm text-accent-foreground"
             >
               수행하기
@@ -142,7 +145,7 @@ export function HallScreen({ sage }: { sage: Sage }) {
         )}
 
         <Link
-          href={`/z/${sageId}/practice`}
+          href={practiceHref}
           className="w-full max-w-[320px] rounded-full bg-accent py-4 text-center font-sans text-base font-bold text-accent-foreground"
         >
           수행하기

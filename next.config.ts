@@ -19,6 +19,14 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // v1 경로 전부 308로 영구 이전 (SPEC v4 §4.9)
+  async redirects() {
+    return [
+      { source: "/play", destination: "/", permanent: true },
+      { source: "/result", destination: "/", permanent: true },
+      { source: "/r/:sage", destination: "/z/:sage", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

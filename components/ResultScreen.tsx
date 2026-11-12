@@ -35,6 +35,8 @@ export function ResultScreen({ sage }: { sage: Sage }) {
   const [pickedFlipped, setPickedFlipped] = useState(false);
   const [listFlipped, setListFlipped] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
+  const [savingImage, setSavingImage] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const [moreTalkOpen, setMoreTalkOpen] = useState(false);
   const [moreTalkOptedIn, setMoreTalkOptedIn] = useState(false);
 
@@ -119,6 +121,30 @@ export function ResultScreen({ sage }: { sage: Sage }) {
     router.push(`/z/${sageId}/practice`);
   }
 
+  async function handleSaveImage() {
+    if (!pickedVerse || savingImage) return;
+    setSavingImage(true);
+    try {
+      const params = new URLSearchParams({ stage });
+      const res = await fetch(`/s/${sageId}/${pickedVerse.id}/story?${params.toString()}`);
+      if (!res.ok) throw new Error("failed to generate image");
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = `seonghyeon-${sageId}-${pickedVerse.id}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+      track("image_save", { sage: sageId, verse_id: pickedVerse.id, stage });
+    } catch {
+      setSaveError(true);
+    } finally {
+      setSavingImage(false);
+    }
+  }
+
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-8">
       <section className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-6 text-center">
@@ -150,8 +176,8 @@ export function ResultScreen({ sage }: { sage: Sage }) {
           <p className="mt-2 font-sans text-sm text-muted">와닿는 구절을 더 찾아보게.</p>
         )}
 
-        <div className="mt-3 flex w-full items-center justify-center gap-3">
-          {pickedVerse && (
+        {pickedVerse && (
+          <div className="mt-3 flex w-full flex-col items-center gap-2">
             <button
               type="button"
               onClick={handleShare}
@@ -159,8 +185,16 @@ export function ResultScreen({ sage }: { sage: Sage }) {
             >
               보내기
             </button>
-          )}
-        </div>
+            <button
+              type="button"
+              onClick={handleSaveImage}
+              disabled={savingImage}
+              className="w-full rounded-full border border-border py-3 font-sans text-sm text-foreground disabled:opacity-50"
+            >
+              {savingImage ? "이미지 만드는 중..." : "이미지 저장"}
+            </button>
+          </div>
+        )}
       </section>
 
       <StageCard
@@ -260,6 +294,9 @@ export function ResultScreen({ sage }: { sage: Sage }) {
 
       <AnimatePresence>
         {copied && <Toast text="복사됨" onDone={() => setCopied(false)} />}
+        {saveError && (
+          <Toast text="이미지 저장에 실패했습니다" onDone={() => setSaveError(false)} />
+        )}
       </AnimatePresence>
 
       <MoreTalkSheet

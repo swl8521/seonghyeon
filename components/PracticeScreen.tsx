@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { getVerse } from "@/lib/content";
@@ -17,6 +17,8 @@ import { TopBar } from "@/components/TopBar";
 export function PracticeScreen({ sage }: { sage: Sage }) {
   const sageId = sage.id;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const shareVerseId = searchParams.get("shareId") ?? undefined;
   const { presence } = useLive(sageId);
 
   const hasHydrated = usePlayStore((s) => s.hasHydrated);
@@ -42,7 +44,7 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
       return;
     }
     if (!practice || practice.sage !== sageId) {
-      startPractice(sageId);
+      startPractice(sageId, { fromShareVerseId: shareVerseId });
       lastDevotionGainRef.current = 0;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

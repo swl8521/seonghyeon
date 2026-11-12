@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { SAGES, getSage } from "@/lib/content";
 import { PracticeScreen } from "@/components/PracticeScreen";
@@ -12,5 +13,9 @@ export default async function PracticePage({ params }: PageProps<"/z/[sage]/prac
   const sage = getSage(sageParam as SageId);
   if (!sage) notFound();
 
-  return <PracticeScreen sage={sage} />;
+  return (
+    <Suspense fallback={null}>
+      <PracticeScreen sage={sage} />
+    </Suspense>
+  );
 }
