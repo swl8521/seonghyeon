@@ -59,8 +59,9 @@
   --color-sage-confucius: var(--sage-confucius);
   --color-sage-laozi: var(--sage-laozi);
   --color-sage-sunzi: var(--sage-sunzi);
-  --font-sans: var(--font-noto-sans-kr);
-  --font-serif: var(--font-noto-serif-kr);
+  --font-sans: var(--font-pretendard), system-ui, sans-serif;
+  --font-serif: var(--font-maru-buri), var(--font-noto-serif-kr), serif;
+  --font-original: var(--font-noto-serif-kr), serif;
 }
 
 html {

@@ -1,16 +1,24 @@
 import type { Metadata } from "next";
-import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
+import { Noto_Serif_KR } from "next/font/google";
+import localFont from "next/font/local";
 import { PageViewTracker } from "@/components/PageViewTracker";
 import { LocaleProvider, LanguagePicker } from "@/components/LocaleProvider";
 import "./globals.css";
 
-// 한글 폰트는 굵기마다 전체 유니코드 서브셋 @font-face 선언이 추가되어 렌더링 차단 CSS가
-// 크게 불어난다(굵기당 약 150KB). 기본 굵기만 로드하고, 굵게 표시가 필요한 곳은
-// 브라우저의 합성 볼드(synthetic bold)에 맡긴다.
-const notoSansKR = Noto_Sans_KR({
-  variable: "--font-noto-sans-kr",
-  subsets: ["latin"],
-  weight: ["400"],
+// UI는 가변 고딕, 한국어 구절·제목은 마루 부리로 자체 호스팅한다.
+// Noto 명조는 한문 원문용으로 기본 굵기만 유지한다.
+const pretendard = localFont({
+  src: "../public/fonts/PretendardVariable.woff2",
+  variable: "--font-pretendard",
+  weight: "100 900",
+  display: "swap",
+});
+const maruBuri = localFont({
+  src: "../public/fonts/MaruBuri-Regular.woff2",
+  variable: "--font-maru-buri",
+  weight: "400",
+  display: "swap",
+  preload: false,
 });
 
 const notoSerifKR = Noto_Serif_KR({
@@ -35,7 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${notoSansKR.variable} ${notoSerifKR.variable} h-full antialiased`}
+      className={`${pretendard.variable} ${maruBuri.variable} ${notoSerifKR.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col overflow-x-hidden font-sans">
         <LocaleProvider>

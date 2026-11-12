@@ -156,10 +156,10 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
             <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
               <MonkeyCharacter pose={getVersePose(verse)} size={72} />
               <div className="flex flex-col gap-1.5">
-                <p className="font-serif text-3xl leading-snug tracking-wide">{verse.original}</p>
+                <p className="font-original text-3xl leading-snug tracking-wide">{verse.original}</p>
                 {verse.reading && <p className="font-sans text-sm text-muted">{verse.reading}</p>}
               </div>
-              <p className="font-sans text-lg leading-relaxed">{verse.translation}</p>
+              <p className="font-serif text-lg leading-relaxed">{verse.translation}</p>
             </div>
 
             <p className="text-right text-xs text-muted">{verse.source}</p>
@@ -168,7 +168,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
           <div aria-hidden={!flipped} inert={!flipped} className="relative flex min-w-0 flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-card p-6 text-center shadow-lg shadow-black/10 [grid-area:1/1] [backface-visibility:hidden] [transform:rotateY(180deg)]">
             <MonkeyCharacter pose="think" size={96} />
             <p className="font-sans text-sm text-muted">{sageName}</p>
-            <p className="font-serif text-base leading-relaxed">{verse.note}</p>
+            <p className="font-sans text-lg leading-relaxed">{verse.note}</p>
           </div>
         </motion.div>
       </motion.div>
