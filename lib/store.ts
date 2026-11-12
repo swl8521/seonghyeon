@@ -27,7 +27,7 @@ function todayKey(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function pickRandomLine(sage: SageId, kind: SageLine["kind"]): SageLine | undefined {
+export function pickRandomLine(sage: SageId, kind: SageLine["kind"]): SageLine | undefined {
   const pool = LINES.filter((l) => l.sage === sage && l.kind === kind);
   if (pool.length === 0) return undefined;
   return pool[Math.floor(Math.random() * pool.length)];
@@ -136,6 +136,7 @@ interface PlayStore {
   addToInventory: (verseId: string, source: InventoryItem["source"], zone: Zone) => void;
   removeFromInventory: (verseId: string) => void;
   flipLiveVerse: (verseId: string, zone: Zone) => void;
+  pickHeadlineVerse: (verseId: string) => void;
   tickDwellCredit: (sage: SageId, deltaMs: number) => void;
   toggleSound: () => void;
   dismissIntro: () => void;
@@ -323,6 +324,13 @@ export const usePlayStore = create<PlayStore>()(
         });
         recalcStage(get, set, verse.sage);
         track("live_flip", { zone, verseId });
+      },
+
+      pickHeadlineVerse: (verseId) => {
+        const { practice } = get();
+        if (!practice?.outcome) return;
+        set({ practice: { ...practice, outcome: { ...practice.outcome, pickedVerseId: verseId } } });
+        track("pick_change", { verseId });
       },
 
       tickDwellCredit: (sage, deltaMs) => {

@@ -29,12 +29,13 @@ interface SwipeCardProps {
   verse: Verse;
   sageName: string;
   flipped: boolean;
+  isFirstTime?: boolean;
   onFlip: () => void;
   onSwipe: (dir: SwipeDirection, method: SwipeMethod) => void;
 }
 
 export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function SwipeCard(
-  { verse, sageName, flipped, onFlip, onSwipe },
+  { verse, sageName, flipped, isFirstTime, onFlip, onSwipe },
   ref
 ) {
   const shouldReduceMotion = useReducedMotion();
@@ -125,14 +126,20 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
               style={{ opacity: likeOpacity }}
               className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-xl border-4 border-like px-4 py-2 text-2xl font-bold text-like"
             >
-              좋아요
+              와닿음
             </motion.span>
             <motion.span
               style={{ opacity: dislikeOpacity }}
               className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-12 rounded-xl border-4 border-dislike px-4 py-2 text-2xl font-bold text-dislike"
             >
-              싫어요
+              넘김
             </motion.span>
+
+            {isFirstTime && (
+              <span className="absolute right-4 top-4 rounded border border-border px-1.5 py-0.5 font-sans text-[10px] text-muted">
+                처음
+              </span>
+            )}
 
             <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
               <MonkeyCharacter pose={getVersePose(verse)} size={72} />
@@ -142,6 +149,8 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
               </div>
               <p className="font-sans text-lg leading-relaxed">{verse.translation}</p>
             </div>
+
+            <p className="text-right text-xs text-muted">{verse.source}</p>
           </div>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-card p-6 text-center shadow-lg shadow-black/10 [backface-visibility:hidden] [transform:rotateY(180deg)]">

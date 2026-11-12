@@ -5,27 +5,14 @@ import Link from "next/link";
 import { useLive } from "@/lib/live";
 import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
 import { track } from "@/lib/analytics";
-import { nextRequirement, stageDevotionTarget } from "@/lib/practice";
-import type { Sage, Stage } from "@/lib/types";
+import type { Sage } from "@/lib/types";
 import { TopBar } from "@/components/TopBar";
 import { LiveVerseCard } from "@/components/LiveVerseCard";
 import { LiveActions } from "@/components/LiveActions";
-import { StageBadge } from "@/components/StageBadge";
+import { StageCard } from "@/components/StageCard";
 
 const BOW_BATCH_MS = 5000;
 const DWELL_TICK_MS = 30_000;
-
-const STAGE_ORDER: Stage[] = ["outside", "entered", "disciple", "senior"];
-
-function requirementText(stage: Stage, req: ReturnType<typeof nextRequirement>): string | null {
-  if (!req) return null;
-  const nextStageLabel = { outside: "", entered: "입문", disciple: "제자", senior: "고제" }[
-    STAGE_ORDER[STAGE_ORDER.indexOf(stage) + 1]
-  ];
-  if (req.kind === "devotion") return `${nextStageLabel}까지: 정진 ${req.remaining}점 더`;
-  if (req.kind === "read") return `${nextStageLabel}까지: 구절 ${req.remaining}개 더 읽기`;
-  return `${nextStageLabel}까지: 해설 ${req.remaining}개 더 읽기`;
-}
 
 export function HallScreen({ sage }: { sage: Sage }) {
   const sageId = sage.id;
@@ -94,9 +81,6 @@ export function HallScreen({ sage }: { sage: Sage }) {
   const inInventory = verse ? inventory.some((i) => i.verseId === verse.verseId) : false;
   const readCount = readCountFor(sageId, readVerseIds);
   const flippedCount = flippedCountFor(sageId, flippedVerseIds);
-  const req = nextRequirement(stage, devotion, readCount, flippedCount);
-  const target = stageDevotionTarget(stage);
-  const gaugeFraction = target ? Math.min(1, devotion / target) : 1;
 
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-6">
@@ -164,21 +148,7 @@ export function HallScreen({ sage }: { sage: Sage }) {
           수행하기
         </Link>
 
-        <div className="w-full max-w-[320px] rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <span className="font-sans text-sm text-foreground">내 문하</span>
-            <StageBadge stage={stage} />
-          </div>
-          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-border">
-            <div
-              className="h-full rounded-full bg-accent transition-[width] duration-300"
-              style={{ width: `${gaugeFraction * 100}%` }}
-            />
-          </div>
-          {req && (
-            <p className="mt-2 font-sans text-xs text-muted">{requirementText(stage, req)}</p>
-          )}
-        </div>
+        <StageCard stage={stage} devotion={devotion} readCount={readCount} flippedCount={flippedCount} />
 
         <details className="w-full max-w-[320px] text-center">
           <summary className="cursor-pointer font-sans text-xs text-muted underline underline-offset-4">

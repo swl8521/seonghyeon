@@ -38,7 +38,7 @@ export function MoreTalkSheet({ open, optedIn, onOptIn, onClose }: MoreTalkSheet
             ) : (
               <>
                 <p className="text-center font-serif text-lg leading-relaxed">
-                  성현과 1:1 대화 기능을 준비 중입니다.
+                  읽다가 궁금한 걸 성현께 직접 여쭙는 기능을 준비 중입니다.
                   <br />
                   열리면 가장 먼저 알려드릴까요?
                 </p>
