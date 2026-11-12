@@ -91,8 +91,8 @@ export function InventoryScreen() {
         <Link href="/" className="font-sans text-xs text-muted">
           {t("← 광장")}
         </Link>
-        <h1 className="font-serif text-2xl font-bold">{t("경함(經函)")}</h1>
-        <p className="font-sans text-sm text-muted">{t("담아둔 구절")}</p>
+        <h1 className="font-serif text-2xl font-bold">{t("모아둔 구절")}</h1>
+        <p className="font-sans text-sm text-muted">{t("마음에 든 구절을 모아 보세요")}</p>
       </div>
 
       <div className="flex gap-2">

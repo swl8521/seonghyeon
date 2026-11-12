@@ -11,7 +11,7 @@ const STAGE_ORDER: Stage[] = ["outside", "entered", "disciple", "senior"];
 function requirementText(stage: Stage, req: NextRequirement | null, locale: Locale): string | null {
   if (!req) return null;
   const nextLabel = stageLabel(STAGE_ORDER[STAGE_ORDER.indexOf(stage) + 1], locale);
-  const key = req.kind === "devotion" ? "{stage}까지: 정진 {count}점 더" : req.kind === "read" ? "{stage}까지: 구절 {count}개 더 읽기" : "{stage}까지: 해설 {count}개 더 읽기";
+  const key = req.kind === "devotion" ? "{stage}까지: 배움 {count}점 더" : req.kind === "read" ? "{stage}까지: 구절 {count}개 더 읽기" : "{stage}까지: 해설 {count}개 더 읽기";
   return translate(locale, key, { stage: nextLabel, count: req.remaining });
 }
 

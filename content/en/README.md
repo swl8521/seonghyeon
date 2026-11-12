@@ -9,3 +9,7 @@ Use stable quote IDs across languages. Never translate IDs, sage keys, stage key
 Language URLs use `?lang=ko` and `?lang=en`. Explicit links take precedence over saved preference, then supported browser languages. Unsupported browser languages fall back to English. The selector saves a separate local preference.
 
 Translation QA: all 3 sages, 60 quote IDs, 72 dialogue IDs, source book/chapter, original text preservation, consistent labels, short mobile buttons, and complete share metadata/image text. Test a partially completed copying challenge through reload and language switching.
+
+Verification completed: 38 unit tests, 8 live-server tests, ESLint, Korean/English content coverage and placeholder checks, and production build. Local production HTTP checks confirmed Korean/English share pages and locale-specific OG URLs. English and Korean OG images rendered at 1200×630; English story downloads rendered at 1080×1920. The longest English quote's OG/story layouts were visually inspected. Interactive mobile/IME flows and third-party KakaoTalk/Instagram crawlers still need user testing.
+
+Language selection and UI switching happen after client hydration on ordinary pages. Share pages render the explicitly requested language on the server for crawlers. Language subpaths and fully localized search-engine landing pages are outside this initial implementation.

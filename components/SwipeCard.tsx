@@ -129,7 +129,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
               style={{ opacity: likeOpacity }}
               className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-xl border-4 border-like px-4 py-2 text-2xl font-bold text-like"
             >
-              {t("와닿음")}
+              {t("마음에 들어요")}
             </motion.span>
             <motion.span
               style={{ opacity: dislikeOpacity }}

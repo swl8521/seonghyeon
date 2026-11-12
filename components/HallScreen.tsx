@@ -143,7 +143,7 @@ export function HallScreen({ sage: initialSage, shareVerseId }: { sage: Sage; sh
               href={practiceHref}
               className="rounded-full bg-accent px-6 py-2 font-sans text-sm text-accent-foreground"
             >
-              {t("수행하기")}
+              {t("구절 읽기")}
             </Link>
           </div>
         )}
@@ -173,7 +173,7 @@ export function HallScreen({ sage: initialSage, shareVerseId }: { sage: Sage; sh
           href={practiceHref}
           className="w-full max-w-[320px] rounded-full bg-accent py-4 text-center font-sans text-base font-bold text-accent-foreground"
         >
-          {t("수행하기")}
+          {t("구절 읽기")}
         </Link>
 
         <StageCard sage={sageId} stage={stage} devotion={devotion} readCount={readCount} flippedCount={flippedCount} />

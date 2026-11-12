@@ -220,7 +220,7 @@ export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
             onClick={() => cardRef.current?.flyOff("like", "button")}
             className="rounded-full bg-like px-6 py-3 font-sans text-sm text-like-foreground"
           >
-            {t("와닿음")}
+            {t("마음에 들어요")}
           </button>
         </div>
       )}

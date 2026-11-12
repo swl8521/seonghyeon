@@ -265,7 +265,7 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
           onClick={handleRestart}
           className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground"
         >
-          {t("다시 수행")}
+          {t("다시 읽기")}
         </button>
         <button
           type="button"

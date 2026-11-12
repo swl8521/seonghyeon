@@ -1,6 +1,11 @@
 import sages from "../content/sages.json" with { type: "json" };
 import verses from "../content/verses.json" with { type: "json" };
 import lines from "../content/lines.json" with { type: "json" };
+import englishSages from "../content/en/sages.json" with { type: "json" };
+import englishVerses from "../content/en/verses.json" with { type: "json" };
+import englishLines from "../content/en/lines.json" with { type: "json" };
+import englishUi from "../content/i18n/en.json" with { type: "json" };
+import { readFileSync, readdirSync } from "node:fs";
 import type { Axis, SageId, SageLine, Sage, Verse } from "../lib/types";
 
 const AXES: Axis[] = ["ren", "xue", "dao", "mou", "rou"];
@@ -135,6 +140,25 @@ for (const id of SAGE_IDS) {
   }
 }
 
+// Locale content must preserve stable IDs and remain marked as an editorial draft.
+if (Object.keys(englishSages).sort().join() !== [...SAGE_IDS].sort().join()) fail("en/sages: sage IDs differ");
+if (Object.keys(englishVerses).sort().join() !== [...verseIds].sort().join()) fail("en/verses: quote IDs differ");
+if (englishLines.length !== linesTyped.length || englishLines.some((line) => !line.trim())) fail("en/lines: dialogue coverage differs");
+for (const [id, verse] of Object.entries(englishVerses)) {
+  if (!verse.translation.trim() || !verse.note.trim() || verse.reviewed !== false) fail(`en/verses: invalid draft ${id}`);
+}
+for (const [key, value] of Object.entries(englishUi)) {
+  const placeholders = (text: string) => [...new Set(text.match(/\{\w+\}/g) ?? [])].sort().join();
+  if (!value.trim() || placeholders(key) !== placeholders(value)) fail(`en/ui: missing text or placeholder mismatch: ${key}`);
+}
+for (const file of readdirSync(new URL("../components/", import.meta.url))) {
+  if (!file.endsWith(".tsx")) continue;
+  const source = readFileSync(new URL(`../components/${file}`, import.meta.url), "utf8");
+  for (const match of source.matchAll(/\bt\("([^"\n]+)"/g)) {
+    if (!(match[1] in englishUi)) fail(`en/ui: missing key in ${file}: ${match[1]}`);
+  }
+}
+
 if (errors.length > 0) {
   console.error(`콘텐츠 검증 실패 (${errors.length}건):`);
   for (const e of errors) console.error(`  - ${e}`);
@@ -142,5 +166,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `콘텐츠 검증 통과: sages ${sagesTyped.length}, verses ${versesTyped.length}, lines ${linesTyped.length}`
+  `콘텐츠 검증 통과 (ko/en): sages ${sagesTyped.length}, verses ${versesTyped.length}, lines ${linesTyped.length}`
 );

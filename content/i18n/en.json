@@ -1,5 +1,11 @@
 {
   "성현 문하": "Learn with the Sages",
+  "모아둔 구절": "Saved quotes",
+  "마음에 든 구절을 모아 보세요": "Keep the quotes that speak to you",
+  "구절 읽기": "Start reading",
+  "다시 읽기": "Read again",
+  "마음에 들어요": "Speaks to me",
+  "{stage}까지: 배움 {count}점 더": "To {stage}: earn {count} more learning points",
   "다음 성장 단계에 도달했어요!": "You reached the next growth stage!",
   "광장": "Community Square",
   "광장으로": "Back to the square",
@@ -47,8 +53,8 @@
   "{stage}까지: 구절 {count}개 더 읽기": "To {stage}: read {count} more quotes",
   "{stage}까지: 해설 {count}개 더 읽기": "To {stage}: explore {count} more notes",
   "읽은 구절 {count}/20": "Quotes read: {count}/20",
-  "{stage}로 자랄 준비가 됐어요!": "Ready to grow into a {stage}!",
-  "{stage} 단계로 자랐어요!": "You have grown into a {stage}!",
+  "{stage}로 자랄 준비가 됐어요!": "Ready for the {stage} stage!",
+  "{stage} 단계로 자랐어요!": "You reached the {stage} stage!",
   "좋아한 구절부터 짧은 번역 {total}개를 따라 써요. {done}/{total}개 완료": "Copy {total} short quotes, starting with your favorites. {done}/{total} completed.",
   "따라쓰기 이어하기": "Continue copying",
   "따라쓰기 시작": "Start copying",
@@ -70,7 +76,7 @@
   "이 과제는 {language}로 시작했어요. 끝날 때까지 같은 언어로 이어집니다.": "This challenge was started in {language}. Its language stays the same until you finish.",
   "한국어": "Korean",
   "영어": "English",
-  "{name}와 함께 {stage} 단계로 자랐어요": "You grew into a {stage} with {name}",
+  "{name}와 함께 {stage} 단계로 자랐어요": "You reached the {stage} stage with {name}",
   "오늘도 {name}와 함께 읽었어요": "You read with {name} today",
   "{name}와 함께 배움의 씨앗을 심었어요": "You planted a seed of learning with {name}",
   "마음에 드는 구절을 더 찾아보세요": "Keep exploring until a quote speaks to you",
@@ -95,5 +101,5 @@
   "누군가 {name}와 함께 읽으며 이 구절을 보냈습니다": "Someone shared this quote while reading with {name}",
   "법당에 들어가기": "Start exploring",
   "이 서비스는 로그인이나 회원가입 없이 이용할 수 있어요. 읽기 기록, 모아둔 구절, 성장 단계, 따라쓰기 진행과 언어 선택은 이 브라우저에 저장돼요. 다른 기기와 자동으로 동기화되지 않아요. 실시간 서버는 현재 접속 수를 메모리에서 집계해요. 서비스 개선을 위해 Google Analytics for Firebase로 이용 통계를 수집해요.": "No account is needed. Reading history, saved quotes, growth, copying progress and language preferences are stored in this browser and do not automatically sync across devices. The live server counts active connections in memory. We use Google Analytics for Firebase to collect usage statistics to improve the service.",
-  "{name}와 함께 {stage} 단계로 자랐어요!": "You grew into a {stage} with {name}!"
+  "{name}와 함께 {stage} 단계로 자랐어요!": "You reached the {stage} stage with {name}!"
 }
