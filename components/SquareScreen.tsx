@@ -153,7 +153,6 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
             >
               <span className="font-serif text-xl">{sage.hanja[0]}</span>
               <span className="font-sans text-xs text-foreground">{sage.hall}</span>
-              <span className="font-sans text-[11px] text-muted">{sage.name}</span>
               {status !== "fallback" && status !== "closed" && (
                 <span className="font-sans text-[11px] text-muted">
                   {t("지금 {count}명", { count: presence?.[sage.id] ?? 0 })}
