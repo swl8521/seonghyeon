@@ -173,7 +173,7 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
         <p className="text-center font-serif text-lg leading-relaxed">
           모두가 같은 구절을 함께 읽는 사이버 법당입니다.
           <br />
-          구절은 1분마다 바뀌고, 전각에 들어가면 그 성현의 구절만 모아 수행할 수 있어요.
+          구절은 1분마다 바뀌고, 배움터에 들어가면 그 성현의 구절을 모아 읽을 수 있어요.
         </p>
       </InfoSheet>
     </main>

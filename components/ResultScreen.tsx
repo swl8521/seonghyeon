@@ -276,7 +276,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
           onClick={() => router.push(`/z/${sageId}`)}
           className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground"
         >
-          전각으로
+          배움터로
         </button>
         <button
           type="button"
