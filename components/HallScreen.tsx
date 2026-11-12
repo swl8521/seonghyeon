@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useLive } from "@/lib/live";
 import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
+import { playWoodenClack } from "@/lib/sound";
 import { track } from "@/lib/analytics";
 import type { Sage } from "@/lib/types";
 import { TopBar } from "@/components/TopBar";
@@ -21,6 +22,7 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
     : `/z/${sageId}/practice`;
 
   const { status, verse, presence, bows, bow } = useLive(sageId);
+  const soundOn = usePlayStore((s) => s.soundOn);
   const devotion = usePlayStore((s) => s.devotion[sageId]);
   const stage = usePlayStore((s) => s.stage[sageId]);
   const readVerseIds = usePlayStore((s) => s.readVerseIds);
@@ -46,6 +48,7 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
     }
     track("live_verse_view", { zone: sageId, verse_id: verse.verseId, slot: verse.slot, late_join: 0 });
     setFlipped(false);
+    if (soundOn && !firstJoin) playWoodenClack();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [verse?.slot]);
 
