@@ -18,18 +18,25 @@ function ensureAnalytics(): Promise<Analytics | null> {
   return analyticsPromise;
 }
 
+function isDebugMode(): boolean {
+  if (window.location.hostname === "localhost") return true;
+  return new URLSearchParams(window.location.search).get("debug") === "1";
+}
+
 export function track(name: string, props: Record<string, unknown> = {}): void {
   if (typeof window === "undefined") return;
+
+  const payload = isDebugMode() ? { ...props, debug_mode: 1 } : props;
 
   ensureAnalytics()
     .then((analytics) => {
       if (analytics) {
-        logEvent(analytics, name, props);
+        logEvent(analytics, name, payload);
       } else {
-        console.debug(`[track] ${name}`, props);
+        console.debug(`[track] ${name}`, payload);
       }
     })
     .catch(() => {
-      console.debug(`[track] ${name}`, props);
+      console.debug(`[track] ${name}`, payload);
     });
 }

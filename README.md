@@ -33,7 +33,7 @@ http://localhost:3000 에서 확인할 수 있습니다.
 
 | 변수 | 용도 | 없을 때 동작 |
 |---|---|---|
-| `NEXT_PUBLIC_FIREBASE_API_KEY` 등 Firebase 설정값 6종 | Firebase Analytics | `track()`이 `console.debug`로 대체 |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` 등 Firebase 설정값 5종 | Firebase Analytics | `track()`이 `console.debug`로 대체 |
 | `NEXT_PUBLIC_KAKAO_JS_KEY` | 카카오톡 공유 SDK 키 | 공유 버튼 숨김 |
 | `NEXT_PUBLIC_SITE_URL` | OG/메타데이터 절대 URL | `VERCEL_URL` 또는 localhost |
 
