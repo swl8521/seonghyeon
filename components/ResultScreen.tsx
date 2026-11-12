@@ -14,10 +14,10 @@ import { StageCard } from "@/components/StageCard";
 import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
 import { useLive } from "@/lib/live";
-import { stageLabel } from "@/lib/locale";
+import { activeLocale, localeHref, stageLabel } from "@/lib/locale";
 
 export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
-  const { locale, t, href } = useLocale();
+  const { locale, t, href, ready } = useLocale();
   const sage = localizedSage(initialSage.id, locale)!;
   const sageId = sage.id;
   useLive(sageId);
@@ -45,9 +45,9 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
     // hasHydrated가 true가 되기 전의 practice === null은 "완료된 수행 없음"이
     // 아니라 "아직 localStorage를 다 읽지 못함"일 수 있다. 이 체크 없이
     // 리다이렉트하면 새로고침할 때마다 전각으로 튕겨나간다.
-    if (!hasHydrated) return;
+    if (!hasHydrated || !ready) return;
     if (!practice || practice.sage !== sageId || !practice.outcome) {
-      router.replace(href(`/z/${sageId}`));
+      router.replace(localeHref(`/z/${sageId}`, activeLocale()));
       return;
     }
     if (trackedRoundIdRef.current === practice.id) return;
@@ -57,7 +57,7 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
       head_kind: practice.outcome.headKind,
       picked_verse_id: practice.outcome.pickedVerseId,
     });
-  }, [hasHydrated, practice, sageId, router, href]);
+  }, [hasHydrated, ready, practice, sageId, router]);
 
   if (!practice || practice.sage !== sageId || !practice.outcome) return null;
   const outcome = practice.outcome;

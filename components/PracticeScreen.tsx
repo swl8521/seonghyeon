@@ -2,6 +2,7 @@
 
 import { localizedSage, localizedVerse, localizedLine } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
+import { activeLocale, localeHref } from "@/lib/locale";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,7 +18,7 @@ import { Toast } from "@/components/Toast";
 import { TopBar } from "@/components/TopBar";
 
 export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
-  const { locale, t, href } = useLocale();
+  const { locale, t, ready } = useLocale();
   const sage = localizedSage(initialSage.id, locale)!;
   const sageId = sage.id;
   const router = useRouter();
@@ -45,17 +46,16 @@ export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
   const [devotionFlash, setDevotionFlash] = useState<{ id: number; delta: number } | null>(null);
 
   useEffect(() => {
-    if (!hasHydrated) return;
+    if (!hasHydrated || !ready) return;
     if (practice?.sage === sageId && practice.outcome) {
-      router.replace(href(`/z/${sageId}/result`));
+      router.replace(localeHref(`/z/${sageId}/result`, activeLocale()));
       return;
     }
     if (!practice || practice.sage !== sageId) {
       startPractice(sageId, { fromShareVerseId: shareVerseId });
       lastDevotionGainRef.current = 0;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasHydrated, practice, sageId]);
+  }, [hasHydrated, ready, practice, sageId, router, shareVerseId, startPractice]);
 
   useEffect(() => {
     if (!practice || practice.sage !== sageId) return;
