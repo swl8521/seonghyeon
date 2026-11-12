@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "motion/react";
 import { LINES, getVerse } from "@/lib/content";
@@ -31,6 +31,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
   const [saveError, setSaveError] = useState(false);
   const [moreTalkOpen, setMoreTalkOpen] = useState(false);
   const [moreTalkOptedIn, setMoreTalkOptedIn] = useState(false);
+  const trackedRoundIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     // hasHydrated가 true가 되기 전의 practice === null은 "완료된 수행 없음"이
@@ -39,7 +40,15 @@ export function ResultScreen({ sage }: { sage: Sage }) {
     if (!hasHydrated) return;
     if (!practice || practice.sage !== sageId || !practice.outcome) {
       router.replace(`/z/${sageId}`);
+      return;
     }
+    if (trackedRoundIdRef.current === practice.id) return;
+    trackedRoundIdRef.current = practice.id;
+    track("result_view", {
+      sage: sageId,
+      head_kind: practice.outcome.headKind,
+      picked_verse_id: practice.outcome.pickedVerseId,
+    });
   }, [hasHydrated, practice, sageId, router]);
 
   if (!practice || practice.sage !== sageId || !practice.outcome) return null;

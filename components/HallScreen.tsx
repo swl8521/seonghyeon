@@ -37,6 +37,14 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
   const joinedRef = useRef(false);
   const bowTapsRef = useRef(0);
   const bowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastStatusRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (status !== lastStatusRef.current) {
+      lastStatusRef.current = status;
+      track("live_status", { status });
+    }
+  }, [status]);
 
   useEffect(() => {
     if (!verse || verse.slot === lastTrackedSlot.current) return;
@@ -44,7 +52,11 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
     joinedRef.current = true;
     lastTrackedSlot.current = verse.slot;
     if (firstJoin) {
-      track("zone_enter", { zone: sageId, presence: presence?.[sageId] ?? 0, from_share: 0 });
+      track("zone_enter", {
+        zone: sageId,
+        presence: presence?.[sageId] ?? 0,
+        from_share: shareVerseId ? 1 : 0,
+      });
     }
     track("live_verse_view", { zone: sageId, verse_id: verse.verseId, slot: verse.slot, late_join: 0 });
     setFlipped(false);

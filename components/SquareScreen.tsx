@@ -49,7 +49,7 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
     joinedRef.current = true;
     lastTrackedSlot.current = verse.slot;
     if (firstJoin) {
-      track("zone_enter", { zone: "hall", presence: presence?.total ?? 0, from_share: 0 });
+      track("zone_enter", { zone: "hall", presence: presence?.total ?? 0, from_share: shareVerseId ? 1 : 0 });
     }
     track("live_verse_view", { zone: "hall", verse_id: verse.verseId, slot: verse.slot, late_join: 0 });
     setFlipped(false);

@@ -22,6 +22,16 @@ import {
 } from "./practice";
 import type { InventoryItem, SageId, SageLine, Stage, Zone } from "./types";
 
+const READ_MILESTONES = [20, 40, 60];
+
+function trackReadMilestones(beforeCount: number, afterCount: number) {
+  for (const m of READ_MILESTONES) {
+    if (beforeCount < m && afterCount >= m) {
+      track("read_milestone", { read_count: m });
+    }
+  }
+}
+
 function todayKey(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -129,7 +139,7 @@ interface PlayStore {
   setHasHydrated: (value: boolean) => void;
 
   startPractice: (sage: SageId, opts?: { fromShareVerseId?: string }) => void;
-  swipePractice: (dir: SwipeDirection, method: "drag" | "button" | "key") => void;
+  swipePractice: (dir: SwipeDirection, method: "drag" | "button" | "key", dwellMs?: number) => void;
   flipPracticeCard: (verseId: string) => void;
   dismissNote: () => void;
   acceptRecommendation: () => void;
@@ -183,7 +193,7 @@ export const usePlayStore = create<PlayStore>()(
         });
       },
 
-      swipePractice: (dir, method) => {
+      swipePractice: (dir, method, dwellMs) => {
         const { practice, pendingNote } = get();
         if (!practice || pendingNote || practice.index >= practice.deck.length) return;
 
@@ -191,8 +201,17 @@ export const usePlayStore = create<PlayStore>()(
         const verseId = practice.deck[swipeIndex];
         const verse = getVerse(verseId);
         if (!verse) return;
+        const flipped = practice.flippedIds.includes(verseId);
 
-        track("swipe", { sage: practice.sage, verseId, dir, index: swipeIndex, method });
+        track("swipe", {
+          sage: practice.sage,
+          verse_id: verseId,
+          dir,
+          index: swipeIndex,
+          method,
+          dwell_ms: dwellMs ?? 0,
+          flipped: flipped ? 1 : 0,
+        });
 
         let next = applyPracticeSwipe(practice, verse, dir);
 
@@ -251,7 +270,7 @@ export const usePlayStore = create<PlayStore>()(
         const { practice } = get();
         if (!practice) return;
         set({ practice: flipPracticeCardPure(practice, verseId) });
-        track("card_flip", { verseId, index: practice.index });
+        track("card_flip", { verse_id: verseId, index: practice.index });
       },
 
       dismissNote: () => {
@@ -277,7 +296,7 @@ export const usePlayStore = create<PlayStore>()(
           practice: { ...next, devotionGain: next.devotionGain + DEVOTION.recAccept },
           pendingNote: null,
         });
-        track("rec_accept", { sage: practice.sage, verseId: pendingNote.recommendedVerseId });
+        track("rec_accept", { sage: practice.sage, verse_id: pendingNote.recommendedVerseId });
       },
 
       addToInventory: (verseId, source, zone) => {
@@ -301,14 +320,15 @@ export const usePlayStore = create<PlayStore>()(
           devotion: nextDevotion,
         });
         recalcStage(get, set, verse.sage);
-        track("inventory_add", { source, zone, verseId });
+        trackReadMilestones(readVerseIds.length, nextReadVerseIds.length);
+        track("inventory_add", { source, zone, verse_id: verseId });
       },
 
       removeFromInventory: (verseId) => {
         set((state) => ({
           inventory: state.inventory.filter((i) => i.verseId !== verseId),
         }));
-        track("inventory_remove", { verseId });
+        track("inventory_remove", { verse_id: verseId });
       },
 
       flipLiveVerse: (verseId, zone) => {
@@ -317,20 +337,24 @@ export const usePlayStore = create<PlayStore>()(
         const verse = getVerse(verseId);
         if (!verse) return;
 
+        const nextReadVerseIds = readVerseIds.includes(verseId)
+          ? readVerseIds
+          : [...readVerseIds, verseId];
         set({
-          readVerseIds: readVerseIds.includes(verseId) ? readVerseIds : [...readVerseIds, verseId],
+          readVerseIds: nextReadVerseIds,
           flippedVerseIds: [...flippedVerseIds, verseId],
           devotion: { ...devotion, [verse.sage]: (devotion[verse.sage] ?? 0) + DEVOTION.liveFlip },
         });
         recalcStage(get, set, verse.sage);
-        track("live_flip", { zone, verseId });
+        trackReadMilestones(readVerseIds.length, nextReadVerseIds.length);
+        track("live_flip", { zone, verse_id: verseId });
       },
 
       pickHeadlineVerse: (verseId) => {
         const { practice } = get();
         if (!practice?.outcome) return;
         set({ practice: { ...practice, outcome: { ...practice.outcome, pickedVerseId: verseId } } });
-        track("pick_change", { verseId });
+        track("pick_change", { verse_id: verseId });
       },
 
       tickDwellCredit: (sage, deltaMs) => {
@@ -498,6 +522,7 @@ function finishPracticeInternal(
   if (stageAfter !== practice.stageBefore) {
     track("stage_up", { sage: practice.sage, from: practice.stageBefore, to: stageAfter, via: "practice" });
   }
+  trackReadMilestones(readVerseIds.length, nextReadVerseIds.length);
   track("practice_complete", {
     sage: practice.sage,
     liked_count: practice.likedIds.length,

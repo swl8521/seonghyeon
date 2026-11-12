@@ -35,6 +35,9 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
 
   const cardRef = useRef<SwipeCardHandle>(null);
   const lastDevotionGainRef = useRef(0);
+  const cardShownAtRef = useRef(0);
+  const recommendedVerseIdsRef = useRef<Set<string>>(new Set());
+  const lastViewedIndexRef = useRef<number | null>(null);
   const [devotionFlash, setDevotionFlash] = useState<{ id: number; delta: number } | null>(null);
 
   useEffect(() => {
@@ -59,6 +62,24 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [practice?.devotionGain]);
+
+  useEffect(() => {
+    if (!practice || practice.sage !== sageId || practice.outcome) return;
+    if (practice.index >= practice.deck.length) return;
+    if (lastViewedIndexRef.current === practice.index) return;
+    lastViewedIndexRef.current = practice.index;
+    cardShownAtRef.current = Date.now();
+
+    const verseId = practice.deck[practice.index];
+    track("verse_view", {
+      sage: sageId,
+      verse_id: verseId,
+      index: practice.index,
+      first_time: readVerseIds.includes(verseId) ? 0 : 1,
+      recommended: recommendedVerseIdsRef.current.has(verseId) ? 1 : 0,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [practice?.index, practice?.sage]);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -155,7 +176,14 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
             lineText={pendingNote.lineText}
             result={pendingNote.kind}
             recommendedOriginal={recommendedVerse?.original ?? null}
-            onAccept={pendingNote.recommendedVerseId ? acceptRecommendation : undefined}
+            onAccept={
+              pendingNote.recommendedVerseId
+                ? () => {
+                    recommendedVerseIdsRef.current.add(pendingNote.recommendedVerseId!);
+                    acceptRecommendation();
+                  }
+                : undefined
+            }
             onContinue={dismissNote}
           />
         ) : done || !verse ? null : (
@@ -167,7 +195,9 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
             isFirstTime={!readVerseIds.includes(verse.id)}
             flipped={practice.flippedIds.includes(verse.id)}
             onFlip={() => flipPracticeCard(verse.id)}
-            onSwipe={(dir, method) => swipePractice(dir, method)}
+            onSwipe={(dir, method) =>
+              swipePractice(dir, method, Date.now() - cardShownAtRef.current)
+            }
           />
         )}
       </div>
