@@ -1,5 +1,14 @@
 # Mobile performance follow-up
 
+**Status: parked at 86-87 by decision, 2026-11-13.** The work below took the
+mobile score from 39 to 86-87 and the remaining gap is entirely LCP inside a
+throttled lab simulation. Everything still on the table costs something
+user-facing - a typeface, the UI's appearance - for roughly a point each, so the
+trade stops being worth making. Pick this back up from real-user Core Web Vitals
+in Cloudflare Web Analytics, not from another Lighthouse run. The beacon that
+collects them is deliberately left enabled; it is the only field-data source
+here, since GA4 does not gather web vitals by default.
+
 ## Where this landed
 
 Measured on the production deployment at `https://munha.yeoul.dev`, Lighthouse
