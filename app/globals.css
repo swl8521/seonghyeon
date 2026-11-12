@@ -1,41 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  /* 한지(ivory) 배경 + 먹색(ink) 텍스트 + 낙관 빨강(seal red) 포인트 */
-  --background: #f5f0e4;
-  --foreground: #2b2724;
-  --muted: #6b6156;
-  --border: #ddd4c2;
-  --card: #fbf8f0;
-  --accent: #b23a2e;
-  --accent-foreground: #fbf8f0;
-  /* 스와이프 방향(좋아요/싫어요)을 나타내는 색 — 브랜드 accent와는 별개 */
-  --like: #3f7d53;
-  --like-foreground: #fbf8f0;
-  --dislike: #b23a2e;
-  --dislike-foreground: #fbf8f0;
-  /* 판별 이벤트 카드에서 성현을 구분하는 테두리 색 */
-  --sage-confucius: #b23a2e;
-  --sage-laozi: #4b7a63;
-  --sage-sunzi: #3d5a80;
+  /* 밤 법당(기본 테마): 먹빛 남색 + 한지색 글자 + 등불 포인트.
+     단청 포인트 색(녹청·주홍·황)은 성현 구분에만 쓰고, 배경엔 쓰지 않는다. */
+  --background: #10141f;
+  --foreground: #e8dfc9;
+  --muted: #8b8a7c;
+  --border: #262c3d;
+  --card: #161b29;
+  --accent: #d98a4a;
+  --accent-foreground: #171208;
+  --lantern-glow: #f0a860;
+  /* 스와이프 방향(와닿음/넘김)을 나타내는 색 — 성현 포인트 색과는 별개 */
+  --like: #6fc48f;
+  --like-foreground: #11151f;
+  --dislike: #d9674a;
+  --dislike-foreground: #11151f;
+  /* 성현 구분 색 (단청: 주홍·녹청·황) */
+  --sage-confucius: #d9674a;
+  --sage-laozi: #4fb3a0;
+  --sage-sunzi: #e0b84a;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --background: #211d1a;
-    --foreground: #f0e9d8;
-    --muted: #9b9080;
-    --border: #3a3430;
-    --card: #2a2521;
-    --accent: #d65a46;
-    --accent-foreground: #211d1a;
-    --like: #6fc48f;
-    --like-foreground: #211d1a;
-    --dislike: #d65a46;
-    --dislike-foreground: #211d1a;
-    --sage-confucius: #d65a46;
-    --sage-laozi: #7bb79c;
-    --sage-sunzi: #7093c2;
+    /* 새벽 법당: 기존 한지 톤 */
+    --background: #f5f0e4;
+    --foreground: #2b2724;
+    --muted: #6b6156;
+    --border: #ddd4c2;
+    --card: #fbf8f0;
+    --accent: #b23a2e;
+    --accent-foreground: #fbf8f0;
+    --lantern-glow: #c97a35;
+    --like: #3f7d53;
+    --like-foreground: #fbf8f0;
+    --dislike: #b23a2e;
+    --dislike-foreground: #fbf8f0;
+    --sage-confucius: #b23a2e;
+    --sage-laozi: #3d8a76;
+    --sage-sunzi: #9c7a1f;
   }
 }
 
@@ -47,6 +51,7 @@
   --color-card: var(--card);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-lantern-glow: var(--lantern-glow);
   --color-like: var(--like);
   --color-like-foreground: var(--like-foreground);
   --color-dislike: var(--dislike);
@@ -68,6 +73,54 @@ body {
   overscroll-behavior-x: none;
 }
 
+/* 등불 글로우: 4초 주기로 숨쉬듯 밝아졌다 어두워진다 (§4.2) */
+@keyframes lantern-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 24px 2px color-mix(in srgb, var(--lantern-glow) 25%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 40px 6px color-mix(in srgb, var(--lantern-glow) 45%, transparent);
+  }
+}
+
+.lantern-glow {
+  animation: lantern-breathe 4s ease-in-out infinite;
+}
+
+/* 정각 전환: 이전 구절은 연기처럼 위로 흩어지고, 새 구절은 아래에서 떠오른다 (§4.2) */
+@keyframes verse-smoke-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-16px) scale(1.02);
+    filter: blur(4px);
+  }
+}
+
+@keyframes verse-rise-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.verse-exit {
+  animation: verse-smoke-exit 600ms ease-in forwards;
+}
+
+.verse-enter {
+  animation: verse-rise-enter 600ms ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -76,5 +129,10 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .lantern-glow {
+    animation: none !important;
+    box-shadow: 0 0 20px 2px color-mix(in srgb, var(--lantern-glow) 30%, transparent) !important;
   }
 }
