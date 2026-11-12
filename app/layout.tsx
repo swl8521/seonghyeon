@@ -36,12 +36,31 @@ export const metadata: Metadata = {
   description: "모두가 같은 구절을 함께 읽고, 마음에 든 구절을 따라 쓰며 씨앗에서 고목으로 자라요.",
 };
 
+const liveOrigin = (() => {
+  const url = process.env.NEXT_PUBLIC_LIVE_URL;
+  if (!url) return null;
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+})();
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
       className={`${maruBuri.variable} ${notoSerifKR.variable} h-full antialiased`}
     >
+      {/* 광장·전각의 본문(실시간 구절)은 하이드레이션 직후 실시간 서버로 거는
+          WebSocket 응답을 기다린다. DNS·TCP·TLS를 미리 끝내두면 그 왕복이
+          그만큼 일찍 시작된다. */}
+      {liveOrigin && (
+        <head>
+          <link rel="preconnect" href={liveOrigin} crossOrigin="anonymous" />
+          <link rel="dns-prefetch" href={liveOrigin} />
+        </head>
+      )}
       <body className="min-h-full flex flex-col overflow-x-hidden font-sans">
         <LocaleProvider>
         <PageViewTracker />

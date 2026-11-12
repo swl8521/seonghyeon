@@ -10,12 +10,21 @@ function ensureAnalytics(): Promise<Analytics | null> {
     analyticsPromise = (async () => {
       // Keep Firebase out of the initial interactive bundle. Calls still queue
       // on this shared promise while the SDK loads.
+      //
+      // gtag.js는 150KB가 넘어서, 초기 렌더가 끝나기 전에 받기 시작하면 느린
+      // 기기에서 첫 화면 그리기와 메인 스레드를 두고 경쟁한다. load 이후의
+      // 유휴 시간까지 기다린다. 그 사이 발생한 이벤트는 이 프로미스에 큐로
+      // 쌓였다가 그대로 전송되므로 유실되지 않는다.
       await new Promise<void>((resolve) => {
-        if ("requestIdleCallback" in window) {
-          window.requestIdleCallback(() => resolve(), { timeout: 2000 });
-        } else {
-          setTimeout(resolve, 1000);
-        }
+        const whenIdle = () => {
+          if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(() => resolve(), { timeout: 2000 });
+          } else {
+            setTimeout(resolve, 1000);
+          }
+        };
+        if (document.readyState === "complete") whenIdle();
+        else window.addEventListener("load", whenIdle, { once: true });
       });
       const [{ getAnalytics, isSupported }, { getFirebaseApp }] = await Promise.all([
         import("firebase/analytics"), import("./firebase"),
