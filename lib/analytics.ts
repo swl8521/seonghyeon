@@ -1,6 +1,7 @@
 "use client";
 
-import { getAnalytics, isSupported, logEvent, type Analytics } from "firebase/analytics";
+import { getAnalytics, isSupported, logEvent, setUserProperties, type Analytics } from "firebase/analytics";
+import { analyticsPayload, validEventName } from "./analytics-payload";
 import { getFirebaseApp } from "./firebase";
 
 let analyticsPromise: Promise<Analytics | null> | null = null;
@@ -24,9 +25,9 @@ function isDebugMode(): boolean {
 }
 
 export function track(name: string, props: Record<string, unknown> = {}): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !validEventName(name)) return;
 
-  const payload = isDebugMode() ? { ...props, debug_mode: 1 } : props;
+  const payload = analyticsPayload(isDebugMode() ? { debug_mode: 1, ...props } : props);
 
   ensureAnalytics()
     .then((analytics) => {
@@ -39,4 +40,11 @@ export function track(name: string, props: Record<string, unknown> = {}): void {
     .catch(() => {
       console.debug(`[track] ${name}`, payload);
     });
+}
+
+export function updateGrowthProperties(props: { top_stage: string; read_count: number; inventory_count: number }): void {
+  if (typeof window === "undefined") return;
+  void ensureAnalytics().then((analytics) => {
+    if (analytics) setUserProperties(analytics, props);
+  }).catch(() => {});
 }
