@@ -4,6 +4,7 @@ import { localizedSage } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
 
 import { useEffect, useRef, useState } from "react";
+import { useShareVerseId } from "@/lib/useShareVerseId";
 import Link from "@/components/LocaleLink";
 import { SAGES } from "@/lib/content";
 import { useLive } from "@/lib/live";
@@ -23,7 +24,8 @@ import { SAGE_BORDER_CLASS } from "@/lib/sageColors";
 
 const BOW_BATCH_MS = 5000;
 
-export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
+export function SquareScreen() {
+  const shareVerseId = useShareVerseId();
   const { locale, t } = useLocale();
   const { status, verse, remainingMs, presence, bows, bow } = useLive("hall");
   const soundOn = usePlayStore((s) => s.soundOn);
@@ -98,8 +100,8 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
         }
       />
 
-      <div className="relative flex flex-1 flex-col items-center justify-center gap-6">
-        {!seenIntro && verse && (
+      <div className="relative flex flex-col items-center gap-6">
+        {!seenIntro && (
           <div className="flex w-full max-w-[320px] shrink-0 items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2 text-center font-sans text-xs leading-relaxed text-muted">
             <span className="min-w-0 flex-1">{t("모두가 같은 구절을 함께 봅니다. 1분마다 바뀝니다.")}</span>
             <button type="button" onClick={dismissIntro} aria-label={t("닫기")} className="flex h-8 w-8 shrink-0 items-center justify-center text-base">
@@ -108,7 +110,8 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
           </div>
         )}
 
-        {status === "connecting" && (
+        <div className="flex min-h-[652px] w-full shrink-0 flex-col items-center gap-6">
+        {!verse && status !== "closed" && (
           <div className="flex min-h-[580px] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
             <p className="font-sans text-sm text-muted">{t("법당 문을 여는 중…")}</p>
           </div>
@@ -145,6 +148,7 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
           </>
         )}
 
+        </div>
         <div className="grid w-full grid-cols-3 gap-3">
           {SAGES.map((originalSage) => localizedSage(originalSage.id, locale)!).map((sage) => (
             <Link

@@ -5,6 +5,7 @@ import { localizedSage } from "@/lib/localized-content";
 import { useLocale } from "@/components/LocaleProvider";
 
 import { useEffect, useRef, useState } from "react";
+import { useShareVerseId } from "@/lib/useShareVerseId";
 import Link from "@/components/LocaleLink";
 import { useLive } from "@/lib/live";
 import { Toast } from "@/components/Toast";
@@ -20,7 +21,8 @@ import { StageCard } from "@/components/StageCard";
 const BOW_BATCH_MS = 5000;
 const DWELL_TICK_MS = 30_000;
 
-export function HallScreen({ sage: initialSage, shareVerseId }: { sage: Sage; shareVerseId?: string }) {
+export function HallScreen({ sage: initialSage }: { sage: Sage }) {
+  const shareVerseId = useShareVerseId();
   const { locale, t } = useLocale();
   const sage = localizedSage(initialSage.id, locale)!;
   const sageId = sage.id;
@@ -126,9 +128,10 @@ export function HallScreen({ sage: initialSage, shareVerseId }: { sage: Sage; sh
         }
       />
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-6">
-        {status === "connecting" && (
-          <div className="flex aspect-[3/4] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
+      <div className="flex flex-col items-center gap-6">
+        <div className="flex min-h-[652px] w-full shrink-0 flex-col items-center gap-6">
+        {!verse && status !== "closed" && (
+          <div className="flex min-h-[580px] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
             <p className="font-sans text-sm text-muted">{t("법당 문을 여는 중…")}</p>
           </div>
         )}
@@ -170,6 +173,7 @@ export function HallScreen({ sage: initialSage, shareVerseId }: { sage: Sage; sh
           </>
         )}
 
+        </div>
         <Link
           href={practiceHref}
           className="w-full max-w-[320px] rounded-full bg-accent py-4 text-center font-sans text-base font-bold text-accent-foreground"

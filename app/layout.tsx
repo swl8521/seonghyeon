@@ -4,16 +4,10 @@ import localFont from "next/font/local";
 import { PageViewTracker } from "@/components/PageViewTracker";
 import { LocaleProvider, LanguagePicker } from "@/components/LocaleProvider";
 import "./globals.css";
+import "./pretendard-subset.css";
 
 // UI는 기본 굵기 고딕, 한국어 구절·제목은 마루 부리로 자체 호스팅한다.
 // Noto 명조는 한문 원문용으로 기본 굵기만 유지한다.
-const pretendard = localFont({
-  src: "../public/fonts/Pretendard-Regular.woff2",
-  variable: "--font-pretendard",
-  weight: "400",
-  display: "optional",
-  preload: false,
-});
 const maruBuri = localFont({
   src: "../public/fonts/MaruBuri-Regular.woff2",
   variable: "--font-maru-buri",
@@ -46,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${pretendard.variable} ${maruBuri.variable} ${notoSerifKR.variable} h-full antialiased`}
+      className={`${maruBuri.variable} ${notoSerifKR.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col overflow-x-hidden font-sans">
         <LocaleProvider>
