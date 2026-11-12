@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useShareVerseId } from "@/lib/useShareVerseId";
 import Link from "@/components/LocaleLink";
 import { SAGES } from "@/lib/content";
-import { useLive } from "@/lib/live";
+import { useLive, type VerseState } from "@/lib/live";
 import { Toast } from "@/components/Toast";
 import { usePlayStore } from "@/lib/store";
 import { playWoodenClack } from "@/lib/sound";
@@ -24,10 +24,10 @@ import { SAGE_BORDER_CLASS } from "@/lib/sageColors";
 
 const BOW_BATCH_MS = 5000;
 
-export function SquareScreen() {
+export function SquareScreen({ initialVerse }: { initialVerse?: VerseState | null }) {
   const shareVerseId = useShareVerseId();
   const { locale, t } = useLocale();
-  const { status, verse, remainingMs, presence, bows, bow } = useLive("hall");
+  const { status, verse, remainingMs, presence, bows, bow } = useLive("hall", initialVerse);
   const soundOn = usePlayStore((s) => s.soundOn);
   const toast = usePlayStore((s) => s.toast);
   const dismissToast = usePlayStore((s) => s.dismissToast);

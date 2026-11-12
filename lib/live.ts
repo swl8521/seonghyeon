@@ -183,6 +183,15 @@ class LiveManager {
     );
   }
 
+  /**
+   * SSR이 미리 받아둔 구절을 초기값으로 심는다. 소켓이 아직 아무것도 못 받은
+   * 상태에서만 적용되고, 이후 서버가 보내는 verse 이벤트가 그대로 덮어쓴다.
+   */
+  seedVerse(state: VerseState) {
+    if (this.snapshot.verse || state.zone !== this.zone) return;
+    this.applyVerse(state);
+  }
+
   private applyVerse(state: VerseState, bows?: number) {
     if (state.zone !== this.zone) return;
     // slot이 지금보다 작으면(지연 도착) 무시한다.
@@ -283,8 +292,13 @@ export interface UseLiveResult {
   bow: () => void;
 }
 
-/** 라우트에 따라 zone을 바꿔가며 방에 들어가는 훅 (§6). zone이 null이면 leave. */
-export function useLive(zone: Zone | null): UseLiveResult {
+/**
+ * 라우트에 따라 zone을 바꿔가며 방에 들어가는 훅 (§6). zone이 null이면 leave.
+ *
+ * initialVerse는 SSR이 미리 받아둔 구절이다. 소켓이 응답하기 전까지 이 값을
+ * 그대로 쓰므로 서버 HTML과 첫 클라이언트 렌더가 어긋나지 않는다.
+ */
+export function useLive(zone: Zone | null, initialVerse?: VerseState | null): UseLiveResult {
   const [snapshot, setSnapshot] = useState<LiveSnapshot>(liveManager.getSnapshot());
 
   useEffect(() => {
@@ -298,7 +312,15 @@ export function useLive(zone: Zone | null): UseLiveResult {
     };
   }, [zone]);
 
+  // 매니저에도 심어둬야 카운트다운 타이머가 초기 구절부터 돌기 시작한다.
+  useEffect(() => {
+    if (initialVerse) liveManager.seedVerse(initialVerse);
+  }, [initialVerse]);
+
   const bow = useCallback(() => liveManager.bow(), []);
 
-  return { ...snapshot, bow };
+  const verse = snapshot.verse ?? initialVerse ?? null;
+  const remainingMs = snapshot.verse ? snapshot.remainingMs : (initialVerse?.remainingMs ?? 0);
+
+  return { ...snapshot, verse, remainingMs, bow };
 }
