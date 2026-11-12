@@ -2,26 +2,29 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
-import { LINES, SAGE_IDS, SAGES, VERSES, getVerse } from "./content";
-import { buildDeck } from "./deck";
+import { LINES, SAGE_IDS, VERSES, getSage, getVerse } from "./content";
+import { DEVOTION, NOTE_INDICES, SKIP_REACTION_CHANCE } from "./constants";
 import { track } from "./analytics";
 import {
-  applySwipe,
-  createRoundState,
-  isJudgmentIndex,
-  runJudgment,
-  DISLIKE_REACTION_CHANCE,
-  JUDGMENT_WINDOW,
+  advanceStage,
+  applyPracticeSwipe,
+  buildPracticeDeck,
+  computeStage,
+  createPracticeState,
+  finalizePracticeOutcome,
+  flipPracticeCard as flipPracticeCardPure,
+  insertRecommendedVerse,
+  judgeTeacherNote,
+  pickRecommendedVerse,
   type JudgmentResult,
-  type RoundState,
+  type PracticeState,
   type SwipeDirection,
-} from "./judge";
-import type { SageId, SageLine } from "./types";
+} from "./practice";
+import type { InventoryItem, SageId, SageLine, Stage, Zone } from "./types";
 
-const RECENT_LIMIT = 21;
-
-function makeRoundId(): string {
-  return `r_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+function todayKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function pickRandomLine(sage: SageId, kind: SageLine["kind"]): SageLine | undefined {
@@ -33,10 +36,10 @@ function pickRandomLine(sage: SageId, kind: SageLine["kind"]): SageLine | undefi
 function pickUnusedLine(
   sage: SageId,
   kind: SageLine["kind"],
-  usedTexts: string[]
+  usedIds: string[]
 ): SageLine | undefined {
   const pool = LINES.filter((l) => l.sage === sage && l.kind === kind);
-  const unused = pool.filter((l) => !usedTexts.includes(l.text));
+  const unused = pool.filter((l) => !usedIds.includes(l.id));
   const source = unused.length > 0 ? unused : pool;
   if (source.length === 0) return undefined;
   return source[Math.floor(Math.random() * source.length)];
@@ -66,177 +69,428 @@ const safeStorage: StateStorage = {
   },
 };
 
-export interface PendingJudgment {
-  index: number;
+export interface PendingNote {
   sage: SageId;
-  result: JudgmentResult;
-  p: number;
+  kind: JudgmentResult;
+  lineId: string;
   lineText: string;
+  recommendedVerseId: string | null;
+  atIndex: number;
 }
 
-export interface DislikeToast {
+export interface SkipToast {
   id: number;
   text: string;
 }
 
+function zeroCounts(): Record<SageId, number> {
+  const out = {} as Record<SageId, number>;
+  for (const id of SAGE_IDS) out[id] = 0;
+  return out;
+}
+
+function zeroStages(): Record<SageId, Stage> {
+  const out = {} as Record<SageId, Stage>;
+  for (const id of SAGE_IDS) out[id] = "outside";
+  return out;
+}
+
+function zeroDwell(): Record<SageId, { day: string; points: number; accMs: number }> {
+  const out = {} as Record<SageId, { day: string; points: number; accMs: number }>;
+  for (const id of SAGE_IDS) out[id] = { day: todayKey(), points: 0, accMs: 0 };
+  return out;
+}
+
+function readCountFor(sage: SageId, readVerseIds: string[]): number {
+  return readVerseIds.filter((id) => getVerse(id)?.sage === sage).length;
+}
+
+function flippedCountFor(sage: SageId, flippedVerseIds: string[]): number {
+  return flippedVerseIds.filter((id) => getVerse(id)?.sage === sage).length;
+}
+
 interface PlayStore {
-  round: RoundState | null;
-  recentVerseIds: string[];
-  flippedIds: string[];
-  usedDislikeLines: string[];
-  likedVerseIds: string[];
-  pendingJudgment: PendingJudgment | null;
-  toast: DislikeToast | null;
-  // localStorage에서 저장된 라운드를 다 읽어오기 전까지는 true가 아니다.
-  // 이 값을 보지 않고 round만으로 "새 라운드 시작"을 판단하면, 하이드레이션이
-  // 끝나기 전의 과도기 null 상태를 "진행 중인 라운드 없음"으로 오인해
-  // 진행하던 라운드를 새 라운드로 덮어써 버린다.
+  practice: PracticeState | null;
+  readVerseIds: string[];
+  flippedVerseIds: string[];
+  inventory: InventoryItem[];
+  devotion: Record<SageId, number>;
+  stage: Record<SageId, Stage>;
+  dwellCredit: Record<SageId, { day: string; points: number; accMs: number }>;
+  practicesDone: Record<SageId, number>;
+  lastPracticeVerseIds: Record<SageId, string[]>;
+  soundOn: boolean;
+  seenIntro: boolean;
+  pendingNote: PendingNote | null;
+  toast: SkipToast | null;
+  usedSkipLineIds: string[];
+  // localStorage에서 저장된 상태를 다 읽어오기 전까지는 true가 아니다.
   hasHydrated: boolean;
   setHasHydrated: (value: boolean) => void;
-  // 지금까지 시작한 라운드 수. 성향(user/likes/dislikes)은 라운드마다 리셋되지
-  // 않고 이어지므로, 몇 번째 라운드인지를 결과 화면에 보여주기 위한 값.
-  roundsPlayed: number;
-  startRound: (opts?: { fromShare?: boolean }) => void;
-  swipe: (dir: SwipeDirection, method: "drag" | "button" | "key") => void;
-  flipCard: (verseId: string) => void;
-  dismissJudgment: () => void;
+
+  startPractice: (sage: SageId, opts?: { fromShareVerseId?: string }) => void;
+  swipePractice: (dir: SwipeDirection, method: "drag" | "button" | "key") => void;
+  flipPracticeCard: (verseId: string) => void;
+  dismissNote: () => void;
+  acceptRecommendation: () => void;
+  addToInventory: (verseId: string, source: InventoryItem["source"], zone: Zone) => void;
+  removeFromInventory: (verseId: string) => void;
+  tickDwellCredit: (sage: SageId, deltaMs: number) => void;
+  toggleSound: () => void;
+  dismissIntro: () => void;
   dismissToast: () => void;
 }
 
 export const usePlayStore = create<PlayStore>()(
   persist(
     (set, get) => ({
-      round: null,
-      recentVerseIds: [],
-      flippedIds: [],
-      usedDislikeLines: [],
-      likedVerseIds: [],
-      pendingJudgment: null,
+      practice: null,
+      readVerseIds: [],
+      flippedVerseIds: [],
+      inventory: [],
+      devotion: zeroCounts(),
+      stage: zeroStages(),
+      dwellCredit: zeroDwell(),
+      practicesDone: zeroCounts(),
+      lastPracticeVerseIds: { confucius: [], laozi: [], sunzi: [] },
+      soundOn: false,
+      seenIntro: false,
+      pendingNote: null,
       toast: null,
+      usedSkipLineIds: [],
       hasHydrated: false,
       setHasHydrated: (value) => set({ hasHydrated: value }),
-      roundsPlayed: 0,
 
-      startRound: (opts) => {
-        const { recentVerseIds, round: prevRound, roundsPlayed } = get();
-        const deck = buildDeck(VERSES, SAGE_IDS, Math.random, recentVerseIds);
-        // 이전 라운드가 있었다면 그 성향(user/likes/dislikes)을 이어받는다 —
-        // "다시 하기"가 성향을 0으로 리셋하지 않고 계속 누적되게 하기 위함.
-        const seed = prevRound
-          ? { user: prevRound.user, likes: prevRound.likes, dislikes: prevRound.dislikes }
-          : undefined;
-        const round = createRoundState(deck, makeRoundId(), SAGE_IDS, Date.now(), seed);
-        set({
-          round,
-          flippedIds: [],
-          usedDislikeLines: [],
-          pendingJudgment: null,
-          toast: null,
-          roundsPlayed: roundsPlayed + 1,
+      startPractice: (sage, opts) => {
+        const { readVerseIds, inventory, lastPracticeVerseIds, stage } = get();
+        const inventoryVerseIds = inventory.map((i) => i.verseId);
+        const deck = buildPracticeDeck(
+          sage,
+          VERSES,
+          readVerseIds,
+          inventoryVerseIds,
+          lastPracticeVerseIds[sage] ?? [],
+          opts?.fromShareVerseId ?? null
+        );
+        const practice = createPracticeState(sage, deck, stage[sage], opts?.fromShareVerseId ?? null);
+        set({ practice, pendingNote: null, toast: null, usedSkipLineIds: [] });
+        track("practice_start", {
+          sage,
+          practices_done: get().practicesDone[sage],
+          stage: stage[sage],
         });
-        track("round_start", { roundId: round.roundId, fromShare: !!opts?.fromShare });
       },
 
-      swipe: (dir, method) => {
-        const { round, pendingJudgment, usedDislikeLines } = get();
-        if (!round || pendingJudgment || round.index >= round.deck.length) return;
+      swipePractice: (dir, method) => {
+        const { practice, pendingNote } = get();
+        if (!practice || pendingNote || practice.index >= practice.deck.length) return;
 
-        const swipeIndex = round.index;
-        const verseId = round.deck[swipeIndex];
+        const swipeIndex = practice.index;
+        const verseId = practice.deck[swipeIndex];
         const verse = getVerse(verseId);
         if (!verse) return;
 
-        track("swipe", {
-          roundId: round.roundId,
-          verseId,
-          sage: verse.sage,
-          dir,
-          index: swipeIndex,
-          method,
-        });
+        track("swipe", { sage: practice.sage, verseId, dir, index: swipeIndex, method });
 
-        let nextRound = applySwipe(round, verse, dir);
+        let next = applyPracticeSwipe(practice, verse, dir);
 
-        let nextPendingJudgment: PendingJudgment | null = null;
-        if (isJudgmentIndex(nextRound.index)) {
-          const recentIds = nextRound.deck.slice(
-            nextRound.index - JUDGMENT_WINDOW,
-            nextRound.index
-          );
-          const recentSages = recentIds
-            .map((id) => getVerse(id)?.sage)
-            .filter((s): s is SageId => Boolean(s));
-
-          const { state: stateWithEvent, event } = runJudgment(
-            nextRound,
-            SAGES,
-            recentSages,
-            Math.random
-          );
-          nextRound = stateWithEvent;
-
-          const line = pickRandomLine(event.sage, event.result === "accept" ? "nod" : "nudge");
-          nextPendingJudgment = { ...event, lineText: line?.text ?? "" };
-          track("judgment_shown", {
-            roundId: round.roundId,
-            sage: event.sage,
-            result: event.result,
-            p: event.p,
+        let nextPendingNote: PendingNote | null = null;
+        const sageDef = getSage(next.sage)!;
+        if ((NOTE_INDICES as readonly number[]).includes(next.index)) {
+          const verdict = judgeTeacherNote(next, sageDef.vec);
+          const line = pickRandomLine(next.sage, verdict.kind);
+          const recommendedVerseId =
+            verdict.kind === "nod" ? pickRecommendedVerse(next, VERSES, get().readVerseIds) : null;
+          if (verdict.kind === "nod") {
+            next = { ...next, devotionGain: next.devotionGain + DEVOTION.nod };
+          }
+          nextPendingNote = line
+            ? {
+                sage: next.sage,
+                kind: verdict.kind,
+                lineId: line.id,
+                lineText: line.text,
+                recommendedVerseId,
+                atIndex: next.index,
+              }
+            : null;
+          track("teacher_note_shown", {
+            sage: next.sage,
+            kind: verdict.kind,
+            has_rec: recommendedVerseId ? 1 : 0,
           });
         }
 
         let nextToast = get().toast;
-        let nextUsedDislikeLines = usedDislikeLines;
-        if (dir === "dislike" && Math.random() < DISLIKE_REACTION_CHANCE) {
-          const line = pickUnusedLine(verse.sage, "skip", nextUsedDislikeLines);
+        let nextUsedSkipLineIds = get().usedSkipLineIds;
+        if (dir === "dislike" && Math.random() < SKIP_REACTION_CHANCE) {
+          const line = pickUnusedLine(verse.sage, "skip", nextUsedSkipLineIds);
           if (line) {
             nextToast = { id: Date.now(), text: line.text };
-            nextUsedDislikeLines = [...nextUsedDislikeLines, line.text];
-            track("dislike_reaction", { sage: verse.sage });
+            nextUsedSkipLineIds = [...nextUsedSkipLineIds, line.id];
+            track("skip_reaction", { sage: verse.sage });
           }
         }
 
-        set((state) => ({
-          round: nextRound,
-          recentVerseIds: [verseId, ...state.recentVerseIds].slice(0, RECENT_LIMIT),
-          pendingJudgment: nextPendingJudgment,
-          toast: nextToast,
-          usedDislikeLines: nextUsedDislikeLines,
-          likedVerseIds:
-            dir === "like" && !state.likedVerseIds.includes(verseId)
-              ? [...state.likedVerseIds, verseId]
-              : state.likedVerseIds,
-        }));
-      },
+        const done = next.index >= next.deck.length;
+        if (done && !nextPendingNote) {
+          next = finishPracticeInternal(get, set, next);
+        }
 
-      flipCard: (verseId) => {
-        const { flippedIds } = get();
-        const flippedNow = !flippedIds.includes(verseId);
         set({
-          flippedIds: flippedNow
-            ? [...flippedIds, verseId]
-            : flippedIds.filter((id) => id !== verseId),
+          practice: next,
+          pendingNote: nextPendingNote,
+          toast: nextToast,
+          usedSkipLineIds: nextUsedSkipLineIds,
         });
-        track("card_flip", { verseId, flipped: flippedNow });
       },
 
-      dismissJudgment: () => set({ pendingJudgment: null }),
+      flipPracticeCard: (verseId) => {
+        const { practice } = get();
+        if (!practice) return;
+        set({ practice: flipPracticeCardPure(practice, verseId) });
+        track("card_flip", { verseId, index: practice.index });
+      },
+
+      dismissNote: () => {
+        const { practice, pendingNote } = get();
+        if (!practice) {
+          set({ pendingNote: null });
+          return;
+        }
+        let next = practice;
+        const done = next.index >= next.deck.length;
+        if (done) {
+          next = finishPracticeInternal(get, set, next);
+        }
+        set({ practice: next, pendingNote: null });
+        void pendingNote;
+      },
+
+      acceptRecommendation: () => {
+        const { practice, pendingNote } = get();
+        if (!practice || !pendingNote?.recommendedVerseId) return;
+        const next = insertRecommendedVerse(practice, pendingNote.recommendedVerseId);
+        set({
+          practice: { ...next, devotionGain: next.devotionGain + DEVOTION.recAccept },
+          pendingNote: null,
+        });
+        track("rec_accept", { sage: practice.sage, verseId: pendingNote.recommendedVerseId });
+      },
+
+      addToInventory: (verseId, source, zone) => {
+        const { inventory, readVerseIds, devotion } = get();
+        if (inventory.some((i) => i.verseId === verseId)) return;
+        const verse = getVerse(verseId);
+        if (!verse) return;
+
+        const item: InventoryItem = { verseId, source, zone, at: Date.now() };
+        const nextReadVerseIds = readVerseIds.includes(verseId)
+          ? readVerseIds
+          : [...readVerseIds, verseId];
+        const nextDevotion = { ...devotion };
+        if (source === "live") {
+          nextDevotion[verse.sage] = (nextDevotion[verse.sage] ?? 0) + DEVOTION.liveAdd;
+        }
+
+        set({
+          inventory: [item, ...inventory],
+          readVerseIds: nextReadVerseIds,
+          devotion: nextDevotion,
+        });
+        recalcStage(get, set, verse.sage);
+        track("inventory_add", { source, zone, verseId });
+      },
+
+      removeFromInventory: (verseId) => {
+        set((state) => ({
+          inventory: state.inventory.filter((i) => i.verseId !== verseId),
+        }));
+        track("inventory_remove", { verseId });
+      },
+
+      tickDwellCredit: (sage, deltaMs) => {
+        const { dwellCredit, devotion } = get();
+        const today = todayKey();
+        const current = dwellCredit[sage] ?? { day: today, points: 0, accMs: 0 };
+        const reset = current.day === today ? current : { day: today, points: 0, accMs: 0 };
+        const accMs = reset.accMs + deltaMs;
+
+        const ticks = Math.floor(accMs / DEVOTION.dwellTickMs);
+        const remainderMs = accMs % DEVOTION.dwellTickMs;
+        const affordable = Math.max(0, DEVOTION.dwellDailyCap - reset.points);
+        const award = Math.min(ticks, affordable);
+
+        const nextDwell = {
+          ...dwellCredit,
+          [sage]: { day: today, points: reset.points + award, accMs: award > 0 ? remainderMs : accMs },
+        };
+        if (award > 0) {
+          set({
+            dwellCredit: nextDwell,
+            devotion: { ...devotion, [sage]: (devotion[sage] ?? 0) + award * DEVOTION.dwellPerTick },
+          });
+          recalcStage(get, set, sage);
+        } else {
+          set({ dwellCredit: nextDwell });
+        }
+      },
+
+      toggleSound: () => {
+        set((state) => {
+          track("sound_toggle", { on: state.soundOn ? 0 : 1 });
+          return { soundOn: !state.soundOn };
+        });
+      },
+
+      dismissIntro: () => set({ seenIntro: true }),
       dismissToast: () => set({ toast: null }),
     }),
     {
       name: "seonghyeon-round",
+      version: 4,
       storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({
-        round: state.round,
-        recentVerseIds: state.recentVerseIds,
-        flippedIds: state.flippedIds,
-        usedDislikeLines: state.usedDislikeLines,
-        likedVerseIds: state.likedVerseIds,
-        roundsPlayed: state.roundsPlayed,
+        practice: state.practice,
+        readVerseIds: state.readVerseIds,
+        flippedVerseIds: state.flippedVerseIds,
+        inventory: state.inventory,
+        devotion: state.devotion,
+        stage: state.stage,
+        dwellCredit: state.dwellCredit,
+        practicesDone: state.practicesDone,
+        lastPracticeVerseIds: state.lastPracticeVerseIds,
+        soundOn: state.soundOn,
+        seenIntro: state.seenIntro,
       }),
+      // v1(및 한 번도 안 쓰인 v3) 저장 데이터를 v4 모양으로 옮긴다.
+      migrate: (persistedState) => {
+        const old = persistedState as {
+          version?: number;
+          likedVerseIds?: string[];
+          roundsPlayed?: number;
+        } | null;
+
+        if (!old || old.version === 4) return old as unknown;
+
+        const likedVerseIds = old.likedVerseIds ?? [];
+        const readVerseIds = likedVerseIds;
+        const now = Date.now();
+        const inventory: InventoryItem[] = likedVerseIds
+          .map((verseId): InventoryItem | null => {
+            const verse = getVerse(verseId);
+            if (!verse) return null;
+            return { verseId, source: "practice", zone: verse.sage, at: now };
+          })
+          .filter((i): i is InventoryItem => i !== null);
+
+        const devotion = zeroCounts();
+        for (const id of likedVerseIds) {
+          const verse = getVerse(id);
+          if (verse) devotion[verse.sage] = (devotion[verse.sage] ?? 0) + 2;
+        }
+
+        const stage = zeroStages();
+        for (const id of SAGE_IDS) {
+          stage[id] = computeStage(devotion[id], readCountFor(id, readVerseIds), 0);
+        }
+
+        return {
+          version: 4,
+          practice: null,
+          readVerseIds,
+          flippedVerseIds: [],
+          inventory,
+          devotion,
+          stage,
+          dwellCredit: zeroDwell(),
+          practicesDone: zeroCounts(),
+          lastPracticeVerseIds: { confucius: [], laozi: [], sunzi: [] },
+          soundOn: false,
+          seenIntro: false,
+        };
+      },
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
     }
   )
 );
+
+/** 수행이 끝났을 때(10장 완료) 누적 상태에 반영하고 outcome을 확정한다 (§5.8). 재계산 금지. */
+function finishPracticeInternal(
+  get: () => PlayStore,
+  set: (partial: Partial<PlayStore>) => void,
+  practice: PracticeState
+): PracticeState {
+  const { readVerseIds, flippedVerseIds, inventory, devotion, practicesDone, lastPracticeVerseIds } =
+    get();
+
+  const nextReadVerseIds = Array.from(new Set([...readVerseIds, ...practice.deck]));
+  const nextFlippedVerseIds = Array.from(new Set([...flippedVerseIds, ...practice.flippedIds]));
+
+  const now = Date.now();
+  const newItems: InventoryItem[] = practice.likedIds
+    .filter((id) => !inventory.some((i) => i.verseId === id))
+    .map((verseId) => ({ verseId, source: "practice" as const, zone: practice.sage, at: now }));
+  const nextInventory = [...newItems, ...inventory];
+
+  const nextDevotion = {
+    ...devotion,
+    [practice.sage]: Math.max(0, (devotion[practice.sage] ?? 0) + practice.devotionGain),
+  };
+
+  const stageComputed = computeStage(
+    nextDevotion[practice.sage],
+    readCountFor(practice.sage, nextReadVerseIds),
+    flippedCountFor(practice.sage, nextFlippedVerseIds)
+  );
+  const stageAfter = advanceStage(practice.stageBefore, stageComputed);
+
+  const outcome = finalizePracticeOutcome(practice, stageAfter, VERSES);
+
+  const nextStageMap = { ...get().stage, [practice.sage]: stageAfter };
+  const nextPracticesDone = {
+    ...practicesDone,
+    [practice.sage]: (practicesDone[practice.sage] ?? 0) + 1,
+  };
+  const nextLastPracticeVerseIds = { ...lastPracticeVerseIds, [practice.sage]: practice.deck };
+
+  set({
+    readVerseIds: nextReadVerseIds,
+    flippedVerseIds: nextFlippedVerseIds,
+    inventory: nextInventory,
+    devotion: nextDevotion,
+    stage: nextStageMap,
+    practicesDone: nextPracticesDone,
+    lastPracticeVerseIds: nextLastPracticeVerseIds,
+  });
+
+  if (stageAfter !== practice.stageBefore) {
+    track("stage_up", { sage: practice.sage, from: practice.stageBefore, to: stageAfter, via: "practice" });
+  }
+  track("practice_complete", {
+    sage: practice.sage,
+    liked_count: practice.likedIds.length,
+    flipped_count: practice.flippedIds.length,
+    duration_ms: now - practice.startedAt,
+    head_kind: outcome.headKind,
+  });
+
+  return { ...practice, outcome };
+}
+
+function recalcStage(get: () => PlayStore, set: (partial: Partial<PlayStore>) => void, sage: SageId) {
+  const { devotion, readVerseIds, flippedVerseIds, stage } = get();
+  const computed = computeStage(
+    devotion[sage] ?? 0,
+    readCountFor(sage, readVerseIds),
+    flippedCountFor(sage, flippedVerseIds)
+  );
+  const before = stage[sage];
+  const after = advanceStage(before, computed);
+  if (after !== before) {
+    set({ stage: { ...stage, [sage]: after } });
+    track("stage_up", { sage, from: before, to: after, via: "live" });
+  }
+}

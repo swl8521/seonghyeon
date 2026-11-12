@@ -9,7 +9,7 @@ import {
   type PanInfo,
 } from "motion/react";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
-import type { SwipeDirection } from "@/lib/judge";
+import type { SwipeDirection } from "@/lib/practice";
 import type { Verse } from "@/lib/types";
 import { getVersePose } from "@/lib/monkey";
 import { MonkeyCharacter } from "@/components/MonkeyCharacter";

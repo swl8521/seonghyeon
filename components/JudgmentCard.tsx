@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import type { JudgmentResult } from "@/lib/judge";
+import type { JudgmentResult } from "@/lib/practice";
 import type { Sage } from "@/lib/types";
 import { SAGE_BORDER_CLASS } from "@/lib/sageColors";
 import { MonkeyCharacter } from "@/components/MonkeyCharacter";
@@ -10,12 +10,21 @@ interface JudgmentCardProps {
   sage: Sage;
   lineText: string;
   result: JudgmentResult;
+  recommendedOriginal?: string | null;
+  onAccept?: () => void;
   onContinue: () => void;
 }
 
-export function JudgmentCard({ sage, lineText, result, onContinue }: JudgmentCardProps) {
+export function JudgmentCard({
+  sage,
+  lineText,
+  result,
+  recommendedOriginal,
+  onAccept,
+  onContinue,
+}: JudgmentCardProps) {
   const shouldReduceMotion = useReducedMotion();
-  const accepted = result === "accept";
+  const isNod = result === "nod";
 
   return (
     <motion.div
@@ -27,10 +36,10 @@ export function JudgmentCard({ sage, lineText, result, onContinue }: JudgmentCar
     >
       <span
         className={`absolute right-5 top-5 rotate-12 rounded-lg border-4 px-3 py-1 font-sans text-lg font-bold ${
-          accepted ? "border-like text-like" : "border-dislike text-dislike"
+          isNod ? "border-accent text-accent" : "border-sage-laozi text-sage-laozi"
         }`}
       >
-        {accepted ? "받아들임" : "거절"}
+        {isNod ? "끄덕" : "일깨움"}
       </span>
 
       <MonkeyCharacter pose={sage.id === "confucius" ? "bow" : sage.id === "laozi" ? "meditate" : "point"} size={104} />
@@ -38,13 +47,29 @@ export function JudgmentCard({ sage, lineText, result, onContinue }: JudgmentCar
         {sage.hanja} · {sage.name}
       </p>
       <p className="font-serif text-lg leading-relaxed">{lineText}</p>
-      <button
-        type="button"
-        onClick={onContinue}
-        className="mt-4 rounded-full bg-accent px-6 py-2 font-sans text-sm text-accent-foreground"
-      >
-        계속
-      </button>
+
+      {recommendedOriginal && (
+        <p className="font-serif text-base text-muted">이것도 읽어보게 — {recommendedOriginal}</p>
+      )}
+
+      <div className="mt-4 flex items-center gap-3">
+        {recommendedOriginal && onAccept && (
+          <button
+            type="button"
+            onClick={onAccept}
+            className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground"
+          >
+            읽어보기
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onContinue}
+          className="rounded-full bg-accent px-6 py-2 font-sans text-sm text-accent-foreground"
+        >
+          계속
+        </button>
+      </div>
     </motion.div>
   );
 }

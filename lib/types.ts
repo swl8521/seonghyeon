@@ -27,9 +27,36 @@ export interface Verse {
 }
 
 export interface SageLine {
+  id: string; // 로드 시 부여 (content/lines.json 자체엔 없음)
   sage: SageId;
   kind: "nod" | "nudge" | "skip" | "admit" | "promote" | "stay";
   original?: string; // 고전에서 따온 구절이면 원문
   text: string; // 화면에 보일 한국어 대사
   reviewed: boolean; // 사람 검수 여부, 생성 시 false
+}
+
+export type Stage = "outside" | "entered" | "disciple" | "senior";
+export type Zone = "hall" | SageId;
+
+export interface InventoryItem {
+  verseId: string;
+  source: "live" | "practice";
+  zone: Zone; // 담은 곳
+  at: number; // epoch ms
+}
+
+export interface TeacherNote {
+  sage: SageId;
+  kind: "nod" | "nudge";
+  lineId: string;
+  recommendedVerseId: string | null;
+  accepted: boolean;
+  atIndex: number;
+}
+
+export type PracticeHeadKind = "enter" | "promote" | "stay" | "front" | "none";
+
+export interface PracticeOutcome {
+  headKind: PracticeHeadKind;
+  pickedVerseId: string | null;
 }
