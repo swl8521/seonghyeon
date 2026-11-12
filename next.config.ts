@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
   // v1 경로 전부 308로 영구 이전 (SPEC v4 §4.9)
   async redirects() {
     return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "seonghyeon-lac\\.vercel\\.app" }],
+        destination: "https://munha.yeoul.dev/:path*",
+        permanent: true,
+      },
       { source: "/play", destination: "/", permanent: true },
       { source: "/result", destination: "/", permanent: true },
       { source: "/saved", destination: "/inventory", permanent: true },
