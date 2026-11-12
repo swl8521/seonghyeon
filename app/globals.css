@@ -74,6 +74,19 @@ body {
   overscroll-behavior-x: none;
 }
 
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+summary,
+select:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* 등불 글로우: 4초 주기로 숨쉬듯 밝아졌다 어두워진다 (§4.2) */
 @keyframes lantern-breathe {
   0%,
