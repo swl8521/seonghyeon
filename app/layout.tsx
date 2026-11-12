@@ -8,8 +8,10 @@ import "./pretendard-subset.css";
 
 // UI는 기본 굵기 고딕, 한국어 구절·제목은 마루 부리로 자체 호스팅한다.
 // Noto 명조는 한문 원문용으로 기본 굵기만 유지한다.
+// 마루 부리는 원본이 424 KiB라, 이 앱이 실제로 그리는 글자만 남긴 서브셋을
+// 쓴다 (scripts/subset-maruburi.py). 빠진 글자는 Noto 명조로 떨어진다.
 const maruBuri = localFont({
-  src: "../public/fonts/MaruBuri-Regular.woff2",
+  src: "../public/fonts/MaruBuri-Regular.subset.woff2",
   variable: "--font-maru-buri",
   weight: "400",
   display: "optional",
