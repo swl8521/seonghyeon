@@ -8,6 +8,8 @@ export interface Sage {
   name: string; // "공자"
   hanja: string; // "孔子"
   book: string; // "논어"
+  hall: string; // "대성전"
+  hallHanja: string; // "大成殿"
   intro: string; // 성현 소개 2줄 (책 이름, 핵심 사상)
   vec: Vec;
 }

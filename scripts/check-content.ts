@@ -57,7 +57,7 @@ for (const id of SAGE_IDS) {
     continue;
   }
   checkVec(`sages.json[${id}].vec`, found.vec);
-  for (const field of ["name", "hanja", "book", "intro"] as const) {
+  for (const field of ["name", "hanja", "book", "hall", "hallHanja", "intro"] as const) {
     if (!found[field]) fail(`sages.json[${id}]: 필드 "${field}"가 비어있음`);
   }
   for (const banned of ["typeName", "typeTagline"]) {

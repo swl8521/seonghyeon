@@ -1,20 +1,20 @@
-# 성현 문하 MVP: 작업 지시서 v3
+# 성현 문하 MVP: 작업 지시서 v4 (사이버 법당)
 
 > 가칭: **성현 문하(門下)** (코드명 `seonghyeon` 유지)
-> 한 줄: **고전을 스와이프로 읽으면, 성현이 나를 제자로 들인다.**
-> 목적: 고전을 읽게 만드는 것. 다른 구절 앱과의 차이는 **성현이 내 독서에 반응하고, 많이 읽을수록 문하가 깊어진다**는 점.
-> 형태: Next.js 웹 하나. 서버 DB, 로그인, 결제, LLM은 없음.
+> 한 줄: **사이버 법당에서 모두가 같은 구절을 함께 보고, 전각에 들어가 수행하면 성현이 나를 제자로 들인다.**
+> 목적: 고전을 읽게 만드는 것.
+> 구성: 프론트 Next.js (Vercel) + **실시간 서버 Node/Socket.IO (집 서버, `server/` 폴더, 구현 완료)**
 > 배포: https://seonghyeon-lac.vercel.app
 
 ---
 
 ## 0. Claude Code에게
 
-- 이 문서는 **v1으로 구현·배포된 코드베이스를 고치는 지시서**야. 새로 만들지 말고 기존 코드를 수정해.
-- v2 지시서로 이미 작업한 부분이 있으면 버리지 말고 이어서 해. v2와 v3가 다른 곳은 **v3가 우선**이야.
-- 먼저 **§1 변경 요약**을 읽고 **§11 작업 순서대로** 진행해.
-- 범위 밖(§12)은 만들지 마. 애매하면 더 작게.
-- 단계마다 `npm run build`, `npm run test`, `npm run check:content` 통과를 확인하고 넘어가.
+- 이 문서는 **v1으로 구현·배포된 코드베이스를 고치는 지시서**야. v2, v3로 이미 작업한 부분이 있으면 이어서 하고, 다른 곳은 **v4가 우선**이야.
+- **`server/` 폴더는 이미 구현·테스트된 실시간 서버**야. 레포 루트에 그대로 두고, 프로토콜(§9)에 맞춰 프론트만 붙여. 서버 수정이 꼭 필요하면 이유를 작업 로그에 남기고 `server/test`를 같이 고쳐.
+- 서버 설치·운영은 `docs/HOME_SERVER.md`가 따로 있어. 사람이 하는 일이니 너는 건드리지 마.
+- **§13 작업 순서대로** 진행. 범위 밖(§14)은 만들지 마.
+- 단계마다 `npm run build`, `npm run test`, `npm run check:content`, `cd server && npm test` 통과 확인.
 
 ---
 
@@ -22,37 +22,32 @@
 
 ### 1.1 버전별 방향
 
-| | v1 (배포됨) | v2 (폐기된 방향) | **v3 (이번)** |
-|---|---|---|---|
-| 성현의 역할 | 나를 판별, 매칭 | 곁에서 한마디 | **스승. 나를 제자로 들이고, 문하가 깊어짐** |
-| 주인공 | 대표 유형 | 구절 | **문하 + 나를 들인 구절** (둘이 한 세트) |
-| 어휘 | 인연, 매칭 | 와닿음 | **문하, 입문, 제자, 고제, 스승** |
-| 반복 동기 | 없음 | 읽기 진행도 | **문하 단계 승급 = 더 읽어야 오름** |
-| 공유 | 유형 (`/r/[sage]`) | 구절 (`/v/[id]`) | **문하 + 구절** (`/s/[sage]/[id]`) |
-
-v2에서 가져오는 것: 와닿음/넘김 라벨, 스승의 평 + 추천 구절, 안 읽은 구절 우선 덱, 오늘 읽은 21구절 목록, `/saved`, Firebase 분석.
-v2에서 버리는 것: "오늘 가장 와닿은 구절"이 단독 주인공인 결과 화면, "한 줄 성향".
-
-### 1.2 v1 코드에서 바꿀 것
-
-| 영역 | v1 | v3 |
+| | v3 | **v4** |
 |---|---|---|
-| 스와이프 라벨 | 좋아요 / 싫어요 | **와닿음 / 넘김** |
-| 카드 앞면 | 출처 없음 | 하단에 출처 |
-| 6·12·18장 이벤트 | 수락/거절 판정, 표시 없음 | **스승의 평**(끄덕 / 일깨움 도장) + 추천 구절 |
-| 결과 화면 | 대표 유형 크게 + "매칭 (41)" | **문하 헤드라인 + 나를 들인 구절** → 세 문하 단계 → 오늘 읽은 21구절 |
-| 누적 | 좋아요 구절만 | **성현별 정진 점수, 단계, 읽은 구절, 해설 읽은 구절** |
-| 덱 | 랜덤 | 안 읽은 구절 우선 |
-| 공유 | `/r/[sage]` | `/s/[sage]/[verseId]` (+ `/v/[verseId]`), `/r/*`는 `/`로 리다이렉트 |
-| 분석 | PostHog (배포에서 로드 안 됨) | **Firebase Analytics(GA4)** |
+| 공간 | 랜딩 → 스와이프 21장 | **광장(실시간) → 전각 3곳(실시간) → 전각 안 수행(스와이프)** |
+| 구절 | 혼자 덱을 넘김 | 광장·전각: **모두가 같은 구절을 1분마다 함께 봄** / 수행: 혼자 넘김 |
+| 함께 있다는 느낌 | 없음 | **구역별 접속자 수, 합장 수** |
+| 수행 덱 | 3인 섞어 21장 | **그 전각 성현 구절만 10장** |
+| 저장 | `/saved` | **경함(經函)** `/inventory` (실시간 구절 담기 + 수행 와닿음) |
+| 분위기 | 한지 | **사이버 법당**: 밤 법당 톤, 등불, 단청 포인트 |
+
+v3에서 그대로 가져오는 것: 와닿음/넘김, 스승의 평(끄덕/일깨움) + 추천 구절, 안 읽은 구절 우선, 정진 점수와 문하 단계(문외·입문·제자·고제), 결과 헤드라인 + 나를 들인 구절, `/s`·`/v` 공유, Firebase 분석, 콘텐츠 규칙.
+
+### 1.2 v1 코드에서 바꿀 것 (요약)
+
+- PostHog 제거 → Firebase Analytics
+- `/play`, `/result`의 3인 혼합 21장 → 전각별 `/z/[sage]/practice` 10장
+- 대표 유형, 매칭, 관계 판정 삭제
+- 좋아요/싫어요 → 와닿음/넘김, 카드 앞면 출처 추가
+- 판별 이벤트 → 스승의 평
+- `/r/*`, `/play`, `/result` → 리다이렉트 (§4.9)
 
 ### 1.3 배포에서 확인된 문제 (같이 고쳐)
 
-- 분석 도구가 로드되지 않아 이벤트가 하나도 안 쌓임 → §10
-- "매칭 (41)"은 누적 좋아요 구절인데 라벨이 오해를 부름 → 삭제, `/saved`로 이동
-- 판별 카드에 수락/거절 표시가 없음 → 스승의 평 도장 (§5.3)
-- 카드 앞면에 출처 없음
-- 결과 화면에서 목록을 접으면 버튼까지 빈 공간이 큼
+- 분석 도구 미로드 → §12
+- "매칭 (41)" 라벨 오해 → 경함으로 이동
+- 판별 카드에 결과 표시 없음 → 스승의 평 도장
+- 카드 앞면 출처 없음, 결과 화면 빈 공간
 
 ---
 
@@ -60,264 +55,319 @@ v2에서 버리는 것: "오늘 가장 와닿은 구절"이 단독 주인공인 
 
 | 가설 | 지표 | 측정 |
 |---|---|---|
-| 스와이프로 고전을 끝까지 읽는다 | 21장 완독률 | `round_start` → `round_complete` |
-| 구절을 깊이 읽는다 | 해설 읽기율 | `card_flip` / `verse_view` |
-| 문하 결과를 남에게 보여주고 싶다 | 결과 대비 공유율 | `result_view` → `share_click` |
-| 공유가 사람을 데려온다 | 공유 랜딩 대비 읽기 시작률 | `share_landing` → `round_start` |
-| 승급하려고 다시 온다 | D1 / D7 재방문, 2판 이상 비율, `stage_up` 발생률 | GA4 리텐션, `round_start.rounds_played` |
-| 성현과 대화 수요가 있다 | 페이크 도어 클릭률 | `more_talk_click` |
+| 광장이 사람을 머물게 한다 | 광장 체류 시간, 본 실시간 구절 수 | `live_verse_view`, GA4 참여 시간 |
+| 함께 보는 느낌이 행동을 만든다 | 합장률, 담기율 | `bow`, `inventory_add(source=live)` / `live_verse_view` |
+| 광장 → 전각 → 수행으로 깊어진다 | 단계별 전환율 | `zone_enter` → `practice_start` → `practice_complete` |
+| 구절을 깊이 읽는다 | 해설 읽기율 | `card_flip`, `live_flip` |
+| 승급하려고 다시 온다 | D1 / D7, `stage_up` 발생률 | GA4 리텐션 |
+| 공유가 사람을 데려온다 | 공유 랜딩 → 광장 입장 | `share_landing` → `zone_enter` |
+| 성현과 대화 수요 | 페이크 도어 클릭률 | `more_talk_click` |
 
 ---
 
 ## 3. 기술 스택
 
-- Next.js App Router, TypeScript, Tailwind CSS (v1 유지)
-- motion (카드 드래그), zustand + persist (localStorage) (v1 유지)
-- next/og (OG 이미지)
-- **firebase** (`firebase/app`, `firebase/analytics`만). `posthog-js` 제거
-- Noto Serif KR / Noto Sans KR, Vercel 배포
+- 프론트: Next.js App Router, TypeScript, Tailwind, motion, zustand + persist, next/og (v1 유지)
+- 실시간 클라이언트: **socket.io-client** (`server/`와 같은 메이저 버전 4)
+- 분석: **firebase** (`firebase/app`, `firebase/analytics`). `posthog-js` 제거
+- 실시간 서버: `server/` (Node 20+, Socket.IO 4, PM2 fork 1개, Cloudflare Tunnel 뒤)
+- 폰트: Noto Serif KR / Noto Sans KR
+
+환경변수 (프론트, `.env.example`에 이름만):
+```
+NEXT_PUBLIC_LIVE_URL=https://live-munha.yeoul.dev   # Cloudflare Tunnel (집 서버)
+NEXT_PUBLIC_SITE_URL=https://munha.yeoul.dev        # OG·공유 링크 절대 주소 (metadataBase)
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+```
+
+### 3.1 도메인
+
+`yeoul.dev`는 앞으로 만들 서비스들이 같이 쓰는 공용 도메인. 성현 문하는 서브도메인으로:
+
+| 주소 | 용도 |
+|---|---|
+| `https://munha.yeoul.dev` | 프론트 (Vercel 커스텀 도메인) |
+| `https://live-munha.yeoul.dev` | 실시간 서버 (Cloudflare Tunnel → 집 서버) |
+
+- `app/layout.tsx`의 `metadata.metadataBase`는 `NEXT_PUBLIC_SITE_URL`로. OG 이미지, 공유 URL(`/s`, `/v`)은 전부 이 값 기준 절대 주소
+- 공유 버튼이 만드는 링크도 `window.location.origin` 말고 `NEXT_PUBLIC_SITE_URL` 사용 (프리뷰·vercel.app 주소로 공유되는 것 방지)
+- 기존 `seonghyeon-lac.vercel.app`으로 들어온 요청은 `middleware.ts`에서 `munha.yeoul.dev`로 308 리다이렉트 (호스트가 `seonghyeon-lac.vercel.app`일 때만. 프리뷰 주소는 건드리지 않음)
 
 ---
 
-## 4. 화면
+## 4. 공간과 화면
 
-### 4.1 흐름
+### 4.1 구조
 
 ```
-랜딩(/) ─▶ 읽기(/play) 21장 ─▶ 문하 결과(/result) ─▶ 공유
-   ▲                                                │
-   └──────── 공유 랜딩(/s/[sage]/[verseId]) ◀─────────┘
+광장 /  ─────────────── 실시간: 3인 전체 60구절, 1분마다 교체
+ ├─ 대성전  /z/confucius ── 실시간: 공자 20구절
+ │    └─ 수행 /z/confucius/practice → 결과 /z/confucius/result
+ ├─ 태청궁  /z/laozi ────── 실시간: 노자 20구절
+ │    └─ 수행 → 결과
+ └─ 병성각  /z/sunzi ────── 실시간: 손자 20구절
+      └─ 수행 → 결과
+
+경함 /inventory · 공유 /s/[sage]/[verseId], /v/[verseId] · /privacy
 ```
 
-### 4.2 랜딩 `/`
+전각 이름 (`sages.json`에 `hall` 필드로):
 
-- 메인 카피: **"구절을 읽으면, 성현이 당신을 제자로 들입니다."**
-- 서브 카피: "와닿으면 오른쪽, 아니면 왼쪽. 많이 읽을수록 문하가 깊어집니다."
-- 성현 3인 원형 아이콘 (현재 유지)
-- **재방문자**: 아이콘 아래에 각 성현의 단계 뱃지(`문외` / `입문` / `제자` / `고제`)와 읽은 구절 `n/20`
-- 버튼: [읽기 시작] (재방문자는 [이어 읽기])
-- 하단 작은 링크: [내가 고른 구절] [개인정보처리방침]
+| 성현 | 전각 | 한자 |
+|---|---|---|
+| 공자 | 대성전 | 大成殿 |
+| 노자 | 태청궁 | 太淸宮 |
+| 손자 | 병성각 | 兵聖閣 |
 
-### 4.3 읽기 `/play`
+### 4.2 분위기: 사이버 법당
 
-- v1 유지: 카드 21장, 드래그 / 버튼 / ← → 키, 탭하면 뒤집기, 상단 진행도
-- **라벨 변경**: 와닿음(오른쪽) / 넘김(왼쪽). 버튼, 드래그 스탬프 모두. 내부 값은 `like` / `dislike` 유지 가능
-- **카드 앞면 하단에 출처**: `손자병법 · 허실편` (작게, 흐린 색)
-- 처음 보는 구절이면 카드 우상단에 작은 `처음` 표시
-- 넘김 시 25% 확률로 성현 반응 토스트 (대사 `skip`, §7.2)
-- 6, 12, 18장째 직후 **스승의 평** 카드 (§5.3)
-- 스와이프 직후, 그 성현의 정진 점수가 오른 경우 카드가 날아가는 방향에 작은 `+2` 같은 표시 (300ms, reduced-motion이면 생략)
+- **기본 테마는 "밤 법당"**: 먹빛에 가까운 남색 배경, 한지색 글자, 등불(따뜻한 주황) 글로우, 단청 색(녹청·주홍·황)은 포인트로만
+- 라이트 모드(시스템 설정)는 **"새벽 법당"**: 기존 한지 톤
+- 실시간 구절 카드 뒤에 은은한 등불 글로우가 천천히 숨쉬듯 밝아졌다 어두워짐 (4초 주기). 향 연기 같은 아주 옅은 파티클은 선택 (성능 우선, 모바일에서 30fps 이하로 떨어지면 끔)
+- **정각 전환**: 모든 접속자 화면에서 동시에 구절이 바뀜. 이전 구절은 위로 연기처럼 흩어지고 새 구절이 아래에서 떠오름 (600ms)
+- **목탁 소리**: 정각 전환 때 "똑" 한 번. **기본 꺼짐**, 우상단 스피커 아이콘으로 켬 (설정은 localStorage)
+- `prefers-reduced-motion`이면 글로우·연기·전환 애니메이션 전부 끄고 크로스페이드만
+- 모바일 우선 390px, 데스크톱은 가운데 480px 컬럼 (v1 유지)
 
-### 4.4 문하 결과 `/result`
+### 4.3 광장 `/`
 
-위에서부터 이 순서로. 섹션 간격은 촘촘하게, 빈 공간 없이.
+위에서부터:
 
-**① 문하 헤드라인 + 나를 들인 구절** (한 장의 카드, 가장 크게. 이게 공유 카드 그 자체)
+1. 상단 바: `광장` · 지금 **N명** (광장 접속자) · 스피커 아이콘 · 경함 아이콘(담은 개수 뱃지)
+2. **실시간 구절 카드** (화면 중심, 가장 크게)
+   - 성현 이름 작게, 원문 크게, 음독, 번역, 출처
+   - 탭하면 해설 (카드 뒤집기, v1 컴포넌트 재사용)
+   - 카드 아래: 다음 구절까지 남은 시간 (얇은 원형 게이지 + `0:37`)
+3. 행동 버튼 2개
+   - **[합장]**: 누를 때마다 작은 빛이 위로 떠오름. 옆에 "함께 합장 **7**" (이 구역, 이 구절 기준 누적. 서버 값)
+   - **[담기]**: 경함에 저장. 이미 담았으면 `담음` 상태로 비활성
+4. **전각 문 3개** (가로 3칸): 아이콘, 전각 이름, 성현 이름, 지금 **n명**, 내 문하 단계 뱃지
+5. 하단 작은 링크: 처음 왔다면 "이곳은" (한 줄 설명 바텀시트), 개인정보처리방침
 
-- 헤드라인 (§5.6 규칙):
-  - 승급: "**공자** 문하의 **제자**가 되었습니다"
-  - 첫 입문: "**공자** 문하에 들었습니다"
-  - 유지: "오늘도 **공자** 문하에서 읽었습니다"
-  - 없음: "아직 어느 문하에도 들지 못했습니다"
-- 헤드라인 아래, 그 성현의 한마디 (대사 `admit` / `promote` / `stay`, §7.2). 원문 인용이 있으면 원문 작게 + 풀이
-- 그 아래 **"당신을 들인 구절"**: 원문 크게, 음독, 번역, 출처. 탭하면 해설
-- 버튼: [보내기] (주 버튼) [이미지 저장]
-- "없음"일 때: 구절 대신 "와닿는 구절을 더 찾아보게." + [다시 읽기]. 공유 버튼 숨김
+처음 방문자에게만 카드 위에 한 줄 안내 (닫으면 다시 안 보임): "모두가 같은 구절을 함께 봅니다. 1분마다 바뀝니다."
 
-**② 세 문하**
+### 4.4 전각 `/z/[sage]`
 
-- 성현 3줄. 각 줄: 아이콘, 이름, 단계 뱃지, 다음 단계까지 게이지, 읽은 구절 `n/20`
-- 게이지 아래 작은 안내 (§5.5의 부족한 조건 중 하나): "제자까지: 정진 6점 더" 또는 "제자까지: 구절 3개 더 읽기" 또는 "고제까지: 해설 4개 더 읽기"
-- 이번 판에 승급한 성현은 줄에 낙관 도장 애니메이션 한 번
-- 성현 이름 탭하면 소개 2줄 (`intro`)
+광장과 같은 레이아웃, 차이점만:
 
-**③ 오늘 읽은 21구절**
+- 상단 바: `← 광장` · `대성전` · 지금 **n명**
+- 실시간 구절은 그 성현 20구절 풀
+- 전각 문 3개 대신 **[수행하기]** 큰 버튼 + 내 문하 카드 (단계 뱃지, 다음 단계까지 게이지, 안내 문구 v3 §5.5 `nextRequirement`)
+- 성현 소개 2줄 (`intro`), 접힘
 
-- 기본 접힘. 펼치면 한 줄씩: 원문 + 번역 앞부분. 와닿음 누른 건 낙관 표시
-- 각 줄의 ☆를 누르면 ①의 "당신을 들인 구절"을 그걸로 교체 (헤드라인 성현 구절이 아니어도 허용)
-- 줄을 탭하면 해설 펼침
+### 4.5 수행 `/z/[sage]/practice`
 
-**④ 버튼**: [다시 읽기] [내가 고른 구절]
+v3의 읽기 화면을 그 성현 전용으로:
 
-**⑤ 맨 아래 텍스트 링크**: [성현께 직접 여쭙기] (페이크 도어, §9)
+- 카드 **10장**, 그 성현 구절만 (덱 규칙 §5.4)
+- 와닿음(오른쪽) / 넘김(왼쪽), 드래그·버튼·← → 키, 탭하면 뒤집기, 상단 진행도 `n / 10`
+- 카드 앞면 하단 출처, 처음 보는 구절 `처음` 표시, 정진 `+n` 표시
+- 넘김 시 25% 확률 반응 토스트 (`skip`)
+- **4장, 8장째 직후 스승의 평** (§5.3)
+- 상단 바에 이 전각 접속자 수 작게 (수행 중에도 전각 방에 들어가 있는 상태 유지)
+- 테마는 전각과 같음
 
-- "매칭", "유형", "손자형" 같은 v1 표현 전부 제거
+### 4.6 수행 결과 `/z/[sage]/result`
 
-### 4.5 내가 고른 구절 `/saved`
+v3 결과 화면을 한 성현 기준으로:
 
-- 누적 와닿음 구절 전체, 최신순. 성현별 필터 탭 (전체 / 공자 / 노자 / 손자)
-- 각 구절 [보내기] → `/v/[verseId]` 링크
-- 비어 있으면 "아직 고른 구절이 없어요" + [읽기 시작]
+1. **문하 헤드라인 + 나를 들인 구절** (한 장의 카드 = 공유 카드)
+   - 헤드라인 (§5.6): 첫 입문 "**대성전**에서 **공자** 문하에 들었습니다" / 승급 "**공자** 문하의 **제자**가 되었습니다" / 유지 "오늘도 **공자** 문하에서 수행했습니다" / 문하 앞 "**공자** 문하 앞에 섰습니다" / 없음 "아직 문이 열리지 않았습니다"
+   - 성현 대사 (`admit` / `promote` / `stay`)
+   - "당신을 들인 구절": 원문, 음독, 번역, 출처, 탭하면 해설
+   - [보내기] (주) [이미지 저장]. 없음이면 구절·공유 대신 "와닿는 구절을 더 찾아보게." + [다시 수행]
+2. **내 문하** 카드: 단계 뱃지, 게이지, `n/20`, 다음 단계 안내. 승급했으면 낙관 도장 애니메이션
+3. **이번 수행 10구절** (접힘, ☆로 나를 들인 구절 교체, 탭하면 해설)
+4. 버튼: [다시 수행] [전각으로] [광장으로]
+5. 맨 아래 [성현께 직접 여쭙기] (페이크 도어 §11)
 
-### 4.6 공유 랜딩
+### 4.7 경함 `/inventory`
 
-**`/s/[sage]/[verseId]`** (결과 화면에서 보낸 링크)
-- 상단: "누군가 **공자** 문하에 들며 이 구절을 보냈어요"
-- 구절 카드 (원문, 음독, 번역, 해설 펼침, 출처)
-- 버튼: [나도 읽어보기] → `/play?from=share&sage=confucius&id=...`
+- 제목 "경함(經函)", 부제 "담아둔 구절"
+- 실시간에서 [담기]한 구절 + 수행에서 와닿음 누른 구절, 최신순, 중복 없음
+- 필터 탭: 전체 / 공자 / 노자 / 손자
+- 각 구절: 원문, 번역, 출처, 담은 곳 작게 (`광장` / `대성전` / `대성전 수행` …), 담은 날짜
+- 각 구절 [보내기] → `/v/[verseId]`, [빼기]
+- 비어 있으면 "아직 담은 구절이 없습니다" + [광장으로]
 
-**`/v/[verseId]`** (`/saved`에서 보낸 링크)
-- 상단: "누군가 이 구절을 보냈어요" + 같은 카드 + [다른 구절도 읽어보기]
+### 4.8 공유 랜딩
 
-**공통**: 공유로 들어온 첫 판은 그 구절을 덱에 넣지 **않고**, 그 성현 구절을 최소 2장 포함
+- **`/s/[sage]/[verseId]`** (수행 결과에서 보낸 링크): "누군가 **공자** 문하에 들며 이 구절을 보냈습니다" + 구절 카드(해설 펼침) + [법당에 들어가기] → `/z/{sage}?from=share&id=...`
+- **`/v/[verseId]`** (경함에서 보낸 링크): "누군가 이 구절을 보냈습니다" + 카드 + [법당에 들어가기] → `/?from=share&id=...`
+- 공유로 들어온 사람의 첫 수행은 공유된 구절을 덱에서 빼고 시작
+- OG: v3 §8 그대로 (`/s`: `孔子 門下` + 구절, `/v`: 성현 이름 + 구절). **배경만 밤 법당 톤**으로
 
-**`/r/[sage]`** (v1 링크): `/`로 308 리다이렉트
+### 4.9 리다이렉트 (308)
 
-### 4.7 `/privacy`
+- `/r/[sage]` → `/z/[sage]`
+- `/play` → `/`
+- `/result` → `/`
+- `/saved` → `/inventory`
 
-- 한 문단: 로그인·개인정보 수집 없음, 읽기 기록은 브라우저(localStorage)에만 저장, Google Analytics for Firebase로 익명 이용 통계 수집
+### 4.10 실시간 서버에 못 붙을 때
+
+- 연결 중: 카드 자리에 "법당 문을 여는 중…" (스켈레톤)
+- 3번 재시도 실패 또는 `NEXT_PUBLIC_LIVE_URL` 없음: **폴백 모드**
+  - `GET {LIVE_URL}/now?zone=` 폴링으로 구절만 표시 (주기 = 받은 `remainingMs`, 실패하면 30초)
+  - 그것도 실패하면 "법당 문이 잠시 닫혔습니다. 수행은 계속할 수 있습니다." + [수행하기] (전각) 또는 전각 문 (광장). 접속자 수·합장 숨김
+- **수행, 결과, 경함, 공유는 실시간 서버 없이도 전부 동작해야 함**
 
 ---
 
 ## 5. 로직
 
-순수 함수는 `lib/`에. **vitest 테스트 필수**. 튜닝할 숫자는 전부 `lib/constants.ts`에.
+순수 함수는 `lib/`에, **vitest 테스트 필수**. 튜닝 숫자는 `lib/constants.ts`.
 
-### 5.1 상태 (zustand persist)
+### 5.1 상태 (zustand persist, `version: 4`)
 
 ```ts
 type SageId = "confucius" | "laozi" | "sunzi";
-type Stage = "outside" | "entered" | "disciple" | "senior";   // 문외 / 입문 / 제자 / 고제
+type Zone = "hall" | SageId;
+type Stage = "outside" | "entered" | "disciple" | "senior";
 
-interface PersistedState {
-  version: 3;
-  round: RoundState | null;
-  readVerseIds: string[];                 // 누적 읽음 (중복 없음)
-  likedVerseIds: string[];                // 누적 와닿음 (최신순)
-  flippedVerseIds: string[];              // 누적 해설 읽음
-  devotion: Record<SageId, number>;       // 누적 정진 점수 (0 미만 불가)
-  stage: Record<SageId, Stage>;           // 누적 단계 (내려가지 않음)
-  roundsPlayed: number;
-  lastRoundVerseIds: string[];
+interface InventoryItem {
+  verseId: string;
+  source: "live" | "practice";
+  zone: Zone;                              // 담은 곳
+  at: number;                              // epoch ms
 }
 
-interface RoundState {
-  roundId: string;
-  deck: string[];                         // 21개
+interface PersistedState {
+  version: 4;
+  practice: PracticeState | null;          // 진행 중인 수행 (전각 하나)
+  readVerseIds: string[];                  // 누적 읽음
+  flippedVerseIds: string[];               // 누적 해설 읽음
+  inventory: InventoryItem[];              // 경함 (verseId 중복 없음, 최신순)
+  devotion: Record<SageId, number>;        // 정진 점수 (≥ 0)
+  stage: Record<SageId, Stage>;            // 단계 (하락 없음)
+  dwellCredit: Record<SageId, { day: string; points: number; accMs: number }>; // 전각 체류 점수 (§5.2)
+  practicesDone: Record<SageId, number>;
+  lastPracticeVerseIds: Record<SageId, string[]>;
+  soundOn: boolean;
+  seenIntro: boolean;
+}
+
+interface PracticeState {
+  id: string;
+  sage: SageId;
+  deck: string[];                          // 10개
   index: number;
-  user: Vec;                              // 이번 판 성향 벡터 (v1 공식 유지)
-  likes: Record<SageId, number>;
-  dislikes: Record<SageId, number>;
+  user: Vec;                               // v1 성향 벡터
   likedIds: string[];
+  dislikedIds: string[];
   flippedIds: string[];
-  devotionGain: Record<SageId, number>;   // 이번 판에 오른 점수
+  devotionGain: number;
   notes: TeacherNote[];
-  stageBefore: Record<SageId, Stage>;     // 판 시작 시 단계 (승급 판정용)
-  pickedVerseId: string | null;
-  fromShare: { sage: SageId; verseId: string } | null;
+  stageBefore: Stage;
+  outcome: PracticeOutcome | null;         // 완료 시 확정, 새로고침해도 재계산 금지
+  fromShareVerseId: string | null;
   startedAt: number;
 }
 ```
 
-**마이그레이션**: persist `version`을 3으로, `migrate`에서 v1(·v2) 데이터 변환
-- `likedVerseIds` 유지
-- `readVerseIds`가 없으면 `likedVerseIds`로 초기화
-- `devotion`은 `likedVerseIds`의 성현별 개수 × 2로 초기화, `stage`는 §5.5로 계산
-- 진행 중이던 v1 `round`는 버림 (`null`)
+**마이그레이션** (v1~v3 → v4):
+- v1/v3 `likedVerseIds` → `inventory`에 `{ source: "practice", zone: 해당 성현, at: 마이그레이션 시각 }`
+- `readVerseIds` 없으면 `likedVerseIds`로
+- `devotion` 없으면 성현별 와닿음 수 × 2, `stage`는 §5.5로 계산
+- 진행 중이던 `round`는 버림
 
-### 5.2 정진 점수 (devotion)
+### 5.2 정진 점수
 
-스와이프마다 해당 구절의 성현 `s`에:
+| 행동 | 대상 | 점수 |
+|---|---|---|
+| 수행: 와닿음 | 그 성현 | +2 |
+| 수행: 와닿음 전에 해설까지 읽음 | 그 성현 | +1 추가 |
+| 수행: 넘김 | 그 성현 | −1 |
+| 수행: 스승의 평 `nod` | 그 성현 | +3 |
+| 수행: 추천 구절 [읽어보기] | 그 성현 | +1 |
+| 실시간: [담기] | 그 구절의 성현 | +1 (구절당 1회) |
+| 실시간: 구절 해설 읽기 | 그 구절의 성현 | +1 (구절당 1회) |
+| 전각 체류 (화면이 보이는 상태) | 그 전각 성현 | 5분마다 +1, **하루 최대 +3** |
 
-| 행동 | 점수 |
-|---|---|
-| 와닿음 | +2 |
-| 와닿음 전에 해설(카드 뒤집기)까지 읽음 | +1 추가 |
-| 넘김 | −1 |
-| 스승의 평이 `nod` | +3 (그 성현) |
-| 추천 구절 [읽어보기] 수락 | +1 (그 성현) |
+- 실시간 [담기]와 해설 읽기는 그 구절을 `readVerseIds`에 추가 (읽음으로 인정). 해설 읽기는 `flippedVerseIds`에도 추가
+- 합장은 점수 없음 (연타 방지)
+- 체류 시간은 `visibilitychange`로 보이는 동안만 누적, 날짜는 로컬 기준 `YYYY-MM-DD`
+- 단계 재계산은 **수행 완료 시**, 그리고 **실시간 담기·해설·체류로 점수가 오를 때**마다 (§5.5). 실시간에서 승급하면 화면 하단에 토스트 "공자 문하에 들었습니다" + `stage_up`
 
-- 누적 `devotion[s]`는 0 아래로 내려가지 않음
-- `devotionGain`에도 같이 기록
+### 5.3 스승의 평 (수행 4장, 8장째 직후)
 
-### 5.3 스승의 평 (6, 12, 18장째 직후)
-
-- **등장 성현**: 직전 6장 중 가장 많이 나온 성현 (동률이면 랜덤) (v1 유지)
-- **종류**: v1의 `score(s)`, `p(s) = sigmoid(4·score)` 공식 유지
-  - `Math.random() < p(s)` → **`nod` (끄덕)**: 그 성현 구절을 와닿아한 걸 알아봐 주는 말
-  - 그 외 → **`nudge` (일깨움)**: 다시 생각해보게 툭 던지는 말. 꾸짖음이 아니라 궁금하게 만드는 톤
-  - RNG 주입 가능하게 (`rng = Math.random`), 테스트에서 시드 고정
-- **카드 구성**: 성현 이름 + 상단 도장(`끄덕` 붉은 낙관 / `일깨움` 먹색 낙관) + 대사 + 하단 "이것도 읽어보게" 추천 구절 미리보기(원문만)
-- **추천 구절 선택**: 그 성현 구절 중 이번 판 덱에 없는 것 → 안 읽은 것 우선 → 이번 판 `user` 벡터와 tags 코사인이 가장 높은 것
-- [읽어보기]: 추천 구절을 **바로 다음 카드로 삽입**, 덱 마지막 카드 하나를 빼서 21장 유지. 삽입 카드 우상단에 `공자 추천` 라벨
-- [계속]: 추천 없이 진행
+- 성현은 그 전각 성현 고정
+- 종류: v1 `score`, `p = sigmoid(4·score)` 유지. 단 `score`의 `fit`은 이번 수행 `user` 벡터와 성현 `vec`의 코사인, `pref`는 이번 수행 (와닿음 − 넘김) / (와닿음 + 넘김 + 1)
+  - `rng() < p` → `nod` (끄덕), 아니면 `nudge` (일깨움). RNG 주입 가능
+- 카드: 성현 이름 + 도장(`끄덕` 주홍 / `일깨움` 녹청) + 대사 + "이것도 읽어보게" 추천 구절 미리보기
+- 추천: 그 성현 구절 중 이번 덱에 없는 것 → 안 읽은 것 우선 → `user`와 tags 코사인 최대
+- [읽어보기]: 다음 카드로 삽입, 덱 마지막 카드 제거 (10장 유지), 삽입 카드에 `추천` 라벨. [계속]: 그냥 진행
 - 금지 표현: 수락, 거절, 받아들임, 인연
 
-```ts
-interface TeacherNote {
-  sage: SageId;
-  kind: "nod" | "nudge";
-  lineId: string;
-  recommendedVerseId: string | null;
-  accepted: boolean;
-  atIndex: number;
-}
-```
+### 5.4 수행 덱
 
-### 5.4 덱 구성
+- 그 성현 20구절 중 10장
+- 우선순위: **안 읽은 구절 → 읽었지만 경함에 없는 구절 → 경함에 있는 구절**, 그룹 안에서는 랜덤
+- 직전 수행 10장(`lastPracticeVerseIds[sage]`)은 안 읽은 구절이 모자랄 때만 다시 허용
+- `fromShareVerseId`는 제외
 
-- 성현별 7장씩 21장, 같은 성현 3장 연속 금지 (v1 유지)
-- 성현별 뽑는 순서: **안 읽은 구절 → 읽었지만 와닿음 안 누른 구절 → 와닿음 누른 구절**. 같은 그룹 안에서는 랜덤
-- 직전 판 21장(`lastRoundVerseIds`)은 안 읽은 구절이 모자랄 때만 다시 허용
-- 공유로 들어온 경우 §4.6 규칙 적용 (해당 성현 최소 2장, 공유된 구절 제외)
+### 5.5 문하 단계 (v3 유지)
 
-### 5.5 문하 단계
-
-판이 끝날 때(`round_complete`) 성현별로 계산. **단계는 내려가지 않음.**
-
-| 단계 | key | 조건 (그 성현 기준, 누적) |
+| 단계 | key | 조건 (그 성현, 누적) |
 |---|---|---|
 | 문외 | `outside` | 기본 |
 | 입문 | `entered` | 정진 ≥ 8 |
-| 제자 | `disciple` | 정진 ≥ 25 **그리고** 그 성현 구절 10개 이상 읽음 |
-| 고제 | `senior` | 정진 ≥ 50 **그리고** 18개 이상 읽음 **그리고** 해설 10개 이상 읽음 |
+| 제자 | `disciple` | 정진 ≥ 25 **그리고** 10구절 이상 읽음 |
+| 고제 | `senior` | 정진 ≥ 50 **그리고** 18구절 이상 읽음 **그리고** 해설 10개 이상 |
 
-- **더 읽어야 오르게** 만든 게 핵심. 점수만으로는 못 오르고 읽기·해설 조건이 같이 걸려 있음
-- 다음 단계까지 남은 조건 계산 함수 `nextRequirement(s)` → `{ kind: "devotion" | "read" | "flipped", remaining: number } | null` (§4.4 ② 안내 문구용, 부족한 것 중 첫 번째)
-- 기준값은 전부 상수. 성현당 한 판 최대 정진은 대략 7×3 + 3×3 + 추천 = 30 안팎이라, 첫 판에 입문, 2~3판에 제자, 5판 안팎에 고제가 목표
-- 테스트: 경계값, 단계 하락 없음, 읽기 조건 미달 시 점수만 높아도 승급 안 됨
+- 하락 없음. `nextRequirement(sage)` → 부족한 것 중 첫 번째 `{ kind, remaining }`
+- 기대 흐름: 첫 수행에 입문, 2~3번째 수행에 제자, 4~5번째에 고제. 수행 한 번 최대 정진은 10×3 + 2×3 + 2 = 38 안팎
+- 테스트: 경계값, 하락 없음, 읽기 조건 미달 시 점수만으로 승급 안 됨
 
-### 5.6 결과 헤드라인
+### 5.6 수행 결과 헤드라인 (`completePractice`)
 
-1. 이번 판 와닿음이 2개 이하 → **없음**
-2. 이번 판에 승급한 성현이 있으면 → 그중 가장 높은 단계로 오른 성현 (동률이면 `devotionGain` 큰 쪽)
-   - `outside → entered`면 **첫 입문**, 그 외 승급이면 **승급**
-3. 승급이 없으면 → `score(s)` 최대 성현 (v1 공식, 이번 판 기준)
-   - 그 성현이 `outside`면 **없음**이 아니라 "**공자** 문하 앞에 섰습니다" (입문 직전 상태. 대사는 `stay`)
-   - 그 외 **유지**
-4. 대사: 첫 입문 `admit`, 승급 `promote`, 유지·문하 앞 `stay`
+순서대로 판정, 결과는 `outcome`에 확정 저장:
+1. 이번 수행 와닿음 ≤ 1 → **없음** (`none`)
+2. 이번 수행으로 단계가 올랐으면: `outside → entered`면 **첫 입문** (`enter`), 그 외 **승급** (`promote`)
+3. 단계가 `outside` 그대로면 **문하 앞** (`front`)
+4. 그 외 **유지** (`stay`)
+
+대사: `enter` → `admit`, `promote` → `promote`, `stay`·`front` → `stay`
 
 ### 5.7 나를 들인 구절
 
-헤드라인 성현의 이번 판 와닿음 구절 중:
-1. 해설까지 읽은 것 우선
-2. 이번 판 `user` 벡터와 tags 코사인이 높은 순
-3. 같으면 나중에 읽은 것
+이번 수행 와닿음 중: 해설까지 읽은 것 → `user`와 tags 코사인 높은 순 → 나중에 읽은 것. 없으면 `null`. ☆로 교체 가능
 
-- 헤드라인 성현 구절이 없으면 이번 판 와닿음 전체에서 같은 규칙. 그래도 없으면 `null`
-- 결과는 `pickedVerseId`. 사용자가 ☆로 바꾸면 덮어씀
-- 공유 URL의 `sage`는 헤드라인 성현, `verseId`는 `pickedVerseId`
+### 5.8 `completePractice` 순서 (테스트 필수)
 
-### 5.8 삭제
+1. `readVerseIds`, `flippedVerseIds`, `inventory`(와닿음, `source: "practice"`) 반영
+2. `devotion` 반영
+3. 단계 재계산, 승급 여부
+4. 헤드라인, 나를 들인 구절 → `outcome`
+5. `practicesDone[sage] += 1`, `lastPracticeVerseIds[sage]` 갱신
+6. 이벤트: `stage_up`(승급 시), `practice_complete`
 
-- v1 관계 판정 관련 코드·상수(`FIT_THRESHOLD`)·문구
-- 대표 유형(`손자형`) 표시, `typeName`, `typeTagline`
-- "매칭" 섹션
+### 5.9 삭제
+
+- v1 관계 판정, `FIT_THRESHOLD`, 대표 유형, `typeName`/`typeTagline`, "매칭" 섹션
+- v1 `/play`, `/result`의 3인 혼합 라운드 로직 (컴포넌트는 수행 화면으로 재사용)
 
 ---
 
-## 6. 판 끝 처리 순서 (`completeRound`)
+## 6. 실시간 클라이언트 (`lib/live.ts`)
 
-한 함수에서 이 순서로 (테스트 필수):
-
-1. `readVerseIds`, `likedVerseIds`, `flippedVerseIds` 누적 반영 (스와이프 시점에 이미 반영했다면 생략)
-2. `devotion` 누적 반영
-3. 단계 재계산 → `stageBefore`와 비교해서 승급 목록
-4. 헤드라인(§5.6), 나를 들인 구절(§5.7) 결정
-5. `roundsPlayed += 1`, `lastRoundVerseIds` 갱신
-6. 승급마다 `stage_up` 이벤트, `round_complete` 이벤트
-
-새로고침해도 같은 결과가 나와야 함 (결정 결과를 `round`에 저장, 재계산 금지).
+- 앱 전체에서 **소켓 하나**. `NEXT_PUBLIC_LIVE_URL`로 `io(url, { transports: ["websocket"], reconnectionDelayMax: 10000 })`
+- 라우트에 따라 방 입장: `/` → `hall`, `/z/[sage]`·`/z/[sage]/practice`·`/z/[sage]/result` → 그 성현. 그 외 페이지 → `leave`
+- 입장은 `emit("join", { zone }, ack)`. ack로 받은 `verse`, `presence`, `bows`로 즉시 화면 구성
+- 이벤트 처리
+  - `verse`: 현재 구절 교체 (`slot`이 지금보다 작으면 무시)
+  - `presence`: 상단 바와 전각 문 숫자 갱신
+  - `bows`: 현재 `zone`·`slot`과 같을 때만 숫자 갱신
+- **지연 대비**: 마지막으로 받은 `remainingMs`로 로컬 타이머를 걸고, 시간이 됐는데 `verse`가 1.5초 안에 안 오면 받아둔 `nextVerseId`로 먼저 넘김 (다음 `verse`가 오면 덮어씀)
+- 카운트다운은 마지막 수신 시각 + `remainingMs` 기준 (`performance.now()`), 기기 시계 사용 금지
+- 탭이 다시 보이면(`visibilitychange`) 연결 상태 확인, 끊겼으면 재접속 후 현재 방 다시 `join`
+- 합장: `emit("bow", { zone, slot })`. 클라이언트도 800ms 쿨다운. 누른 즉시 화면 숫자 +1 (낙관적 갱신), 서버 값이 오면 서버 값으로
+- React에서는 `useLive(zone)` 훅으로 `{ status, verse, remainingMs, presence, bows, bow() }` 노출
+- 개발 중 서버 없이 화면 작업하려면 `NEXT_PUBLIC_LIVE_URL`을 비워서 폴백 모드로
 
 ---
 
@@ -326,223 +376,204 @@ interface TeacherNote {
 ### 7.1 `sages.json`
 
 - `typeName`, `typeTagline` 삭제
-- `intro` 추가: 성현 소개 2줄 (책 이름, 핵심 사상을 쉬운 말로)
-- `vec` 유지
+- 추가: `intro` (2줄), `hall` (`"대성전"`), `hallHanja` (`"大成殿"`)
 
-### 7.2 `lines.json` 재작성
+### 7.2 `lines.json` (v3와 같음)
 
-kind와 개수 (성현별):
-
-| kind | 개수 | 쓰이는 곳 | 예 |
-|---|---|---|---|
-| `nod` | 5 | 스승의 평 · 끄덕 | 공자: "그 구절에 멈췄다면, 자네는 배울 줄 아는 사람이네." |
-| `nudge` | 5 | 스승의 평 · 일깨움 | 노자: "너무 붙잡으려 하지 마라. 다음 구절은 가볍게 읽어보게." |
-| `skip` | 5 | 넘김 반응 토스트 | 손자: "지나쳐도 좋다. 다만 왜 지나쳤는지는 알고 가라." |
-| `admit` | 3 | 결과 · 첫 입문 | 공자: "배우려는 뜻이 보이니, 오늘부터 내 문하에서 읽게." |
-| `promote` | 3 | 결과 · 승급 | 손자: "이제 판을 읽는구나. 한 걸음 더 들어와라." |
-| `stay` | 3 | 결과 · 유지 / 문하 앞 | 노자: "오늘도 왔구나. 물처럼, 서두를 것 없다." |
-
-- 성현당 24개, 총 72개
+성현별 `nod` 5, `nudge` 5, `skip` 5, `admit` 3, `promote` 3, `stay` 3 = 24개, 총 72개.
 - 말투: 공자 점잖은 하게체, 노자 느긋하고 선문답 같은 말투, 손자 짧고 단호한 말투
-- 고전 구절을 인용하면 `original` 필드에 원문
-- **금지 어휘**: 매칭, 인연, 짝, 사랑, 연애, 거절, 수락, 판별, 유형
+- `admit`·`stay`에는 전각 분위기를 살짝 (예: 노자 `stay` "오늘도 태청궁에 들렀구나. 물처럼, 서두를 것 없다.")
+- 금지 어휘: 매칭, 인연, 짝, 사랑, 연애, 거절, 수락, 판별, 유형
 - 전부 `reviewed: false`
 
 ### 7.3 `verses.json`
 
-- 변경 없음 (성현별 20개, 총 60개)
-- 저작권 규칙 유지: 원문은 퍼블릭 도메인, **번역·해설은 직접 작성, 기존 출판 번역 문장 재현 금지**
+- 변경 없음 (60개). **실시간 서버도 이 파일을 읽음** (`server/`의 `CONTENT_PATH` 기본값이 `../content/verses.json`)
+- 구절을 고치면 서버에서 `pm2 sendSignal SIGHUP seonghyeon-live`로 다시 읽게 (사람이 함, `docs/HOME_SERVER.md`)
+- 저작권 규칙: 원문은 퍼블릭 도메인, **번역·해설은 직접 작성, 기존 출판 번역 문장 재현 금지**
 
-### 7.4 `check:content` 수정
+### 7.4 `check:content`
 
-- lines: kind별 개수, 성현별 합계 24
-- lines 텍스트(`text`)에 금지 어휘가 있으면 실패
-- sages: `intro` 필수, `typeName`·`typeTagline` 있으면 실패
+- lines kind별 개수, 금지 어휘
+- sages `intro`, `hall`, `hallHanja` 필수, `typeName`·`typeTagline` 금지
+- verses: 성현별 정확히 20개, id 중복 없음 (서버가 성현별 3개 이상을 요구함)
 
 ---
 
 ## 8. 공유
 
-### 8.1 `/s/[sage]/[verseId]` (메인 공유)
-
-- `generateStaticParams`: **모든 성현 × 그 성현의 구절** (60개). 헤드라인 성현과 다른 성현 구절을 ☆로 고른 경우를 위해 성현 × 전체 구절(180개)로 생성해도 됨. 빌드 시간 보고 결정
-- `generateMetadata`:
-  - title: `"공자 문하에 들었습니다 — 성현 문하"`
-  - description: `"{번역} · {출처}"` (100자 이내)
-- `opengraph-image.tsx` (1200x630): 한지색 배경, 좌상단 `孔子 門下` + 낙관, 중앙에 원문 크게, 그 아래 번역 한 줄, 하단 출처. 원문이 길면 폰트 자동 축소
-- 단계(제자, 고제)는 URL에 넣지 않음 (정적 페이지 수 유지)
-
-### 8.2 `/v/[verseId]` (구절만)
-
-- 60개 정적 생성, OG는 8.1에서 `孔子 門下` 대신 성현 이름만
-
-### 8.3 보내기 버튼
-
-- `navigator.share({ title, text, url })` 지원 시 사용, 아니면 링크 복사 + "복사됨" 토스트
-  - text: `"공자 문하에 들었습니다. \"{번역}\""`
-- URL: `/s/{sage}/{verseId}?ref=share`
-
-### 8.4 이미지 저장 (1080x1920, 인스타 스토리)
-
-- `/s/[sage]/[verseId]/story` 라우트에서 `ImageResponse`로 생성해 다운로드 (또는 클라이언트 canvas)
-- 구성: 상단 `孔子 門下` + 단계 뱃지(이미지에는 단계 포함 가능, 쿼리 `?stage=`로 받음), 중앙 원문 크게, 음독, 번역, 출처, 하단 작게 서비스 이름
+- `/s/[sage]/[verseId]`: 성현 × 그 성현 구절 60개 정적 생성 (☆로 다른 성현 구절을 고를 수 없으니 60개로 충분)
+  - title `"공자 문하에 들었습니다 — 성현 문하"`, description `"{번역} · {출처}"`
+  - OG 1200x630: 밤 법당 배경, 좌상단 `孔子 門下` + 낙관, 원문 크게, 번역 한 줄, 출처
+- `/v/[verseId]`: 60개, OG는 성현 이름 + 구절
+- 보내기: `navigator.share`, 아니면 링크 복사. URL에 `?ref=share`
+- 이미지 저장 1080x1920: `/s/[sage]/[verseId]/story?stage=` 라우트에서 `ImageResponse`. 상단 `大成殿 · 孔子 門下` + 단계 뱃지, 원문, 음독, 번역, 출처, 하단 서비스 이름
 
 ---
 
-## 9. 페이크 도어: "성현께 직접 여쭙기"
+## 9. 실시간 서버 프로토콜 (구현 완료, 참고용)
 
-- 결과 화면 맨 아래 텍스트 링크
-- 바텀시트: "읽다가 궁금한 걸 성현께 직접 여쭙는 기능을 준비 중입니다. 열리면 가장 먼저 알려드릴까요?"
-- [알림 받기] → `more_talk_optin` / [닫기]
+서버 코드: `server/src/index.js`, `server/src/schedule.js`. Socket.IO 기본 네임스페이스.
+
+**방(zone)**: `hall`, `confucius`, `laozi`, `sunzi`. 소켓은 한 번에 한 방에만 있음.
+
+| 방향 | 이벤트 | 페이로드 |
+|---|---|---|
+| C→S | `join` | `{ zone }`, ack → `{ verse, presence, bows }` 또는 `{ error }` |
+| C→S | `leave` | 없음 |
+| C→S | `bow` | `{ zone, slot }` (현재 방, 현재 슬롯만 인정, 소켓당 800ms 쿨다운) |
+| S→C | `verse` | `{ zone, slot, verseId, nextVerseId, remainingMs, periodMs }` (방 전원, 매 정각) |
+| S→C | `presence` | `{ total, hall, confucius, laozi, sunzi }` (전원, 변화 시 1초 묶음) |
+| S→C | `bows` | `{ zone, slot, count }` (방 전원, 500ms 묶음) |
+
+HTTP:
+- `GET /now?zone=hall` → `verse`와 같은 형식 (폴백용)
+- `GET /healthz` → `{ ok, uptimeSec, connections, contentVersion }`
+
+방송 순서: 슬롯 = `floor(서버시각 / periodMs)`. 구역 풀 크기 N을 한 바퀴로 보고 바퀴마다 시드 셔플(시드 = 콘텐츠 버전 + 구역 + 바퀴 번호) → 한 바퀴 안에 중복 없음, 바퀴 경계 연속 중복 없음, 서버를 재시작해도 같은 시각엔 같은 구절.
+
+CORS: 서버 `.env`의 `ALLOWED_ORIGINS`. Vercel 프리뷰 도메인으로 테스트하려면 거기에 추가해야 함 (사람이 함).
+
+---
+
+## 10. 개인정보 `/privacy`
+
+- 로그인·개인정보 수집 없음
+- 읽기 기록·경함·문하 단계는 브라우저(localStorage)에만 저장, 기기를 바꾸면 이어지지 않음
+- 실시간 서버는 접속 중인 연결 수만 세고 저장하지 않음
+- Google Analytics for Firebase로 익명 이용 통계 수집
+
+---
+
+## 11. 페이크 도어: "성현께 직접 여쭙기"
+
+- 수행 결과 맨 아래 텍스트 링크
+- 바텀시트: "읽다가 궁금한 걸 성현께 직접 여쭙는 기능을 준비 중입니다. 열리면 가장 먼저 알려드릴까요?" [알림 받기] / [닫기]
 - 이메일 수집 없음
 
 ---
 
-## 10. 분석: Firebase Analytics (GA4)
+## 12. 분석: Firebase Analytics (GA4)
 
-### 10.1 연결 (최우선)
+### 12.1 연결
 
-- `posthog-js` 의존성과 관련 코드 전부 제거
-- 환경변수 (`.env.example`에 키 이름만. 값은 사람이 Firebase 콘솔 → 프로젝트 설정 → 웹 앱에서 복사해 Vercel Production·Preview에 넣음):
-  ```
-  NEXT_PUBLIC_FIREBASE_API_KEY=
-  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-  NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-  NEXT_PUBLIC_FIREBASE_APP_ID=
-  NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=   # G-로 시작
-  ```
-- `lib/firebase.ts`: `initializeApp`은 한 번만 (`getApps().length` 체크)
-- `lib/analytics.ts`:
-  - **클라이언트에서만** 초기화. 서버에서 import돼도 안 터지게 `typeof window` 체크
-  - `isSupported()`가 false면 (인앱 웹뷰, 프라이빗 모드 등) `console.debug`로 대체, 앱은 정상 동작
-  - 초기화 전 이벤트는 큐에 쌓았다가 flush
-  - 환경변수가 없으면 `console.debug`. **production 빌드에서 `MEASUREMENT_ID`가 없으면 빌드 로그에 경고**
-  - `localhost` 또는 `?debug=1`이면 `debug_mode: 1`을 붙여 GA4 DebugView에서 확인 가능하게
-- **페이지뷰**: `usePathname` 변화마다 `page_view` 수동 전송 (`page_path`, `page_title`). GA4의 향상된 측정 "브라우저 기록 기반 페이지 변경"은 사람이 꺼야 함 → 작업 로그에 남겨
+- `posthog-js` 제거
+- `lib/firebase.ts`: `initializeApp` 한 번만 (`getApps().length`)
+- `lib/analytics.ts`: 클라이언트에서만, `isSupported()` false면 `console.debug`, 초기화 전 이벤트 큐, 환경변수 없으면 `console.debug` + production 빌드 경고, `localhost` 또는 `?debug=1`이면 `debug_mode: 1`
+- `page_view`는 `usePathname` 변화마다 수동 전송. GA4 향상된 측정의 "브라우저 기록 기반 페이지 변경"은 사람이 끔 (작업 로그에 남겨)
 
-### 10.2 GA4 제약 (`track()` 안에서 처리)
+### 12.2 GA4 제약 (`track()` 안에서)
 
-- 이벤트 이름: 영문·숫자·밑줄, 40자 이내, 예약어(`first_open`, `session_start`, `user_engagement` 등) 금지
-- 파라미터: 이벤트당 25개 이내, 이름 40자 이내, 문자열 값 100자 이내 (넘으면 자름)
-- **boolean은 1/0 숫자로 변환**, 객체·배열 금지
-- 보고서용 맞춤 정의 등록 목록을 `docs/ga4-custom-dimensions.md`에 표로 (이름, 범위, 설명). 등록은 사람이 함
-- 익명 client id만 사용, `setUserId` 금지
-- 사용자 속성: `setUserProperties({ rounds_played, read_count, top_stage })` (결과 진입 시 갱신. `top_stage`는 세 성현 중 가장 높은 단계)
+- 이벤트 이름 40자 이내, 예약어 금지
+- 파라미터 25개 이내, 이름 40자, 문자열 100자 (자름)
+- **boolean → 1/0**, 객체·배열 금지
+- `setUserId` 금지. 사용자 속성 `top_stage`, `read_count`, `inventory_count` (변화 시 갱신)
+- 맞춤 정의 목록 `docs/ga4-custom-dimensions.md` (등록은 사람이)
 
-### 10.3 이벤트
+### 12.3 이벤트
 
 | 이벤트 | 시점 | 파라미터 |
 |---|---|---|
 | `page_view` | 경로 변경 | `page_path`, `page_title` |
-| `landing_view` | 랜딩 진입 | `ref`, `returning`, `read_count` |
-| `round_start` | 첫 카드 표시 | `round_id`, `from_share`, `rounds_played` |
-| `verse_view` | 카드가 앞에 뜸 | `round_id`, `verse_id`, `sage`, `index`, `first_time`, `recommended` |
-| `card_flip` | 카드 뒤집기 | `verse_id`, `index` |
-| `swipe` | 와닿음 / 넘김 | `round_id`, `verse_id`, `sage`, `dir`(like\|dislike), `index`, `method`(drag\|button\|key), `dwell_ms`, `flipped` |
-| `teacher_note_shown` | 스승의 평 | `round_id`, `sage`, `kind`(nod\|nudge), `has_rec` |
-| `rec_accept` | [읽어보기] | `round_id`, `sage`, `verse_id` |
+| `zone_enter` | 광장·전각 입장 (join ack) | `zone`, `presence`, `from_share` |
+| `live_verse_view` | 실시간 구절이 화면에 뜸 | `zone`, `verse_id`, `slot`, `late_join`(교체 후 10초 넘어서 봤는지) |
+| `live_flip` | 실시간 구절 해설 | `zone`, `verse_id` |
+| `bow` | 합장 (5초 묶음으로 한 번, `taps` 개수) | `zone`, `verse_id`, `taps` |
+| `inventory_add` | 담기 / 수행 와닿음 | `source`(live\|practice), `zone`, `verse_id` |
+| `inventory_remove` | 경함에서 빼기 | `verse_id` |
+| `live_status` | 실시간 상태 변화 | `status`(connected\|reconnecting\|fallback\|closed) |
+| `practice_start` | 수행 첫 카드 | `sage`, `practices_done`, `stage` |
+| `verse_view` | 수행 카드 표시 | `sage`, `verse_id`, `index`, `first_time`, `recommended` |
+| `card_flip` | 수행 카드 뒤집기 | `verse_id`, `index` |
+| `swipe` | 와닿음/넘김 | `sage`, `verse_id`, `dir`, `index`, `method`, `dwell_ms`, `flipped` |
+| `teacher_note_shown` | 스승의 평 | `sage`, `kind`, `has_rec` |
+| `rec_accept` | 추천 [읽어보기] | `sage`, `verse_id` |
 | `skip_reaction` | 넘김 토스트 | `sage` |
-| `round_abandon` | 21장 전 이탈 (`pagehide`) | `round_id`, `index` |
-| `round_complete` | 21장 완료 | `round_id`, `liked_count`, `flipped_count`, `duration_ms` |
-| `stage_up` | 승급 | `sage`, `from`, `to`, `rounds_played` |
-| `result_view` | 결과 진입 | `round_id`, `head_sage`, `head_kind`(enter\|promote\|stay\|front\|none), `picked_verse_id`, `read_count` |
-| `pick_change` | ☆로 교체 | `verse_id` |
-| `share_click` | 보내기 | `kind`(sage_verse\|verse), `sage`, `verse_id`, `method`(native\|copy) |
+| `practice_abandon` | 10장 전 이탈 | `sage`, `index` |
+| `practice_complete` | 10장 완료 | `sage`, `liked_count`, `flipped_count`, `duration_ms`, `head_kind` |
+| `stage_up` | 승급 (수행·실시간 모두) | `sage`, `from`, `to`, `via`(practice\|live) |
+| `result_view` | 수행 결과 진입 | `sage`, `head_kind`, `picked_verse_id` |
+| `pick_change` | ☆ 교체 | `verse_id` |
+| `share_click` | 보내기 | `kind`(sage_verse\|verse), `sage`, `verse_id`, `method` |
 | `image_save` | 이미지 저장 | `sage`, `verse_id`, `stage` |
-| `share_landing` | `/s/*`, `/v/*` 진입 | `kind`, `sage`, `verse_id`, `ref` |
-| `restart` | 다시 읽기 | `rounds_played` |
-| `saved_view` | `/saved` 진입 | `count` |
+| `share_landing` | `/s`·`/v` 진입 | `kind`, `sage`, `verse_id`, `ref` |
+| `sound_toggle` | 목탁 소리 | `on` |
 | `read_milestone` | 누적 읽음 20, 40, 60 | `read_count` |
-| `more_talk_click` / `more_talk_optin` | 페이크 도어 | `head_sage` |
+| `more_talk_click` / `more_talk_optin` | 페이크 도어 | `sage` |
 
-- localStorage 접근은 전부 try/catch. 실패해도 앱은 메모리 상태로 동작
-
-### 10.4 보는 법 (사람용 메모, 구현 X)
-
-- 실시간: GA4 → 관리 → DebugView (`?debug=1`)
-- 퍼널: 탐색 → 유입경로 (`round_start` → `round_complete` → `result_view` → `share_click`)
-- 리텐션: 보고서 → 리텐션, 탐색 → 동질 집단
-- 승급 동기 확인: `stage_up`이 있는 사용자 vs 없는 사용자의 D7 비교
-- 표준 보고서는 24~48시간 지연
+- localStorage 접근은 전부 try/catch. 실패해도 메모리 상태로 동작
 
 ---
 
-## 11. 작업 순서
+## 13. 작업 순서
 
-1. **Firebase 교체** (§10.1~10.2): PostHog 제거, `lib/firebase.ts`, `lib/analytics.ts`, `page_view`, `.env.example`, 빌드 경고, `/privacy`. 사람이 할 일(Vercel 환경변수, 향상된 측정 끄기, 맞춤 정의 등록)을 작업 로그에 정리
-2. **콘텐츠** (§7): `sages.json` intro, `lines.json` 72개 재작성, `check:content` 수정 후 통과
+1. **Firebase 교체** (§12.1~12.2), `/privacy`
+2. **콘텐츠** (§7): `sages.json` 필드, `lines.json` 72개, `check:content`
 3. **상태 + 마이그레이션** (§5.1)
-4. **로직** (§5.2~5.7, §6): 정진 점수, 스승의 평 + 추천, 덱 우선순위, 단계·`nextRequirement`, 헤드라인, 나를 들인 구절, `completeRound`. **테스트 통과**
-5. **삭제** (§5.8)
-6. **읽기 화면** (§4.3): 와닿음/넘김, 앞면 출처, `처음` 표시, 정진 `+n` 표시, 스승의 평 카드 + 추천 삽입
-7. **결과 화면** (§4.4)
-8. **`/saved`** (§4.5)
-9. **공유** (§4.6, §8.1~8.3): `/s`, `/v` 정적 생성 + OG, 보내기, `/r` 리다이렉트
-10. **이미지 저장** (§8.4)
-11. **랜딩** (§4.2): 카피, 재방문 단계 뱃지
-12. **페이크 도어** (§9)
-13. **이벤트 전부 연결** (§10.3), 발생 지점 확인
-14. **마무리**: UI 문자열에서 금지 어휘 grep, 다크모드, reduced-motion, 390px, Lighthouse 모바일 성능 90+
+4. **로직** (§5.2~5.8): 정진(실시간 포함), 스승의 평, 수행 덱, 단계, 헤드라인, 나를 들인 구절, `completePractice`. **테스트 통과**
+5. **삭제** (§5.9), 리다이렉트 (§4.9)
+6. **실시간 클라이언트** (§6): `lib/live.ts`, `useLive`. 로컬에서 `cd server && npm run dev` 띄우고 `NEXT_PUBLIC_LIVE_URL=http://localhost:4000`으로 확인. 브라우저 창 2개로 같은 구절·접속자 수·합장 수가 맞는지
+7. **테마**: 밤 법당 / 새벽 법당 토큰 (§4.2)
+8. **광장** (§4.3), **전각** (§4.4), 폴백 상태 (§4.10)
+9. **수행** (§4.5), **결과** (§4.6)
+10. **경함** (§4.7)
+11. **공유** (§4.8, §8), OG, 이미지 저장
+12. **분위기 마감**: 글로우, 정각 전환, 합장 빛, 목탁 소리 토글, reduced-motion
+13. **페이크 도어** (§11)
+14. **이벤트 연결** (§12.3)
+15. **마무리**: 금지 어휘 grep, 다크/라이트, 390px, Lighthouse 모바일 성능 90+, 실시간 서버를 끈 상태에서 전 화면 점검
 
 ---
 
-## 12. 범위 밖 (만들지 마)
+## 14. 범위 밖 (만들지 마)
 
-- 로그인, 회원, 서버 DB, 기기 간 동기화
-- 결제, 구독, 열람 제한
-- LLM 호출
-- 성현 3인 외 추가, 구절 추가 (60개 유지)
-- 푸시 알림, PWA 설치 유도
-- 다국어, 관리자 페이지
-- 카카오톡 공유 SDK (다음 단계)
-- 문하 단계 하락, 랭킹, 다른 사용자와 비교
+- 로그인, 서버 DB, 기기 간 동기화 (경함·단계는 브라우저 저장)
+- 다른 사람 닉네임, 채팅, 랭킹, 누가 접속했는지 목록 (숫자만)
+- 결제, 구독, LLM
+- 성현·구절 추가 (60개 유지)
+- 푸시 알림, PWA 설치 유도, 다국어, 관리자 페이지, 카카오톡 SDK
+- 실시간 서버의 수평 확장 (Redis 어댑터 등)
 
 ---
 
-## 13. 완료 기준
+## 15. 완료 기준
 
 **빌드·코드**
-- [ ] `npm run build`, `npm run test`, `npm run check:content` 통과
-- [ ] `posthog` 문자열이 코드와 `package.json`에 없음
-- [ ] UI에 "매칭", "인연", "판별", "유형", "손자형", "수락", "거절" 문자열 없음
+- [ ] `npm run build`, `npm run test`, `npm run check:content`, `cd server && npm test` 통과
+- [ ] `posthog` 문자열 없음, UI에 금지 어휘(매칭, 인연, 판별, 유형, 수락, 거절) 없음
 
-**읽기**
-- [ ] 버튼·스탬프 라벨이 와닿음 / 넘김, 카드 앞면에 출처
-- [ ] 6, 12, 18장째 스승의 평이 `끄덕` / `일깨움` 도장과 함께 뜨고, [읽어보기] 시 추천 구절이 다음 카드로 나오며 21장 유지
-- [ ] 두 번째 판부터 안 읽은 구절이 우선 나옴 (테스트로 검증)
+**실시간**
+- [ ] 브라우저 2개로 광장 접속 시 같은 구절, 같은 카운트다운, 정각에 동시에 교체
+- [ ] 광장 N명, 전각 문 n명이 입장·퇴장에 맞춰 1~2초 안에 바뀜
+- [ ] 합장이 다른 창에 반영됨, 연타해도 800ms에 한 번만 셈
+- [ ] 탭을 백그라운드로 보냈다가 돌아오면 현재 구절로 맞춰짐
+- [ ] 실시간 서버를 끄면 폴백 → 닫힘 안내로 바뀌고, 수행·경함·공유는 정상
 
-**문하**
-- [ ] 정진 점수가 §5.2대로 쌓이고 0 아래로 안 내려감
-- [ ] 점수가 높아도 읽기·해설 조건이 모자라면 승급 안 됨 (테스트)
-- [ ] 단계가 내려가지 않음 (테스트)
-- [ ] 첫 판에서 한 성현 구절을 꾸준히 와닿음 누르면 그 성현 입문 (테스트)
+**수행·문하**
+- [ ] 전각 수행은 그 성현 구절 10장, 두 번째 수행부터 안 읽은 구절 우선 (테스트)
+- [ ] 4·8장째 스승의 평, [읽어보기] 시 다음 카드 삽입, 10장 유지
+- [ ] 정진 점수 §5.2대로, 체류 점수 하루 +3 상한 (테스트)
+- [ ] 읽기·해설 조건 미달이면 점수만으로 승급 안 됨, 단계 하락 없음 (테스트)
+- [ ] 실시간 담기로 승급하면 토스트 + `stage_up(via=live)`
+- [ ] 결과 헤드라인 5종이 §5.6대로 (테스트), 새로고침해도 같음
 
-**결과**
-- [ ] 헤드라인 4가지(첫 입문, 승급, 유지, 문하 앞)와 없음이 §5.6대로 나옴 (테스트)
-- [ ] 헤드라인 아래에 성현 대사와 "당신을 들인 구절", ☆로 교체 가능
-- [ ] 세 문하 줄에 단계 뱃지, 게이지, `n/20`, 다음 단계 안내 문구
-- [ ] 새로고침해도 결과가 같음
+**경함·공유**
+- [ ] 실시간 [담기]와 수행 와닿음이 경함에 중복 없이 모이고, 담은 곳 표시
+- [ ] `/s/{sage}/{verseId}`, `/v/{verseId}` OG가 카카오톡/인스타 DM에서 뜸
+- [ ] `/r/sunzi` → `/z/sunzi`, `/saved` → `/inventory`
+- [ ] 이미지 저장 1080x1920
 
-**공유**
-- [ ] `/s/{sage}/{verseId}` 링크를 카카오톡/인스타 DM에 붙이면 `孔子 門下` + 구절 OG 이미지가 뜸
-- [ ] `/v/{verseId}` OG 정상, `/r/sunzi`는 `/`로 리다이렉트
-- [ ] 이미지 저장이 1080x1920으로 다운로드됨
-
-**분석**
-- [ ] 배포에서 `?debug=1`로 접속하면 GA4 DebugView에 `page_view`, `verse_view`, `swipe`, `stage_up`이 찍힘 (환경변수 설정 후)
-- [ ] 파라미터에 boolean 없음
-- [ ] 카카오톡 인앱 브라우저에서도 앱 정상 동작
-- [ ] `docs/ga4-custom-dimensions.md` 작성
-
-**기타**
-- [ ] v1 사용자의 localStorage 데이터가 깨지지 않고 이어짐 (좋아요 → 정진 점수 초기화 포함)
-- [ ] 다크모드에서 글자가 읽힘
+**분석·기타**
+- [ ] `?debug=1`로 GA4 DebugView에 `zone_enter`, `live_verse_view`, `bow`, `swipe`, `stage_up` 확인 (환경변수 설정 후)
+- [ ] 파라미터에 boolean 없음, 카카오톡 인앱 브라우저에서 정상 동작
+- [ ] v1 사용자 localStorage가 깨지지 않고 이어짐
+- [ ] 밤 법당 / 새벽 법당 모두 글자가 읽힘
 
 ---
 
-## 14. 이후 (참고만, 지금 구현 X)
+## 16. 이후 (참고만)
 
-- 지표가 좋으면 Flutter 앱으로 이전. 같은 Firebase 프로젝트에 앱을 추가하면 웹·앱 지표를 한 곳에서 비교 가능
-- 앱 푸시(FCM): "공자께서 기다리십니다", 승급 직전 알림
-- 문하별 책 순서 완독 모드 (논어 1편부터), 고제 이상 전용 구절
-- 페이크 도어 클릭률이 높으면 "성현께 여쭙기"를 LLM으로, 고제 단계 특전 또는 구독 기능으로 검토
+- 지표가 좋으면 Flutter 앱. 같은 실시간 서버에 붙고, FCM 푸시로 "지금 광장에 N명이 함께 읽고 있습니다"
+- 특정 시각 행사: 매일 밤 10시 "저녁 예불", 모두가 같은 구절을 5분간 함께 읽기
+- 페이크 도어 반응이 좋으면 "성현께 여쭙기"를 LLM으로, 고제 단계 특전 또는 구독으로 검토
+- 접속자가 수천 명을 넘으면 서버에 Redis 어댑터, 또는 클라우드로 이전
