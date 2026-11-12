@@ -3,6 +3,7 @@ vi.mock("./analytics", () => ({ track: vi.fn() }));
 import { usePlayStore } from "./store";
 import { track } from "./analytics";
 import { getVerse, VERSES } from "./content";
+import { localizedVerse } from "./localized-content";
 
 beforeEach(() => {
   usePlayStore.setState(usePlayStore.getInitialState(), true);
@@ -10,6 +11,18 @@ beforeEach(() => {
 });
 
 describe("live inventory rewards", () => {
+  it("keeps an English challenge language and draft through persistence", () => {
+    usePlayStore.setState({ promotions: { confucius: { target: "entered", verseIds: ["confucius-01"], index: 0, draft: "", via: "practice", locale: "en" } } });
+    usePlayStore.getState().updatePromotionDraft("confucius", getVerse("confucius-01")!.translation);
+    expect(usePlayStore.getState().submitPromotion("confucius")).toBe(false);
+    const text = localizedVerse("confucius-01", "en")!.translation;
+    usePlayStore.getState().updatePromotionDraft("confucius", text.toUpperCase());
+    const options = usePlayStore.persist.getOptions();
+    const saved = JSON.parse(JSON.stringify(options.partialize!(usePlayStore.getState())));
+    usePlayStore.setState(options.merge!(saved, usePlayStore.getInitialState()));
+    expect(usePlayStore.getState().promotions.confucius?.locale).toBe("en");
+    expect(usePlayStore.getState().submitPromotion("confucius")).toBe(true);
+  });
   it("removing and adding a verse again does not award another point", () => {
     const store = usePlayStore.getState();
     store.addToInventory("confucius-01", "live", "hall");
@@ -44,7 +57,7 @@ describe("live inventory rewards", () => {
     usePlayStore.getState().updatePromotionDraft("confucius", getVerse(challenge.verseIds[0])!.translation);
     expect(usePlayStore.getState().submitPromotion("confucius")).toBe(true);
     expect(usePlayStore.getState().stage.confucius).toBe("entered");
-    expect(usePlayStore.getState().toast?.text).toContain("공자");
+    expect(usePlayStore.getState().toast?.text).toContain("성장");
     expect(track).toHaveBeenCalledWith("stage_up", {
       sage: "confucius", from: "outside", to: "entered", via: "live",
     });

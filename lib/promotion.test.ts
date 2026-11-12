@@ -14,6 +14,11 @@ it("advances one step and never demotes", () => {
   expect(nextGrowthStage("outside", "senior")).toBe("entered");
   expect(nextGrowthStage("disciple", "entered")).toBeNull();
 });
+it("accepts English capitalization while preserving letters and diacritics", () => {
+  expect(matchesCopy("KNOW YOURSELF!", "Know yourself.", "en")).toBe(true);
+  expect(matchesCopy("know yourself", "Know yourself.", "ko")).toBe(false);
+  expect(matchesCopy("cafe", "café", "en")).toBe(false);
+});
 
 it("selects preferred verses first and uses distinct short translations", () => {
   const pool = VERSES.filter((v) => v.sage === "laozi");

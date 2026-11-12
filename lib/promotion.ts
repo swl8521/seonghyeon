@@ -1,9 +1,11 @@
 import type { Stage, Verse } from "./types";
+import type { Locale } from "./locale";
 
 export const GROWTH_STAGES: Stage[] = ["outside", "entered", "disciple", "senior"];
 export const COPY_COUNTS: Record<Stage, number> = { outside: 0, entered: 1, disciple: 3, senior: 5 };
 
 export interface PromotionChallenge {
+  locale?: Locale; // Pre-localization tasks continue in Korean.
   target: Stage;
   verseIds: string[];
   index: number;
@@ -16,13 +18,14 @@ export function nextGrowthStage(current: Stage, eligible: Stage): Stage | null {
   return GROWTH_STAGES.indexOf(eligible) > rank ? GROWTH_STAGES[rank + 1] : null;
 }
 
-export function normalizeCopy(text: string): string {
-  return text.normalize("NFC").replace(/[\s\p{P}]/gu, "");
+export function normalizeCopy(text: string, locale: Locale = "ko"): string {
+  const normalized = text.normalize("NFC").replace(/[\s\p{P}]/gu, "");
+  return locale === "en" ? normalized.toLowerCase() : normalized;
 }
 
-export function matchesCopy(input: string, expected: string): boolean {
-  const normalized = normalizeCopy(input);
-  return normalized.length > 0 && normalized === normalizeCopy(expected);
+export function matchesCopy(input: string, expected: string, locale: Locale = "ko"): boolean {
+  const normalized = normalizeCopy(input, locale);
+  return normalized.length > 0 && normalized === normalizeCopy(expected, locale);
 }
 
 export function chooseCopyVerses(pool: Verse[], preferredIds: string[], count: number): string[] {

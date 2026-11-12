@@ -3,7 +3,9 @@
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 import { LINES, SAGE_IDS, VERSES, getSage, getVerse } from "./content";
-import { DEVOTION, HEAD_LINE_KIND, NOTE_INDICES, SKIP_REACTION_CHANCE, STAGE_LABEL } from "./constants";
+import { DEVOTION, HEAD_LINE_KIND, NOTE_INDICES, SKIP_REACTION_CHANCE } from "./constants";
+import { activeLocale } from "./locale";
+import { localizedVerse } from "./localized-content";
 import { chooseCopyVerses, COPY_COUNTS, matchesCopy, nextGrowthStage, type PromotionChallenge } from "./promotion";
 import { track } from "./analytics";
 import {
@@ -180,8 +182,9 @@ export const usePlayStore = create<PlayStore>()(
       submitPromotion: (sage) => {
         const challenge = get().promotions[sage];
         if (!challenge || nextGrowthStage(get().stage[sage], challenge.target) !== challenge.target) return false;
-        const verse = getVerse(challenge.verseIds[challenge.index]);
-        if (!verse || !matchesCopy(challenge.draft, verse.translation)) return false;
+        const locale = challenge.locale ?? "ko";
+        const verse = localizedVerse(challenge.verseIds[challenge.index], locale);
+        if (!verse || !matchesCopy(challenge.draft, verse.translation, locale)) return false;
         const index = challenge.index + 1;
         if (index < challenge.verseIds.length) {
           set({ promotions: { ...get().promotions, [sage]: { ...challenge, index, draft: "" } } });
@@ -191,7 +194,7 @@ export const usePlayStore = create<PlayStore>()(
         set({
           stage: { ...get().stage, [sage]: challenge.target },
           promotions: { ...get().promotions, [sage]: undefined },
-          toast: { id: Date.now(), text: `${getSage(sage)?.name}와 함께 ${STAGE_LABEL[challenge.target]} 단계로 자랐어요!` },
+          toast: { id: Date.now(), text: "다음 성장 단계에 도달했어요!" },
         });
         track("stage_up", { sage, from: before, to: challenge.target, via: challenge.via });
         recalcStage(get, set, sage, challenge.via);
@@ -587,6 +590,8 @@ function recalcStage(get: () => PlayStore, set: (partial: Partial<PlayStore>) =>
   const target = nextGrowthStage(before, computed);
   if (!target || get().promotions[sage]) return;
   const preferred = get().inventory.filter((item) => getVerse(item.verseId)?.sage === sage).map((item) => item.verseId);
-  const verseIds = chooseCopyVerses(VERSES.filter((verse) => verse.sage === sage), preferred, COPY_COUNTS[target]);
-  set({ promotions: { ...get().promotions, [sage]: { target, verseIds, index: 0, draft: "", via } } });
+  const locale = activeLocale();
+  const pool = VERSES.filter((verse) => verse.sage === sage).map((verse) => localizedVerse(verse.id, locale)!);
+  const verseIds = chooseCopyVerses(pool, preferred, COPY_COUNTS[target]);
+  set({ promotions: { ...get().promotions, [sage]: { target, verseIds, index: 0, draft: "", via, locale } } });
 }

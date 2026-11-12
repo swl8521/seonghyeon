@@ -3,6 +3,12 @@ import type { Stage } from "./types";
 
 export type Locale = "ko" | "en";
 export const LOCALE_KEY = "seonghyeon-language";
+export function activeLocale(): Locale {
+  if (typeof window === "undefined") return "ko";
+  let saved: string | null = null;
+  try { saved = localStorage.getItem(LOCALE_KEY); } catch {}
+  return resolveLocale(new URLSearchParams(window.location.search).get("lang"), saved, navigator.languages);
+}
 export function isLocale(value: unknown): value is Locale { return value === "ko" || value === "en"; }
 export function resolveLocale(explicit: unknown, saved?: unknown, languages: readonly string[] = []): Locale {
   if (isLocale(explicit)) return explicit;
