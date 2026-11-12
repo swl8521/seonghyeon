@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale } from "@/components/LocaleProvider";
+
 import { useState } from "react";
 import Script from "next/script";
 import { KAKAO_SDK_SRC, ensureKakaoInit, shareKakaoFeed } from "@/lib/kakao";
@@ -19,6 +21,7 @@ export function KakaoShareButton({
   sharePath,
   onShared,
 }: KakaoShareButtonProps) {
+  const { t, href } = useLocale();
   const [ready, setReady] = useState(false);
   const kakaoKey = process.env.NEXT_PUBLIC_KAKAO_JS_KEY;
 
@@ -26,8 +29,8 @@ export function KakaoShareButton({
 
   function handleClick() {
     const origin = window.location.origin;
-    const imageUrl = `${origin}${imagePath}`;
-    const shareUrl = `${origin}${sharePath}`;
+    const imageUrl = `${origin}${href(imagePath)}`;
+    const shareUrl = `${origin}${href(sharePath)}`;
     const sent = shareKakaoFeed({
       objectType: "feed",
       content: {
@@ -38,7 +41,7 @@ export function KakaoShareButton({
       },
       buttons: [
         {
-          title: "나도 해보기",
+          title: t("나도 해보기"),
           link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
         },
       ],
@@ -62,7 +65,7 @@ export function KakaoShareButton({
         disabled={!ready}
         className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground disabled:opacity-50"
       >
-        카카오톡 공유
+        {t("카카오톡 공유")}
       </button>
     </>
   );

@@ -1,9 +1,12 @@
 "use client";
 
+import { localizedSage, localizedVerse, localizedLine } from "@/lib/localized-content";
+import { useLocale } from "@/components/LocaleProvider";
+
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "motion/react";
-import { LINES, getVerse } from "@/lib/content";
+import { LINES } from "@/lib/content";
 import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import type { Sage } from "@/lib/types";
@@ -11,9 +14,11 @@ import { StageCard } from "@/components/StageCard";
 import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
 import { useLive } from "@/lib/live";
-import { STAGE_LABEL } from "@/lib/constants";
+import { stageLabel } from "@/lib/locale";
 
-export function ResultScreen({ sage }: { sage: Sage }) {
+export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
+  const { locale, t, href } = useLocale();
+  const sage = localizedSage(initialSage.id, locale)!;
   const sageId = sage.id;
   useLive(sageId);
   const router = useRouter();
@@ -42,7 +47,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
     // 리다이렉트하면 새로고침할 때마다 전각으로 튕겨나간다.
     if (!hasHydrated) return;
     if (!practice || practice.sage !== sageId || !practice.outcome) {
-      router.replace(`/z/${sageId}`);
+      router.replace(href(`/z/${sageId}`));
       return;
     }
     if (trackedRoundIdRef.current === practice.id) return;
@@ -52,7 +57,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
       head_kind: practice.outcome.headKind,
       picked_verse_id: practice.outcome.pickedVerseId,
     });
-  }, [hasHydrated, practice, sageId, router]);
+  }, [hasHydrated, practice, sageId, router, href]);
 
   if (!practice || practice.sage !== sageId || !practice.outcome) return null;
   const outcome = practice.outcome;
@@ -61,32 +66,24 @@ export function ResultScreen({ sage }: { sage: Sage }) {
   const flippedCount = flippedCountFor(sageId, flippedVerseIds);
 
   const headline = (() => {
-    switch (outcome.headKind) {
-      case "enter":
-        return `${sage.name}와 함께 새싹 단계로 자랐어요`;
-      case "promote":
-        return `${sage.name}와 함께 ${STAGE_LABEL[stage]} 단계로 자랐어요`;
-      case "stay":
-        return `오늘도 ${sage.name} 문하에서 수행했습니다`;
-      case "front":
-        return `${sage.name}와 함께 배움의 씨앗을 심었어요`;
-      case "none":
-        return "아직 문이 열리지 않았습니다";
-    }
+    if (outcome.headKind === "enter" || outcome.headKind === "promote") return t("{name}와 함께 {stage} 단계로 자랐어요", { name: sage.name, stage: stageLabel(stage, locale) });
+    if (outcome.headKind === "stay") return t("오늘도 {name}와 함께 읽었어요", { name: sage.name });
+    if (outcome.headKind === "front") return t("{name}와 함께 배움의 씨앗을 심었어요", { name: sage.name });
+    return t("마음에 드는 구절을 더 찾아보세요");
   })();
 
   // outcome.lineId는 수행이 끝난 시점에 한 번만 뽑혀 고정된다 — 매 렌더마다
   // 다시 뽑으면 새로고침하거나 다른 상태가 바뀔 때마다 대사가 바뀌어버린다.
   const line = outcome.lineId ? LINES.find((l) => l.id === outcome.lineId) : undefined;
-  const pickedVerse = outcome.pickedVerseId ? getVerse(outcome.pickedVerseId) : null;
+  const pickedVerse = outcome.pickedVerseId ? localizedVerse(outcome.pickedVerseId, locale) : null;
 
   function handleShare() {
     if (!pickedVerse) return;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
-    const url = `${siteUrl}/s/${sageId}/${pickedVerse.id}?ref=share`;
+    const url = `${siteUrl}/s/${sageId}/${pickedVerse.id}?ref=share&lang=${locale}`;
     const shareData = {
-      title: `${sage.name} 문하에 들었습니다 — 성현 문하`,
-      text: `${sage.name} 문하에 들었습니다. "${pickedVerse.translation}"`,
+      title: t("{name}와 함께 읽은 구절", { name: sage.name }),
+      text: pickedVerse.translation,
       url,
     };
 
@@ -122,14 +119,14 @@ export function ResultScreen({ sage }: { sage: Sage }) {
   function handleRestart() {
     track("restart", { sage: sageId });
     startPractice(sageId);
-    router.push(`/z/${sageId}/practice`);
+    router.push(href(`/z/${sageId}/practice`));
   }
 
   async function handleSaveImage() {
     if (!pickedVerse || savingImage) return;
     setSavingImage(true);
     try {
-      const params = new URLSearchParams({ stage });
+      const params = new URLSearchParams({ stage, lang: locale });
       const res = await fetch(`/s/${sageId}/${pickedVerse.id}/story?${params.toString()}`);
       if (!res.ok) throw new Error("failed to generate image");
       const blob = await res.blob();
@@ -156,7 +153,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
         {line && (
           <div className="flex flex-col gap-1">
             {line.original && <p className="font-serif text-sm text-muted">{line.original}</p>}
-            <p className="font-serif text-base leading-relaxed">{line.text}</p>
+            <p className="font-serif text-base leading-relaxed">{localizedLine(line.id, locale)}</p>
           </div>
         )}
 
@@ -177,7 +174,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
             )}
           </div>
         ) : (
-          <p className="mt-2 font-sans text-sm text-muted">와닿는 구절을 더 찾아보게.</p>
+          <p className="mt-2 font-sans text-sm text-muted">{t("마음에 드는 구절을 더 찾아보세요")}</p>
         )}
 
         {pickedVerse && (
@@ -187,7 +184,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
               onClick={handleShare}
               className="w-full rounded-full bg-accent py-3 font-sans text-sm font-bold text-accent-foreground"
             >
-              보내기
+              {t("보내기")}
             </button>
             <button
               type="button"
@@ -195,7 +192,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
               disabled={savingImage}
               className="w-full rounded-full border border-border py-3 font-sans text-sm text-foreground disabled:opacity-50"
             >
-              {savingImage ? "이미지 만드는 중..." : "이미지 저장"}
+              {savingImage ? t("이미지 만드는 중...") : t("이미지 저장")}
             </button>
           </div>
         )}
@@ -213,11 +210,11 @@ export function ResultScreen({ sage }: { sage: Sage }) {
 
       <details className="rounded-xl border border-border bg-card p-4">
         <summary className="cursor-pointer font-sans text-sm text-foreground">
-          이번 수행 {practice.deck.length}구절
+          {t("이번에 읽은 {count}구절", { count: practice.deck.length })}
         </summary>
         <ul className="mt-3 flex flex-col gap-2">
           {practice.deck.map((verseId) => {
-            const v = getVerse(verseId);
+            const v = localizedVerse(verseId, locale);
             if (!v) return null;
             const liked = practice.likedIds.includes(verseId);
             const isPicked = outcome.pickedVerseId === verseId;
@@ -237,7 +234,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
                       <>
                         <p className="font-serif text-base">
                           {v.original}
-                          {liked && <span className="ml-2 text-xs text-accent">낙관</span>}
+                          {liked && <span className="ml-2 text-xs text-accent">{t("마음에 듦")}</span>}
                         </p>
                         <p className="mt-1 font-sans text-xs text-muted">{v.translation}</p>
                       </>
@@ -249,7 +246,7 @@ export function ResultScreen({ sage }: { sage: Sage }) {
                     <button
                       type="button"
                       onClick={() => pickHeadlineVerse(verseId)}
-                      aria-label="이 구절을 대표로"
+                      aria-label={t("이 구절을 대표로")}
                       className={`shrink-0 text-lg ${isPicked ? "text-accent" : "text-muted"}`}
                     >
                       {isPicked ? "★" : "☆"}
@@ -268,21 +265,21 @@ export function ResultScreen({ sage }: { sage: Sage }) {
           onClick={handleRestart}
           className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground"
         >
-          다시 수행
+          {t("다시 수행")}
         </button>
         <button
           type="button"
-          onClick={() => router.push(`/z/${sageId}`)}
+          onClick={() => router.push(href(`/z/${sageId}`))}
           className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground"
         >
-          배움터로
+          {t("배움터로")}
         </button>
         <button
           type="button"
-          onClick={() => router.push("/")}
+          onClick={() => router.push(href("/"))}
           className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground"
         >
-          광장으로
+          {t("광장으로")}
         </button>
       </div>
 
@@ -294,13 +291,13 @@ export function ResultScreen({ sage }: { sage: Sage }) {
         }}
         className="mx-auto font-sans text-xs text-muted underline underline-offset-4"
       >
-        성현께 직접 여쭙기
+        {t("성현께 직접 여쭙기")}
       </button>
 
       <AnimatePresence>
-        {copied && <Toast text="복사됨" onDone={() => setCopied(false)} />}
+        {copied && <Toast text={t("복사됨")} onDone={() => setCopied(false)} />}
         {saveError && (
-          <Toast text="이미지 저장에 실패했습니다" onDone={() => setSaveError(false)} />
+          <Toast text={t("이미지 저장에 실패했습니다")} onDone={() => setSaveError(false)} />
         )}
       </AnimatePresence>
 

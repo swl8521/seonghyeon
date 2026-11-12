@@ -1,7 +1,10 @@
 "use client";
 
+import { localizedSage } from "@/lib/localized-content";
+import { useLocale } from "@/components/LocaleProvider";
+
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/LocaleLink";
 import { SAGES } from "@/lib/content";
 import { useLive } from "@/lib/live";
 import { Toast } from "@/components/Toast";
@@ -20,6 +23,7 @@ import { SAGE_BORDER_CLASS } from "@/lib/sageColors";
 const BOW_BATCH_MS = 5000;
 
 export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
+  const { locale, t } = useLocale();
   const { status, verse, remainingMs, presence, bows, bow } = useLive("hall");
   const soundOn = usePlayStore((s) => s.soundOn);
   const toast = usePlayStore((s) => s.toast);
@@ -79,9 +83,9 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
       <TopBar
         left={
           <>
-            <span className="font-semibold">광장</span>
+            <span className="font-semibold">{t("광장")}</span>
             {status !== "fallback" && status !== "closed" && (
-              <span className="text-muted">지금 {presence?.hall ?? 0}명</span>
+              <span className="text-muted">{t("지금 {count}명", { count: presence?.hall ?? 0 })}</span>
             )}
           </>
         }
@@ -96,8 +100,8 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
       <div className="relative flex flex-1 flex-col items-center justify-center gap-6">
         {!seenIntro && verse && (
           <div className="absolute -top-2 z-10 flex max-w-[320px] items-start gap-2 rounded-full border border-border bg-card px-4 py-2 text-center font-sans text-xs text-muted">
-            <span>모두가 같은 구절을 함께 봅니다. 1분마다 바뀝니다.</span>
-            <button type="button" onClick={dismissIntro} aria-label="닫기" className="shrink-0">
+            <span>{t("모두가 같은 구절을 함께 봅니다. 1분마다 바뀝니다.")}</span>
+            <button type="button" onClick={dismissIntro} aria-label={t("닫기")} className="shrink-0">
               ×
             </button>
           </div>
@@ -105,16 +109,16 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
 
         {status === "connecting" && (
           <div className="flex aspect-[3/4] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
-            <p className="font-sans text-sm text-muted">법당 문을 여는 중…</p>
+            <p className="font-sans text-sm text-muted">{t("법당 문을 여는 중…")}</p>
           </div>
         )}
 
         {status === "closed" && !verse && (
           <div className="flex aspect-[3/4] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-card p-6 text-center">
             <p className="font-sans text-sm text-muted">
-              법당 문이 잠시 닫혔습니다.
+              {t("법당 문이 잠시 닫혔습니다.")}
               <br />
-              수행은 계속할 수 있습니다.
+              {t("수행은 계속할 수 있습니다.")}
             </p>
           </div>
         )}
@@ -141,7 +145,7 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
         )}
 
         <div className="grid w-full grid-cols-3 gap-3">
-          {SAGES.map((sage) => (
+          {SAGES.map((originalSage) => localizedSage(originalSage.id, locale)!).map((sage) => (
             <Link
               key={sage.id}
               href={shareVerseId ? `/z/${sage.id}?from=share&id=${shareVerseId}` : `/z/${sage.id}`}
@@ -152,11 +156,11 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
               <span className="font-sans text-[11px] text-muted">{sage.name}</span>
               {status !== "fallback" && status !== "closed" && (
                 <span className="font-sans text-[11px] text-muted">
-                  지금 {presence?.[sage.id] ?? 0}명
+                  {t("지금 {count}명", { count: presence?.[sage.id] ?? 0 })}
                 </span>
               )}
               <StageBadge stage={stage[sage.id]} />
-              {promotions[sage.id] && <span className="font-sans text-[11px] text-accent">따라쓰기 준비 완료</span>}
+              {promotions[sage.id] && <span className="font-sans text-[11px] text-accent">{t("따라쓰기 준비 완료")}</span>}
             </Link>
           ))}
         </div>
@@ -164,16 +168,16 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
 
       <div className="flex items-center justify-center gap-4 font-sans text-xs text-muted underline underline-offset-4">
         <button type="button" onClick={() => setInfoOpen(true)}>
-          이곳은
+          {t("이곳은")}
         </button>
-        <Link href="/privacy">개인정보처리방침</Link>
+        <Link href="/privacy">{t("개인정보처리방침")}</Link>
       </div>
 
       <InfoSheet open={infoOpen} onClose={() => setInfoOpen(false)}>
         <p className="text-center font-serif text-lg leading-relaxed">
-          모두가 같은 구절을 함께 읽는 사이버 법당입니다.
+          {t("모두가 같은 구절을 함께 읽는 사이버 법당입니다.")}
           <br />
-          구절은 1분마다 바뀌고, 배움터에 들어가면 그 성현의 구절을 모아 읽을 수 있어요.
+          {t("구절은 1분마다 바뀌고, 배움터에 들어가면 그 성현의 구절을 모아 읽을 수 있어요.")}
         </p>
       </InfoSheet>
     </main>

@@ -1,7 +1,9 @@
 "use client";
 
+import { localizedSage, localizedVerse } from "@/lib/localized-content";
+import { useLocale } from "@/components/LocaleProvider";
+
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { getSage, getVerse } from "@/lib/content";
 import type { VerseState } from "@/lib/live";
 import { CountdownRing } from "@/components/CountdownRing";
 import { MonkeyCharacter } from "@/components/MonkeyCharacter";
@@ -15,14 +17,15 @@ interface LiveVerseCardProps {
 }
 
 export function LiveVerseCard({ verseState, remainingMs, flipped, onFlip }: LiveVerseCardProps) {
+  const { locale } = useLocale();
   const shouldReduceMotion = useReducedMotion();
-  const verse = getVerse(verseState.verseId);
-  const sage = verse ? getSage(verse.sage) : undefined;
+  const verse = localizedVerse(verseState.verseId, locale);
+  const sage = verse ? localizedSage(verse.sage, locale) : undefined;
   if (!verse || !sage) return null;
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
-      <div className="lantern-glow aspect-[3/4] w-full max-w-[320px] overflow-hidden rounded-2xl [perspective:1200px]">
+      <div className="lantern-glow h-[560px] sm:h-[580px] w-full max-w-[320px] overflow-hidden rounded-2xl [perspective:1200px]">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
             key={verseState.slot}
@@ -61,7 +64,7 @@ export function LiveVerseCard({ verseState, remainingMs, flipped, onFlip }: Live
                 <p className="font-sans text-sm text-muted">
                   {sage.hanja} · {sage.name}
                 </p>
-                <p className="font-serif text-lg leading-relaxed">{verse.note}</p>
+                <p className="max-h-full overflow-y-auto font-serif text-base leading-relaxed">{verse.note}</p>
               </div>
             </motion.div>
           </motion.div>

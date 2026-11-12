@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale } from "@/components/LocaleProvider";
+
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
@@ -18,6 +20,7 @@ export function LiveActions({
   onAddToInventory,
   disabled,
 }: LiveActionsProps) {
+  const { t } = useLocale();
   const shouldReduceMotion = useReducedMotion();
   const [sparks, setSparks] = useState<number[]>([]);
 
@@ -29,7 +32,7 @@ export function LiveActions({
   }
 
   return (
-    <div className="flex items-center justify-center gap-4">
+    <div className="flex flex-wrap items-center justify-center gap-3">
       <button
         type="button"
         onClick={handleBow}
@@ -37,7 +40,7 @@ export function LiveActions({
         className="relative flex items-center gap-2 rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground disabled:opacity-50"
       >
         <span aria-hidden>🙏</span>
-        <span>함께 합장 {bows}</span>
+        <span>{t("함께 합장")} {bows}</span>
         <AnimatePresence>
           {sparks.map((id) => (
             <motion.span
@@ -59,7 +62,7 @@ export function LiveActions({
         disabled={disabled || inInventory}
         className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground disabled:opacity-50"
       >
-        {inInventory ? "담음" : "담기"}
+        {inInventory ? t("담음") : t("담기")}
       </button>
     </div>
   );

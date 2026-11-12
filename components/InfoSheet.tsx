@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale } from "@/components/LocaleProvider";
+
 import type { ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
@@ -10,6 +12,7 @@ interface InfoSheetProps {
 }
 
 export function InfoSheet({ open, onClose, children }: InfoSheetProps) {
+  const { t } = useLocale();
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -37,7 +40,7 @@ export function InfoSheet({ open, onClose, children }: InfoSheetProps) {
               onClick={onClose}
               className="mt-4 w-full rounded-full border border-border py-3 font-sans text-sm text-foreground"
             >
-              닫기
+              {t("닫기")}
             </button>
           </motion.div>
         </motion.div>

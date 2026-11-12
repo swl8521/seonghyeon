@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { isLocale, LOCALE_KEY, resolveLocale, translate, localeHref, type Locale } from "@/lib/locale";
 
@@ -33,7 +33,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 }
 export function useLocale() {
   const context = useContext(LocaleContext);
-  return { ...context, t: (key: string, values?: Record<string, string | number>) => translate(context.locale, key, values), href: (path: string) => localeHref(path, context.locale) };
+  const t = useCallback((key: string, values?: Record<string, string | number>) => translate(context.locale, key, values), [context.locale]);
+  const href = useCallback((path: string) => localeHref(path, context.locale), [context.locale]);
+  return { ...context, t, href };
 }
 export function LanguagePicker() {
   const { locale, setLocale } = useLocale();

@@ -1,4 +1,6 @@
-import { STAGE_LABEL } from "@/lib/constants";
+"use client";
+import { stageLabel } from "@/lib/locale";
+import { useLocale } from "./LocaleProvider";
 import type { Stage } from "@/lib/types";
 
 const STAGE_TONE: Record<Stage, string> = {
@@ -9,11 +11,12 @@ const STAGE_TONE: Record<Stage, string> = {
 };
 
 export function StageBadge({ stage, className = "" }: { stage: Stage; className?: string }) {
+  const { locale } = useLocale();
   return (
     <span
       className={`rounded-full border px-2 py-0.5 font-sans text-xs ${STAGE_TONE[stage]} ${className}`}
     >
-      {STAGE_LABEL[stage]}
+      {stageLabel(stage, locale)}
     </span>
   );
 }

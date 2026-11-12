@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { useLocale } from "./LocaleProvider";
+import { LINES } from "@/lib/content";
+import { localizedLine } from "@/lib/localized-content";
 
 const TOAST_DURATION_MS = 2500;
 
@@ -11,6 +14,9 @@ interface ToastProps {
 }
 
 export function Toast({ text, onDone }: ToastProps) {
+  const { locale, t } = useLocale();
+  const line = LINES.find((line) => line.text === text);
+  const message = line ? localizedLine(line.id, locale) : t(text);
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
@@ -27,7 +33,7 @@ export function Toast({ text, onDone }: ToastProps) {
       className="pointer-events-none fixed inset-x-0 bottom-28 z-50 flex justify-center px-6"
     >
       <div className="max-w-[320px] rounded-full bg-foreground px-4 py-2 text-center text-sm text-background shadow-lg">
-        {text}
+        {message}
       </div>
     </motion.div>
   );

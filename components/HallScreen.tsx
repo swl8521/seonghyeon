@@ -1,7 +1,10 @@
 "use client";
 
+import { localizedSage } from "@/lib/localized-content";
+import { useLocale } from "@/components/LocaleProvider";
+
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/LocaleLink";
 import { useLive } from "@/lib/live";
 import { Toast } from "@/components/Toast";
 import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
@@ -16,7 +19,9 @@ import { StageCard } from "@/components/StageCard";
 const BOW_BATCH_MS = 5000;
 const DWELL_TICK_MS = 30_000;
 
-export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: string }) {
+export function HallScreen({ sage: initialSage, shareVerseId }: { sage: Sage; shareVerseId?: string }) {
+  const { locale, t } = useLocale();
+  const sage = localizedSage(initialSage.id, locale)!;
   const sageId = sage.id;
   const practiceHref = shareVerseId
     ? `/z/${sageId}/practice?shareId=${shareVerseId}`
@@ -110,11 +115,11 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
         left={
           <>
             <Link href="/" className="text-muted">
-              ← 광장
+              {t("← 광장")}
             </Link>
             <span className="font-semibold">{sage.hall}</span>
             {status !== "fallback" && status !== "closed" && (
-              <span className="text-muted">지금 {presence?.[sageId] ?? 0}명</span>
+              <span className="text-muted">{t("지금 {count}명", { count: presence?.[sageId] ?? 0 })}</span>
             )}
           </>
         }
@@ -123,22 +128,22 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
       <div className="flex flex-1 flex-col items-center justify-center gap-6">
         {status === "connecting" && (
           <div className="flex aspect-[3/4] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
-            <p className="font-sans text-sm text-muted">법당 문을 여는 중…</p>
+            <p className="font-sans text-sm text-muted">{t("법당 문을 여는 중…")}</p>
           </div>
         )}
 
         {status === "closed" && !verse && (
           <div className="flex aspect-[3/4] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-card p-6 text-center">
             <p className="font-sans text-sm text-muted">
-              법당 문이 잠시 닫혔습니다.
+              {t("법당 문이 잠시 닫혔습니다.")}
               <br />
-              수행은 계속할 수 있습니다.
+              {t("수행은 계속할 수 있습니다.")}
             </p>
             <Link
               href={practiceHref}
               className="rounded-full bg-accent px-6 py-2 font-sans text-sm text-accent-foreground"
             >
-              수행하기
+              {t("수행하기")}
             </Link>
           </div>
         )}
@@ -168,14 +173,14 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
           href={practiceHref}
           className="w-full max-w-[320px] rounded-full bg-accent py-4 text-center font-sans text-base font-bold text-accent-foreground"
         >
-          수행하기
+          {t("수행하기")}
         </Link>
 
         <StageCard sage={sageId} stage={stage} devotion={devotion} readCount={readCount} flippedCount={flippedCount} />
 
         <details className="w-full max-w-[320px] text-center">
           <summary className="cursor-pointer font-sans text-xs text-muted underline underline-offset-4">
-            {sage.name} 소개
+            {t("{name} 소개", { name: sage.name })}
           </summary>
           <p className="mt-2 whitespace-pre-line font-serif text-sm leading-relaxed text-muted">
             {sage.intro}

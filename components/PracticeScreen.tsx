@@ -1,10 +1,12 @@
 "use client";
 
+import { localizedSage, localizedVerse, localizedLine } from "@/lib/localized-content";
+import { useLocale } from "@/components/LocaleProvider";
+
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import Link from "next/link";
-import { getVerse } from "@/lib/content";
+import Link from "@/components/LocaleLink";
 import { usePlayStore } from "@/lib/store";
 import { useLive } from "@/lib/live";
 import { track } from "@/lib/analytics";
@@ -14,7 +16,9 @@ import { JudgmentCard } from "@/components/JudgmentCard";
 import { Toast } from "@/components/Toast";
 import { TopBar } from "@/components/TopBar";
 
-export function PracticeScreen({ sage }: { sage: Sage }) {
+export function PracticeScreen({ sage: initialSage }: { sage: Sage }) {
+  const { locale, t, href } = useLocale();
+  const sage = localizedSage(initialSage.id, locale)!;
   const sageId = sage.id;
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -43,7 +47,7 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
   useEffect(() => {
     if (!hasHydrated) return;
     if (practice?.sage === sageId && practice.outcome) {
-      router.replace(`/z/${sageId}/result`);
+      router.replace(href(`/z/${sageId}/result`));
       return;
     }
     if (!practice || practice.sage !== sageId) {
@@ -115,9 +119,9 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
   const index = Math.min(practice.index, total);
   const done = index >= total;
   const verseId = done ? undefined : practice.deck[index];
-  const verse = verseId ? getVerse(verseId) : undefined;
+  const verse = verseId ? localizedVerse(verseId, locale) : undefined;
   const recommendedVerse = pendingNote?.recommendedVerseId
-    ? getVerse(pendingNote.recommendedVerseId)
+    ? localizedVerse(pendingNote.recommendedVerseId, locale)
     : null;
 
   return (
@@ -128,7 +132,7 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
             <Link href={`/z/${sageId}`} className="text-muted">
               ← {sage.hall}
             </Link>
-            <span className="text-muted">지금 {presence?.[sageId] ?? 0}명</span>
+            <span className="text-muted">{t("지금 {count}명", { count: presence?.[sageId] ?? 0 })}</span>
           </>
         }
       />
@@ -173,7 +177,7 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
         {pendingNote ? (
           <JudgmentCard
             sage={sage}
-            lineText={pendingNote.lineText}
+            lineText={localizedLine(pendingNote.lineId, locale)}
             result={pendingNote.kind}
             recommendedOriginal={recommendedVerse?.original ?? null}
             onAccept={
@@ -209,14 +213,14 @@ export function PracticeScreen({ sage }: { sage: Sage }) {
             onClick={() => cardRef.current?.flyOff("dislike", "button")}
             className="rounded-full border-2 border-dislike px-6 py-3 font-sans text-sm text-dislike"
           >
-            넘김
+            {t("넘김")}
           </button>
           <button
             type="button"
             onClick={() => cardRef.current?.flyOff("like", "button")}
             className="rounded-full bg-like px-6 py-3 font-sans text-sm text-like-foreground"
           >
-            와닿음
+            {t("와닿음")}
           </button>
         </div>
       )}

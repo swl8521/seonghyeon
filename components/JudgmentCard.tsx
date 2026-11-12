@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale } from "@/components/LocaleProvider";
+
 import { motion, useReducedMotion } from "motion/react";
 import type { JudgmentResult } from "@/lib/practice";
 import type { Sage } from "@/lib/types";
@@ -23,6 +25,7 @@ export function JudgmentCard({
   onAccept,
   onContinue,
 }: JudgmentCardProps) {
+  const { t } = useLocale();
   const shouldReduceMotion = useReducedMotion();
   const isNod = result === "nod";
 
@@ -32,14 +35,14 @@ export function JudgmentCard({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
-      className={`relative flex aspect-[3/4] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border-2 ${SAGE_BORDER_CLASS[sage.id]} bg-card p-6 text-center`}
+      className={`relative flex min-h-[440px] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border-2 ${SAGE_BORDER_CLASS[sage.id]} bg-card p-6 text-center`}
     >
       <span
         className={`absolute right-5 top-5 rotate-12 rounded-lg border-4 px-3 py-1 font-sans text-lg font-bold ${
           isNod ? "border-accent text-accent" : "border-sage-laozi text-sage-laozi"
         }`}
       >
-        {isNod ? "끄덕" : "일깨움"}
+        {isNod ? t("끄덕") : t("일깨움")}
       </span>
 
       <MonkeyCharacter pose={sage.id === "confucius" ? "bow" : sage.id === "laozi" ? "meditate" : "point"} size={104} />
@@ -49,7 +52,7 @@ export function JudgmentCard({
       <p className="font-serif text-lg leading-relaxed">{lineText}</p>
 
       {recommendedOriginal && (
-        <p className="font-serif text-base text-muted">이것도 읽어보게 — {recommendedOriginal}</p>
+        <p className="font-serif text-base text-muted">{t("이것도 읽어보게 — {quote}", { quote: recommendedOriginal })}</p>
       )}
 
       <div className="mt-4 flex items-center gap-3">
@@ -59,7 +62,7 @@ export function JudgmentCard({
             onClick={onAccept}
             className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground"
           >
-            읽어보기
+            {t("읽어보기")}
           </button>
         )}
         <button
@@ -67,7 +70,7 @@ export function JudgmentCard({
           onClick={onContinue}
           className="rounded-full bg-accent px-6 py-2 font-sans text-sm text-accent-foreground"
         >
-          계속
+          {t("계속")}
         </button>
       </div>
     </motion.div>

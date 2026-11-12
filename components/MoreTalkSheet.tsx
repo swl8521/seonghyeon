@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale } from "@/components/LocaleProvider";
+
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 interface MoreTalkSheetProps {
@@ -10,6 +12,7 @@ interface MoreTalkSheetProps {
 }
 
 export function MoreTalkSheet({ open, optedIn, onOptIn, onClose }: MoreTalkSheetProps) {
+  const { t } = useLocale();
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -33,21 +36,21 @@ export function MoreTalkSheet({ open, optedIn, onOptIn, onClose }: MoreTalkSheet
           >
             {optedIn ? (
               <p className="text-center font-serif text-lg leading-relaxed">
-                열리면 가장 먼저 알려드릴게요.
+                {t("관심을 남겨 주셔서 고마워요.")}
               </p>
             ) : (
               <>
                 <p className="text-center font-serif text-lg leading-relaxed">
-                  읽다가 궁금한 걸 성현께 직접 여쭙는 기능을 준비 중입니다.
+                  {t("읽다가 궁금한 걸 성현께 직접 여쭙는 기능을 준비 중입니다.")}
                   <br />
-                  열리면 가장 먼저 알려드릴까요?
+                  {t("열리면 가장 먼저 알려드릴까요?")}
                 </p>
                 <button
                   type="button"
                   onClick={onOptIn}
                   className="mt-6 w-full rounded-full bg-accent py-3 font-sans text-sm text-accent-foreground"
                 >
-                  알림 받기
+                  {t("알림 받기")}
                 </button>
               </>
             )}
@@ -56,7 +59,7 @@ export function MoreTalkSheet({ open, optedIn, onOptIn, onClose }: MoreTalkSheet
               onClick={onClose}
               className="mt-3 w-full rounded-full border border-border py-3 font-sans text-sm text-foreground"
             >
-              닫기
+              {t("닫기")}
             </button>
           </motion.div>
         </motion.div>
