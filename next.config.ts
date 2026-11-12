@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/play", destination: "/", permanent: true },
       { source: "/result", destination: "/", permanent: true },
+      { source: "/saved", destination: "/inventory", permanent: true },
       { source: "/r/:sage", destination: "/z/:sage", permanent: true },
     ];
   },

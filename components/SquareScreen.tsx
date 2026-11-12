@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SAGES } from "@/lib/content";
 import { useLive } from "@/lib/live";
+import { Toast } from "@/components/Toast";
 import { usePlayStore } from "@/lib/store";
 import { playWoodenClack } from "@/lib/sound";
 import { track } from "@/lib/analytics";
@@ -21,6 +22,8 @@ const BOW_BATCH_MS = 5000;
 export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
   const { status, verse, presence, bows, bow } = useLive("hall");
   const soundOn = usePlayStore((s) => s.soundOn);
+  const toast = usePlayStore((s) => s.toast);
+  const dismissToast = usePlayStore((s) => s.dismissToast);
   const seenIntro = usePlayStore((s) => s.seenIntro);
   const dismissIntro = usePlayStore((s) => s.dismissIntro);
   const stage = usePlayStore((s) => s.stage);
@@ -71,6 +74,7 @@ export function SquareScreen({ shareVerseId }: { shareVerseId?: string }) {
 
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-6">
+      {toast && <Toast key={toast.id} text={toast.text} onDone={dismissToast} />}
       <TopBar
         left={
           <>

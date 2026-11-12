@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useLive } from "@/lib/live";
+import { Toast } from "@/components/Toast";
 import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
 import { playWoodenClack } from "@/lib/sound";
 import { track } from "@/lib/analytics";
@@ -23,6 +24,8 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
 
   const { status, verse, presence, bows, bow } = useLive(sageId);
   const soundOn = usePlayStore((s) => s.soundOn);
+  const toast = usePlayStore((s) => s.toast);
+  const dismissToast = usePlayStore((s) => s.dismissToast);
   const devotion = usePlayStore((s) => s.devotion[sageId]);
   const stage = usePlayStore((s) => s.stage[sageId]);
   const readVerseIds = usePlayStore((s) => s.readVerseIds);
@@ -102,6 +105,7 @@ export function HallScreen({ sage, shareVerseId }: { sage: Sage; shareVerseId?: 
 
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-6">
+      {toast && <Toast key={toast.id} text={toast.text} onDone={dismissToast} />}
       <TopBar
         left={
           <>

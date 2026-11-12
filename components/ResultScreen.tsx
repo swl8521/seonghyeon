@@ -10,9 +10,11 @@ import type { Sage } from "@/lib/types";
 import { StageCard } from "@/components/StageCard";
 import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
+import { useLive } from "@/lib/live";
 
 export function ResultScreen({ sage }: { sage: Sage }) {
   const sageId = sage.id;
+  useLive(sageId);
   const router = useRouter();
 
   const hasHydrated = usePlayStore((s) => s.hasHydrated);

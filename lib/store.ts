@@ -124,6 +124,7 @@ interface PlayStore {
   readVerseIds: string[];
   flippedVerseIds: string[];
   inventory: InventoryItem[];
+  liveAddedVerseIds: string[];
   devotion: Record<SageId, number>;
   stage: Record<SageId, Stage>;
   dwellCredit: Record<SageId, { day: string; points: number; accMs: number }>;
@@ -160,6 +161,7 @@ export const usePlayStore = create<PlayStore>()(
       readVerseIds: [],
       flippedVerseIds: [],
       inventory: [],
+      liveAddedVerseIds: [],
       devotion: zeroCounts(),
       stage: zeroStages(),
       dwellCredit: zeroDwell(),
@@ -300,7 +302,7 @@ export const usePlayStore = create<PlayStore>()(
       },
 
       addToInventory: (verseId, source, zone) => {
-        const { inventory, readVerseIds, devotion } = get();
+        const { inventory, readVerseIds, devotion, liveAddedVerseIds } = get();
         if (inventory.some((i) => i.verseId === verseId)) return;
         const verse = getVerse(verseId);
         if (!verse) return;
@@ -310,12 +312,14 @@ export const usePlayStore = create<PlayStore>()(
           ? readVerseIds
           : [...readVerseIds, verseId];
         const nextDevotion = { ...devotion };
-        if (source === "live") {
+        const awardLiveAdd = source === "live" && !liveAddedVerseIds.includes(verseId);
+        if (awardLiveAdd) {
           nextDevotion[verse.sage] = (nextDevotion[verse.sage] ?? 0) + DEVOTION.liveAdd;
         }
 
         set({
           inventory: [item, ...inventory],
+          liveAddedVerseIds: awardLiveAdd ? [...liveAddedVerseIds, verseId] : liveAddedVerseIds,
           readVerseIds: nextReadVerseIds,
           devotion: nextDevotion,
         });
@@ -398,11 +402,21 @@ export const usePlayStore = create<PlayStore>()(
       name: "seonghyeon-round",
       version: 4,
       storage: createJSONStorage(() => safeStorage),
+      merge: (persisted, current) => {
+        const saved = persisted as Partial<PlayStore> | undefined;
+        return {
+          ...current,
+          ...saved,
+          liveAddedVerseIds: saved?.liveAddedVerseIds ?? saved?.inventory
+            ?.filter((item) => item.source === "live").map((item) => item.verseId) ?? [],
+        };
+      },
       partialize: (state) => ({
         practice: state.practice,
         readVerseIds: state.readVerseIds,
         flippedVerseIds: state.flippedVerseIds,
         inventory: state.inventory,
+        liveAddedVerseIds: state.liveAddedVerseIds,
         devotion: state.devotion,
         stage: state.stage,
         dwellCredit: state.dwellCredit,
@@ -544,7 +558,10 @@ function recalcStage(get: () => PlayStore, set: (partial: Partial<PlayStore>) =>
   const before = stage[sage];
   const after = advanceStage(before, computed);
   if (after !== before) {
-    set({ stage: { ...stage, [sage]: after } });
+    set({
+      stage: { ...stage, [sage]: after },
+      toast: { id: Date.now(), text: `${getSage(sage)?.name} 문하${after === "entered" ? "에 들었습니다" : `의 ${after === "senior" ? "고제" : "제자"}가 되었습니다`}` },
+    });
     track("stage_up", { sage, from: before, to: after, via: "live" });
   }
 }

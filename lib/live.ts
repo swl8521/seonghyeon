@@ -77,6 +77,9 @@ class LiveManager {
   setZone(zone: Zone | null) {
     if (this.zone === zone) return;
     this.zone = zone;
+    if (this.lateSwitchTimer) clearTimeout(this.lateSwitchTimer);
+    this.lateSwitchTimer = null;
+    this.update({ verse: null, remainingMs: 0, bows: 0 });
 
     if (!LIVE_URL) {
       // 개발 중 서버 없이 화면만 작업할 때 — 소켓을 아예 시도하지 않는다.
@@ -173,14 +176,15 @@ class LiveManager {
       "join",
       { zone },
       (reply: { verse?: VerseState; presence?: PresenceState; bows?: { count: number }; error?: string }) => {
-        if (reply?.error || !reply?.verse) return;
-        this.update({ status: "connected", presence: reply.presence ?? null, bows: reply.bows?.count ?? 0 });
-        this.applyVerse(reply.verse);
+        if (this.zone !== zone || reply?.error || !reply?.verse || reply.verse.zone !== zone) return;
+        this.applyVerse(reply.verse, reply.bows?.count ?? 0);
+        this.update({ status: "connected", presence: reply.presence ?? null });
       }
     );
   }
 
-  private applyVerse(state: VerseState) {
+  private applyVerse(state: VerseState, bows?: number) {
+    if (state.zone !== this.zone) return;
     // slot이 지금보다 작으면(지연 도착) 무시한다.
     if (this.snapshot.verse && state.slot < this.snapshot.verse.slot) return;
 
@@ -190,7 +194,8 @@ class LiveManager {
     }
 
     this.verseReceivedAt = nowMs();
-    this.update({ verse: state, remainingMs: state.remainingMs, bows: 0 });
+    const sameSlot = this.snapshot.verse?.slot === state.slot;
+    this.update({ verse: state, remainingMs: state.remainingMs, bows: bows ?? (sameSlot ? this.snapshot.bows : 0) });
     this.scheduleLateSwitch(state);
   }
 
@@ -289,8 +294,7 @@ export function useLive(zone: Zone | null): UseLiveResult {
   useEffect(() => {
     liveManager.setZone(zone);
     return () => {
-      // 다른 zone으로 바뀌는 중에만 leave; 언마운트 시점엔 다음 effect가 바로
-      // 새 zone으로 join하거나(라우트 전환) 앱 전체가 사라지는 경우라 그대로 둔다.
+      liveManager.setZone(null);
     };
   }, [zone]);
 
