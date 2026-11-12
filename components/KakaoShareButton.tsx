@@ -23,14 +23,15 @@ export function KakaoShareButton({
 }: KakaoShareButtonProps) {
   const { t, href } = useLocale();
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
   const kakaoKey = process.env.NEXT_PUBLIC_KAKAO_JS_KEY;
 
   if (!kakaoKey) return null;
 
   function handleClick() {
-    const origin = window.location.origin;
-    const imageUrl = `${origin}${href(imagePath)}`;
-    const shareUrl = `${origin}${href(sharePath)}`;
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    const imageUrl = new URL(href(imagePath), origin).href;
+    const shareUrl = new URL(href(sharePath), origin).href;
     const sent = shareKakaoFeed({
       objectType: "feed",
       content: {
@@ -47,6 +48,7 @@ export function KakaoShareButton({
       ],
     });
     if (sent) onShared?.();
+    setFailed(!sent);
   }
 
   return (
@@ -54,19 +56,22 @@ export function KakaoShareButton({
       <Script
         src={KAKAO_SDK_SRC}
         strategy="afterInteractive"
-        onLoad={() => {
-          ensureKakaoInit();
-          setReady(true);
+        onReady={() => {
+          const initialized = Boolean(ensureKakaoInit());
+          setReady(initialized);
+          setFailed(!initialized);
         }}
+        onError={() => setFailed(true)}
       />
       <button
         type="button"
         onClick={handleClick}
         disabled={!ready}
-        className="rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground disabled:opacity-50"
+        className="rounded-full bg-[#FEE500] px-5 py-2 font-sans text-sm text-[#191919] disabled:opacity-50"
       >
         {t("카카오톡 공유")}
       </button>
+      {failed && <p role="status" className="text-xs text-muted">{t("카카오톡 공유를 열지 못했어요. 보내기 버튼을 이용해 주세요.")}</p>}
     </>
   );
 }

@@ -26,7 +26,7 @@ declare global {
   }
 }
 
-export const KAKAO_SDK_SRC = "https://developers.kakao.com/sdk/js/kakao.min.js";
+export const KAKAO_SDK_SRC = "https://t1.kakaocdn.net/kakao_js_sdk/2.8.5/kakao.min.js";
 
 export function ensureKakaoInit(): KakaoSDK | null {
   if (typeof window === "undefined" || !window.Kakao) return null;

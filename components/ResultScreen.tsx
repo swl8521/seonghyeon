@@ -11,6 +11,7 @@ import { usePlayStore, readCountFor, flippedCountFor } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import type { Sage } from "@/lib/types";
 import { StageCard } from "@/components/StageCard";
+import { KakaoShareButton } from "@/components/KakaoShareButton";
 import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
 import { useLive } from "@/lib/live";
@@ -179,6 +180,13 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
 
         {pickedVerse && (
           <div className="mt-3 flex w-full flex-col items-center gap-2">
+            <KakaoShareButton
+              title={t("{name}와 함께 읽은 구절", { name: sage.name })}
+              description={pickedVerse.translation}
+              imagePath={`/s/${sageId}/${pickedVerse.id}/opengraph-image`}
+              sharePath={`/s/${sageId}/${pickedVerse.id}?ref=share`}
+              onShared={() => track("share_click", { kind: "sage_verse", sage: sageId, verse_id: pickedVerse.id, method: "kakao" })}
+            />
             <button
               type="button"
               onClick={handleShare}
@@ -287,7 +295,7 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
         type="button"
         onClick={() => {
           setMoreTalkOpen(true);
-          track("more_talk_click", { head_sage: sageId });
+          track("more_talk_click", { sage: sageId });
         }}
         className="mx-auto font-sans text-xs text-muted underline underline-offset-4"
       >
@@ -306,7 +314,7 @@ export function ResultScreen({ sage: initialSage }: { sage: Sage }) {
         optedIn={moreTalkOptedIn}
         onOptIn={() => {
           setMoreTalkOptedIn(true);
-          track("more_talk_optin", { head_sage: sageId });
+          track("more_talk_optin", { sage: sageId });
         }}
         onClose={() => setMoreTalkOpen(false)}
       />

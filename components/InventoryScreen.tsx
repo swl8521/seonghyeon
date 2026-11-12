@@ -11,6 +11,7 @@ import { usePlayStore } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import type { SageId } from "@/lib/types";
 import { Toast } from "@/components/Toast";
+import { KakaoShareButton } from "@/components/KakaoShareButton";
 
 const FILTERS: { id: SageId | "all"; label: string }[] = [
   { id: "all", label: "전체" },
@@ -133,7 +134,14 @@ export function InventoryScreen() {
                 <p className="font-sans text-xs text-muted">
                   {zoneLabel(item.zone, item.source, locale)} · {formatDate(item.at, locale)}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap justify-end gap-2">
+                  <KakaoShareButton
+                    title={t("성현 문하")}
+                    description={verse.translation}
+                    imagePath={`/v/${verse.id}/opengraph-image`}
+                    sharePath={`/v/${verse.id}?ref=share`}
+                    onShared={() => track("share_click", { kind: "verse", verse_id: verse.id, method: "kakao" })}
+                  />
                   <button
                     type="button"
                     onClick={() => handleShare(item.verseId, verse.translation)}
