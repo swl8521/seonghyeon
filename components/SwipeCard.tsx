@@ -148,7 +148,6 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
             <MonkeyCharacter pose="think" size={96} />
             <p className="font-sans text-sm text-muted">{sageName}</p>
             <p className="font-serif text-lg leading-loose">{verse.note}</p>
-            <p className="text-xs text-muted">{verse.source}</p>
           </div>
         </motion.div>
       </motion.div>

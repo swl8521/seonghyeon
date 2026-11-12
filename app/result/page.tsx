@@ -47,7 +47,7 @@ export default function ResultPage() {
     if (trackedRoundId.current === round.roundId) return;
     trackedRoundId.current = round.roundId;
 
-    const result = computeResult(round, SAGES);
+    const result = computeResult(round.roundUser, round.roundLikes, round.roundDislikes, SAGES);
     track("result_view", {
       roundId: round.roundId,
       type: result.type,
@@ -58,10 +58,10 @@ export default function ResultPage() {
 
   if (!round || !done) return null;
 
-  const result = computeResult(round, SAGES);
+  const result = computeResult(round.roundUser, round.roundLikes, round.roundDislikes, SAGES);
   // SAGES는 고정된 3인 목록이라 result.type은 항상 존재하는 성현을 가리킨다.
   const typeSage = getSage(result.type)!;
-  const narrative = buildResultNarrative(result, SAGES, round.user);
+  const narrative = buildResultNarrative(result, SAGES, round.roundUser);
 
   const likedVerses = likedVerseIds
     .map((id) => getVerse(id))
@@ -160,7 +160,7 @@ export default function ResultPage() {
     <main className="flex flex-1 flex-col gap-8 px-6 py-10">
       <div className="flex flex-1 flex-col items-center justify-center gap-8">
         <section className="flex flex-col items-center gap-2 text-center">
-          <p className="font-sans text-sm text-muted">당신의 대표 유형</p>
+          <p className="font-sans text-sm text-muted">이번 판의 대표 유형</p>
           <h1 className="font-serif text-4xl font-bold">
             {narrative.intensityLabel}
             {typeSage.typeName}
@@ -177,7 +177,7 @@ export default function ResultPage() {
 
         <details className="w-full rounded-xl border border-border bg-card p-4">
           <summary className="cursor-pointer font-sans text-sm text-foreground">
-            매칭 ({likedVerses.length})
+            지금까지 내가 고른 구절 ({likedVerses.length})
           </summary>
           {likedVerses.length === 0 ? (
             <p className="mt-3 font-sans text-sm text-muted">

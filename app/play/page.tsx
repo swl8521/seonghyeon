@@ -103,6 +103,7 @@ export default function PlayPage() {
           <JudgmentCard
             sage={judgmentSage}
             lineText={pendingJudgment.lineText}
+            result={pendingJudgment.result}
             onContinue={dismissJudgment}
           />
         ) : done || !verse || !sage ? null : (

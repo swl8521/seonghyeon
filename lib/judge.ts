@@ -21,9 +21,14 @@ export interface RoundState {
   roundId: string;
   deck: string[]; // verse id 21개
   index: number; // 현재까지 스와이프한 카드 수
+  // 라운드를 거듭해도 리셋되지 않는 누적 성향 — 중간 판별(accept/reject) 연출에 쓰인다.
   user: Vec;
   likes: Record<SageId, number>;
   dislikes: Record<SageId, number>;
+  // 이번 라운드에서만 쌓인 성향 — 결과 화면의 "대표 유형"은 이걸로 계산한다.
+  roundUser: Vec;
+  roundLikes: Record<SageId, number>;
+  roundDislikes: Record<SageId, number>;
   events: JudgmentEvent[];
   startedAt: number;
 }
@@ -122,6 +127,9 @@ export function createRoundState(
     user: seed ? { ...seed.user } : zeroVec(),
     likes: seed ? { ...seed.likes } : zeroCounts(sageIds),
     dislikes: seed ? { ...seed.dislikes } : zeroCounts(sageIds),
+    roundUser: zeroVec(),
+    roundLikes: zeroCounts(sageIds),
+    roundDislikes: zeroCounts(sageIds),
     events: [],
     startedAt,
   };
@@ -136,14 +144,25 @@ export function applySwipe(
   const user = addVec(state.user, verse.tags, delta);
   const likes = { ...state.likes };
   const dislikes = { ...state.dislikes };
-  if (dir === "like") likes[verse.sage] = (likes[verse.sage] ?? 0) + 1;
-  else dislikes[verse.sage] = (dislikes[verse.sage] ?? 0) + 1;
+  const roundUser = addVec(state.roundUser, verse.tags, delta);
+  const roundLikes = { ...state.roundLikes };
+  const roundDislikes = { ...state.roundDislikes };
+  if (dir === "like") {
+    likes[verse.sage] = (likes[verse.sage] ?? 0) + 1;
+    roundLikes[verse.sage] = (roundLikes[verse.sage] ?? 0) + 1;
+  } else {
+    dislikes[verse.sage] = (dislikes[verse.sage] ?? 0) + 1;
+    roundDislikes[verse.sage] = (roundDislikes[verse.sage] ?? 0) + 1;
+  }
 
   return {
     ...state,
     user,
     likes,
     dislikes,
+    roundUser,
+    roundLikes,
+    roundDislikes,
     index: state.index + 1,
   };
 }
@@ -201,16 +220,21 @@ export function relationFor(prefValue: number, fitValue: number): Relation {
   return "none";
 }
 
-export function computeResult(state: RoundState, sages: Sage[]): ResultSummary {
+export function computeResult(
+  user: Vec,
+  likes: Record<SageId, number>,
+  dislikes: Record<SageId, number>,
+  sages: Sage[]
+): ResultSummary {
   const scores = {} as Record<SageId, number>;
   const relations = {} as Record<SageId, Relation>;
 
   for (const sageDef of sages) {
-    const sc = score(state.user, sageDef.vec, sageDef.id, state.likes, state.dislikes);
+    const sc = score(user, sageDef.vec, sageDef.id, likes, dislikes);
     scores[sageDef.id] = sc;
     relations[sageDef.id] = relationFor(
-      pref(sageDef.id, state.likes, state.dislikes),
-      fit(state.user, sageDef.vec)
+      pref(sageDef.id, likes, dislikes),
+      fit(user, sageDef.vec)
     );
   }
 
