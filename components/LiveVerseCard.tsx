@@ -92,7 +92,7 @@ export function LiveVerseCard({ verseState, remainingMs, flipped, onFlip }: Live
         </AnimatePresence>
       </div>
 
-      <CountdownRing remainingMs={remainingMs} periodMs={verseState.periodMs} />
+      <CountdownRing remainingMs={remainingMs} periodMs={verseState.periodMs} slot={verseState.slot} />
     </div>
   );
 }

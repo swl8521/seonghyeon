@@ -151,3 +151,33 @@ select:disabled,
     box-shadow: 0 0 20px 2px color-mix(in srgb, var(--lantern-glow) 30%, transparent) !important;
   }
 }
+
+/* 구절 카운트다운 링 (§4.2).
+   남은 시간 표시는 1분 내내 멈추지 않으므로, React가 매 틱마다 리렌더하면
+   실시간 화면 전체가 초당 여러 번 다시 그려진다. 링은 CSS에 한 번 맡기고
+   React는 1초마다 시계 텍스트만 갱신한다. 음수 animation-delay로 이미 지난
+   만큼 건너뛴 지점에서 시작하므로, 늦게 들어온 사람도 같은 위치에서 본다. */
+@keyframes countdown-deplete {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: var(--countdown-circumference);
+  }
+}
+
+.countdown-ring {
+  animation-name: countdown-deplete;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  /* duration과 delay는 남은 시간에 따라 인라인 style로 들어온다. */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* 위의 전역 규칙이 모든 애니메이션을 0.01ms로 줄여 링이 즉시 비어 보이게
+     되므로, 링은 아예 끄고 React가 넣어준 stroke-dashoffset 속성값을 쓴다. */
+  .countdown-ring {
+    animation: none !important;
+  }
+}
