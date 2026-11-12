@@ -3,17 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 import type { Zone } from "./types";
+import type { VerseState } from "./live-state";
+
+export type { VerseState } from "./live-state";
 
 export type LiveStatus = "connecting" | "connected" | "reconnecting" | "fallback" | "closed";
-
-export interface VerseState {
-  zone: Zone;
-  slot: number;
-  verseId: string;
-  nextVerseId: string;
-  remainingMs: number;
-  periodMs: number;
-}
 
 export interface PresenceState {
   total: number;

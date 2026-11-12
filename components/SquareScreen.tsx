@@ -21,10 +21,11 @@ import { StageBadge } from "@/components/StageBadge";
 import { InfoSheet } from "@/components/InfoSheet";
 import { Icon } from "./Icon";
 import { SAGE_BORDER_CLASS } from "@/lib/sageColors";
+import type { VerseState } from "@/lib/live-state";
 
 const BOW_BATCH_MS = 5000;
 
-export function SquareScreen() {
+export function SquareScreen({ initialVerse }: { initialVerse: VerseState | null }) {
   const shareVerseId = useShareVerseId();
   const { locale, t } = useLocale();
   const { status, verse, remainingMs, presence, bows, bow } = useLive("hall");
@@ -46,6 +47,8 @@ export function SquareScreen() {
   const bowTapsRef = useRef(0);
   const bowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastStatusRef = useRef<string | null>(null);
+  const activeVerse = verse ?? initialVerse;
+  const activeRemainingMs = verse ? remainingMs : initialVerse?.remainingMs ?? 0;
 
   useEffect(() => {
     if (status !== lastStatusRef.current) {
@@ -78,7 +81,7 @@ export function SquareScreen() {
     }, BOW_BATCH_MS);
   }
 
-  const inInventory = verse ? inventory.some((i) => i.verseId === verse.verseId) : false;
+  const inInventory = activeVerse ? inventory.some((i) => i.verseId === activeVerse.verseId) : false;
 
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-6">
@@ -111,13 +114,13 @@ export function SquareScreen() {
         )}
 
         <div className="flex min-h-[652px] w-full shrink-0 flex-col items-center gap-6">
-        {!verse && status !== "closed" && (
+        {!activeVerse && status !== "closed" && (
           <div className="flex min-h-[580px] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
             <p className="font-sans text-sm text-muted">{t("법당 문을 여는 중…")}</p>
           </div>
         )}
 
-        {status === "closed" && !verse && (
+        {status === "closed" && !activeVerse && (
           <div className="flex aspect-[3/4] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-card p-6 text-center">
             <p className="font-sans text-sm text-muted">
               {t("법당 문이 잠시 닫혔습니다.")}
@@ -127,23 +130,23 @@ export function SquareScreen() {
           </div>
         )}
 
-        {verse && (
+        {activeVerse && (
           <>
             <LiveVerseCard
-              verseState={verse}
-              remainingMs={remainingMs}
+              verseState={activeVerse}
+              remainingMs={activeRemainingMs}
               flipped={flipped}
               onFlip={() => {
                 const next = !flipped;
                 setFlipped(next);
-                if (next) flipLiveVerse(verse.verseId, "hall");
+                if (next) flipLiveVerse(activeVerse.verseId, "hall");
               }}
             />
             <LiveActions
               bows={bows}
               onBow={handleBow}
               inInventory={inInventory}
-              onAddToInventory={() => addToInventory(verse.verseId, "live", "hall")}
+              onAddToInventory={() => addToInventory(activeVerse.verseId, "live", "hall")}
             />
           </>
         )}
