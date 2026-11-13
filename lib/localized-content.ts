@@ -27,14 +27,15 @@ const sections: Record<string, string> = {
 function englishSource(verse: Verse): string {
   const section = verse.source.split("·")[1]?.trim() ?? "";
   const label = verse.sage === "confucius" ? "Book" : "Chapter";
-  const parsed = /^(.*?편)(?:\s+(\d+)장)?(?:\s*\(([a-z])\))?$/.exec(section);
+  const parsed = /^(.*?편)(?:\s+(\d+)장)?(?:\s*\(([a-z]{1,2})\))?$/.exec(section);
   if (parsed) {
     const [, name, chapter, segment] = parsed;
     const number = sections[name] ?? name.replace(/[^0-9]/g, "");
     return `${sageText[verse.sage].book} · ${label} ${number}${chapter ? `.${chapter}` : ""}${segment ?? ""}`;
   }
-  // 도덕경처럼 편 이름 없이 "73장" 으로 끝나는 경우
-  const bare = /^(\d+)장(?:\s*\(([a-z])\))?$/.exec(section);
+  // 도덕경처럼 "73장" 또는 "덕경 81장 (b)" 로 끝나는 경우.
+  // 앞에 편 이름이 붙어도 장 번호와 분할 표시를 잡아야 81a 와 81b 가 갈린다.
+  const bare = /^(?:.*?\s)?(\d+)장(?:\s*\(([a-z]{1,2})\))?$/.exec(section);
   const number = bare ? bare[1] : section.replace(/[^0-9]/g, "");
   return `${sageText[verse.sage].book} · ${label} ${number}${bare?.[2] ?? ""}`;
 }
