@@ -141,16 +141,16 @@ export function HallScreen({ sage: initialSage, initialVerse, content }: { sage:
         <div className="flex min-h-[652px] w-full shrink-0 flex-col items-center gap-6">
         {!activeVerse && status !== "closed" && (
           <div className="flex min-h-[580px] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
-            <p className="font-sans text-sm text-muted">{t("법당 문을 여는 중…")}</p>
+            <p className="font-sans text-sm text-muted">{t("함께 읽을 구절을 불러오는 중…")}</p>
           </div>
         )}
 
         {status === "closed" && !activeVerse && (
           <div className="flex aspect-[3/4] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-card p-6 text-center">
             <p className="font-sans text-sm text-muted">
-              {t("법당 문이 잠시 닫혔습니다.")}
+              {t("실시간 구절을 잠시 불러올 수 없어요.")}
               <br />
-              {t("수행은 계속할 수 있습니다.")}
+              {t("구절 읽기는 계속할 수 있어요.")}
             </p>
             <Link
               href={practiceHref}

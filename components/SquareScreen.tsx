@@ -108,7 +108,7 @@ export function SquareScreen({ initialVerse, content }: { initialVerse: VerseSta
       <div className="relative flex flex-col items-center gap-6">
         {!seenIntro && (
           <div className="flex w-full max-w-[320px] shrink-0 items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2 text-center font-sans text-xs leading-relaxed text-muted">
-            <span className="min-w-0 flex-1">{t("모두가 같은 구절을 함께 봅니다. 1분마다 바뀝니다.")}</span>
+            <span className="min-w-0 flex-1">{t("고전이 어렵다면, 한 구절부터. 마음에 드는 문장을 모으고 따라 써 보세요.")}</span>
             <button type="button" onClick={dismissIntro} aria-label={t("닫기")} className="flex h-8 w-8 shrink-0 items-center justify-center text-base">
               <Icon name="close" width={16} height={16} />
             </button>
@@ -118,16 +118,16 @@ export function SquareScreen({ initialVerse, content }: { initialVerse: VerseSta
         <div className="flex min-h-[652px] w-full shrink-0 flex-col items-center gap-6">
         {!activeVerse && status !== "closed" && (
           <div className="flex min-h-[580px] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
-            <p className="font-sans text-sm text-muted">{t("법당 문을 여는 중…")}</p>
+            <p className="font-sans text-sm text-muted">{t("함께 읽을 구절을 불러오는 중…")}</p>
           </div>
         )}
 
         {status === "closed" && !activeVerse && (
           <div className="flex aspect-[3/4] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-card p-6 text-center">
             <p className="font-sans text-sm text-muted">
-              {t("법당 문이 잠시 닫혔습니다.")}
+              {t("실시간 구절을 잠시 불러올 수 없어요.")}
               <br />
-              {t("수행은 계속할 수 있습니다.")}
+              {t("구절 읽기는 계속할 수 있어요.")}
             </p>
           </div>
         )}
@@ -184,9 +184,9 @@ export function SquareScreen({ initialVerse, content }: { initialVerse: VerseSta
 
       <InfoSheet open={infoOpen} onClose={() => setInfoOpen(false)}>
         <p className="text-center font-serif text-lg leading-relaxed">
-          {t("모두가 같은 구절을 함께 읽는 사이버 법당입니다.")}
+          {t("고전 구절을 함께 읽고, 마음에 드는 문장을 모으는 공간입니다.")}
           <br />
-          {t("구절은 1분마다 바뀌고, 배움터에 들어가면 그 성현의 구절을 모아 읽을 수 있어요.")}
+          {t("광장에서는 1분마다 새로운 구절을 함께 읽어요. 성현을 선택하면 그 성현의 구절을 읽고, 마음에 드는 문장을 모으며 따라 쓸 수 있어요.")}
         </p>
       </InfoSheet>
     </main>

@@ -25,6 +25,6 @@ export function ShareScreen({ data, sageId, initialLocale }: { data: ShareScreen
       <p className="mt-3 border-t border-border pt-3 font-serif text-sm leading-relaxed text-muted">{verse.note}</p>
       <p className="mt-2 text-right text-xs text-muted">{verse.source}</p>
     </div>
-    <Link href={localeHref(sageId ? `/z/${sage.id}?from=share&id=${verse.id}` : `/?from=share&id=${verse.id}`, locale)} className="rounded-full bg-accent px-8 py-3 text-base text-accent-foreground">{t("법당에 들어가기")}</Link>
+    <Link href={localeHref(sageId ? `/z/${sage.id}?from=share&id=${verse.id}` : `/?from=share&id=${verse.id}`, locale)} className="rounded-full bg-accent px-8 py-3 text-base text-accent-foreground">{t("지금 함께 읽는 구절 보기")}</Link>
   </main>;
 }
