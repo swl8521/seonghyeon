@@ -5,7 +5,6 @@
 > - 카카오톡 SDK 공유는 넣었다가 사용자 요청으로 제거했다. 링크를 카카오톡에
 >   붙였을 때 OG 이미지가 뜨는 것은 SDK와 무관해서 그대로 동작한다.
 > - GA4 이벤트 값 정리(boolean→숫자, 유효한 이름, 최대 25개 파라미터, 문자열 100자), 성장 사용자 속성 갱신, `more_talk_*`의 `sage` 파라미터를 구현했다.
-> - 이전 Vercel 호스트만 `https://munha.yeoul.dev`로 경로·쿼리를 유지해 308 이동한다. 프리뷰 호스트는 제외한다.
 > - 남은 수동 검증: 두 브라우저 실시간 동기화·재접속·서버 중단, 390px 다크/라이트, 공유 이미지, GA4 DebugView, Lighthouse 모바일 90+.
 > - 영어 콘텐츠는 검수 전 초안이다. 아래 자동 승급·옛 장소명·옛 단계명은 사용자 승인 변경을 우선한다.
 
@@ -26,7 +25,7 @@
 > 한 줄: **사이버 법당에서 모두가 같은 구절을 함께 보고, 전각에 들어가 수행하면 성현이 나를 제자로 들인다.**
 > 목적: 고전을 읽게 만드는 것.
 > 구성: 프론트 Next.js (Vercel) + **실시간 서버 Node/Socket.IO (집 서버, `server/` 폴더, 구현 완료)**
-> 배포: https://seonghyeon-lac.vercel.app
+> 배포: https://commonleaf.yeoul.dev (집 서버 + Cloudflare Tunnel)
 
 ---
 
@@ -97,8 +96,8 @@ v3에서 그대로 가져오는 것: 와닿음/넘김, 스승의 평(끄덕/일�
 
 환경변수 (프론트, `.env.example`에 이름만):
 ```
-NEXT_PUBLIC_LIVE_URL=https://live-munha.yeoul.dev   # Cloudflare Tunnel (집 서버)
-NEXT_PUBLIC_SITE_URL=https://munha.yeoul.dev        # OG·공유 링크 절대 주소 (metadataBase)
+NEXT_PUBLIC_LIVE_URL=https://live-commonleaf.yeoul.dev   # Cloudflare Tunnel (집 서버)
+NEXT_PUBLIC_SITE_URL=https://commonleaf.yeoul.dev        # OG·공유 링크 절대 주소 (metadataBase)
 NEXT_PUBLIC_FIREBASE_API_KEY=
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=
@@ -112,12 +111,12 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
 
 | 주소 | 용도 |
 |---|---|
-| `https://munha.yeoul.dev` | 프론트 (Vercel 커스텀 도메인) |
-| `https://live-munha.yeoul.dev` | 실시간 서버 (Cloudflare Tunnel → 집 서버) |
+| `https://commonleaf.yeoul.dev` | 프론트 (Cloudflare Tunnel → 집 서버) |
+| `https://live-commonleaf.yeoul.dev` | 실시간 서버 (Cloudflare Tunnel → 집 서버) |
 
 - `app/layout.tsx`의 `metadata.metadataBase`는 `NEXT_PUBLIC_SITE_URL`로. OG 이미지, 공유 URL(`/s`, `/v`)은 전부 이 값 기준 절대 주소
 - 공유 버튼이 만드는 링크도 `window.location.origin` 말고 `NEXT_PUBLIC_SITE_URL` 사용 (프리뷰·vercel.app 주소로 공유되는 것 방지)
-- 기존 `seonghyeon-lac.vercel.app`으로 들어온 요청은 `middleware.ts`에서 `munha.yeoul.dev`로 308 리다이렉트 (호스트가 `seonghyeon-lac.vercel.app`일 때만. 프리뷰 주소는 건드리지 않음)
+- Vercel 호스트 리다이렉트는 제거했다. 자체 서버로 들어오는 요청의 호스트는 vercel.app 일 수 없고, 옮겨줄 사용자도 없었다
 
 ---
 

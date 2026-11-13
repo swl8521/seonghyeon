@@ -11,8 +11,9 @@ here, since GA4 does not gather web vitals by default.
 
 ## Where this landed
 
-Measured on the production deployment at `https://munha.yeoul.dev`, Lighthouse
-13.6.0 mobile, emulated Moto G Power on slow 4G. Three consecutive runs scored
+Measured on the production deployment at `https://munha.yeoul.dev` (the address
+has since moved to `https://commonleaf.yeoul.dev`), Lighthouse 13.6.0 mobile,
+emulated Moto G Power on slow 4G. Three consecutive runs scored
 **86, 86, 87**. The last of those:
 
 | Metric | Value |

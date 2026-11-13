@@ -4,8 +4,8 @@
 
 | 공개 주소 | 로컬 프로세스 | 역할 |
 |---|---|---|
-| `https://munha.yeoul.dev` | `127.0.0.1:3000` | Next.js 화면·공유 페이지·OG 이미지 |
-| `https://live-munha.yeoul.dev` | `127.0.0.1:4000` | Socket.IO·현재 구절·접속자·합장 |
+| `https://commonleaf.yeoul.dev` | `127.0.0.1:3000` | Next.js 화면·공유 페이지·OG 이미지 |
+| `https://live-commonleaf.yeoul.dev` | `127.0.0.1:4000` | Socket.IO·현재 구절·접속자·합장 |
 
 두 프로세스 모두 로컬 주소에만 바인딩한다. 방화벽으로 포트를 공개하지 않고
 Cloudflare Tunnel이 TLS와 외부 연결을 담당한다.
@@ -25,11 +25,11 @@ cp server/.env.example server/.env
 취급할 수 없다. 운영값은 적어도 다음과 같이 설정한다.
 
 ```dotenv
-NEXT_PUBLIC_SITE_URL=https://munha.yeoul.dev
-NEXT_PUBLIC_LIVE_URL=https://live-munha.yeoul.dev
+NEXT_PUBLIC_SITE_URL=https://commonleaf.yeoul.dev
+NEXT_PUBLIC_LIVE_URL=https://live-commonleaf.yeoul.dev
 ```
 
-`server/.env`에서는 `ALLOWED_ORIGINS=https://munha.yeoul.dev`를 사용한다.
+`server/.env`에서는 `ALLOWED_ORIGINS=https://commonleaf.yeoul.dev`를 사용한다.
 Firebase를 쓸 경우 기존 `NEXT_PUBLIC_FIREBASE_*` 값도 옮긴다. 환경 파일은
 Git에 커밋하지 않는다.
 
@@ -58,9 +58,19 @@ curl http://127.0.0.1:4000/healthz
 - 임시 Tunnel 주소 또는 hosts 우회로 한국어·영어, 읽기, 따라쓰기 확인
 - 두 브라우저에서 같은 구절, 접속자 수, 합장, 1분 전환 확인
 
-모두 통과한 뒤 Cloudflare DNS의 `munha.yeoul.dev` 연결만 새 터널로 전환한다.
-`live-munha.yeoul.dev`가 이미 같은 서버 터널을 사용한다면 해당 항목은 그대로
-유지한다. 도메인이 같으므로 공유 링크 설정은 바꿀 필요가 없다.
+터널은 대시보드 관리형(`tunnel run --token-file`)이라 공개 호스트명이 서버
+파일이 아니라 Cloudflare Zero Trust 대시보드에 있다. 서버에서는 바꿀 수 없고
+`cloudflared tunnel route dns`도 `cert.pem` 이 없어 쓸 수 없다.
+
+Zero Trust → Networks → Tunnels → 해당 터널 → Public Hostname 에서 추가한다.
+
+| Subdomain | Domain | Service |
+|---|---|---|
+| `commonleaf` | `yeoul.dev` | `HTTP` → `127.0.0.1:3000` |
+| `live-commonleaf` | `yeoul.dev` | `HTTP` → `127.0.0.1:4000` |
+
+DNS 레코드는 대시보드가 알아서 만든다. 새 호스트명을 먼저 추가해 두고 환경
+변수를 바꿔 배포한 뒤, 확인이 끝나면 쓰지 않는 호스트명을 지운다.
 
 ## 3. 이후 배포
 

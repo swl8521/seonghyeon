@@ -4,8 +4,8 @@ tunnel: YOUR_TUNNEL_ID
 credentials-file: /etc/cloudflared/YOUR_TUNNEL_ID.json
 
 ingress:
-  - hostname: munha.yeoul.dev
+  - hostname: commonleaf.yeoul.dev
     service: http://127.0.0.1:3000
-  - hostname: live-munha.yeoul.dev
+  - hostname: live-commonleaf.yeoul.dev
     service: http://127.0.0.1:4000
   - service: http_status:404
