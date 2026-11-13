@@ -153,31 +153,19 @@ select:disabled,
 }
 
 /* 구절 카운트다운 링 (§4.2).
-   남은 시간 표시는 1분 내내 멈추지 않으므로, React가 매 틱마다 리렌더하면
-   실시간 화면 전체가 초당 여러 번 다시 그려진다. 링은 CSS에 한 번 맡기고
-   React는 1초마다 시계 텍스트만 갱신한다. 음수 animation-delay로 이미 지난
-   만큼 건너뛴 지점에서 시작하므로, 늦게 들어온 사람도 같은 위치에서 본다. */
-@keyframes countdown-deplete {
-  from {
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dashoffset: var(--countdown-circumference);
-  }
-}
-
+   링과 시계 텍스트는 같은 remainingMs 에서 나온다. React 가 1초마다 주는
+   값으로 stroke-dashoffset 이 정해지고, 그 사이를 이 transition 이 메운다.
+   예전처럼 링을 별도 키프레임 애니메이션에 맡기면 애니메이션이 제 시간을
+   따로 세기 때문에 숫자와 어긋날 수 있다. duration 은 틱 주기에 맞춰
+   인라인 style 로 들어온다 (components/CountdownRing.tsx). */
 .countdown-ring {
-  animation-name: countdown-deplete;
-  animation-timing-function: linear;
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
-  /* duration과 delay는 남은 시간에 따라 인라인 style로 들어온다. */
+  transition-property: stroke-dashoffset;
+  transition-timing-function: linear;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* 위의 전역 규칙이 모든 애니메이션을 0.01ms로 줄여 링이 즉시 비어 보이게
-     되므로, 링은 아예 끄고 React가 넣어준 stroke-dashoffset 속성값을 쓴다. */
+  /* 전환을 끄면 1초마다 한 칸씩 끊겨 움직인다. 값 자체는 늘 정확하다. */
   .countdown-ring {
-    animation: none !important;
+    transition: none !important;
   }
 }

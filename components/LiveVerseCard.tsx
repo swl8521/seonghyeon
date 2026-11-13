@@ -4,7 +4,7 @@ import { useLocale } from "@/components/LocaleProvider";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
-import type { VerseState } from "@/lib/live";
+import { TICK_MS, type VerseState } from "@/lib/live";
 import { CountdownRing } from "@/components/CountdownRing";
 import { MonkeyCharacter } from "@/components/MonkeyCharacter";
 import { getVersePose } from "@/lib/monkey";
@@ -97,7 +97,12 @@ export function LiveVerseCard({ verseState, remainingMs, flipped, onFlip }: Live
         </AnimatePresence>
       </div>
 
-      <CountdownRing remainingMs={remainingMs} periodMs={verseState.periodMs} slot={verseState.slot} />
+      <CountdownRing
+        remainingMs={remainingMs}
+        periodMs={verseState.periodMs}
+        slot={verseState.slot}
+        tickMs={TICK_MS}
+      />
     </div>
   );
 }
