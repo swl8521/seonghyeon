@@ -1,6 +1,6 @@
 import { DEVOTION, PRACTICE_DECK_SIZE, STAGE_THRESHOLDS } from "./constants";
 import { acceptProbability, addVec, cosine, pref, score, zeroVec } from "./judge";
-import type { PracticeHeadKind, PracticeOutcome, SageId, Stage, Verse, Vec } from "./types";
+import type { PracticeHeadKind, PracticeOutcome, SageId, Stage, Vec, Verse, VerseIndexEntry } from "./types";
 
 export type SwipeDirection = "like" | "dislike";
 export type JudgmentResult = "nod" | "nudge";
@@ -37,7 +37,7 @@ function shuffle<T>(arr: T[], rng: () => number): T[] {
  */
 export function buildPracticeDeck(
   sage: SageId,
-  verses: Verse[],
+  verses: VerseIndexEntry[],
   readVerseIds: string[],
   inventoryVerseIds: string[],
   lastPracticeVerseIds: string[],
@@ -150,7 +150,7 @@ export function judgeTeacherNote(
 /** 추천 구절: 이번 덱에 없는 것 중 안 읽은 것 우선, 그 다음 user와 tags 코사인 최대. */
 export function pickRecommendedVerse(
   state: PracticeState,
-  verses: Verse[],
+  verses: VerseIndexEntry[],
   readVerseIds: string[]
 ): string | null {
   const candidates = verses.filter(
@@ -161,7 +161,7 @@ export function pickRecommendedVerse(
   const unread = candidates.filter((v) => !readVerseIds.includes(v.id));
   const pool = unread.length > 0 ? unread : candidates;
 
-  let best: Verse = pool[0];
+  let best: VerseIndexEntry = pool[0];
   let bestScore = -Infinity;
   for (const v of pool) {
     const c = cosine(state.user, v.tags);
@@ -270,13 +270,13 @@ export function computeHeadKind(
 }
 
 /** 나를 들인 구절 (§5.7): 해설까지 읽은 것 → 코사인 높은 순 → 나중에 읽은 것. */
-export function pickHeadlineVerse(state: PracticeState, verses: Verse[]): string | null {
+export function pickHeadlineVerse(state: PracticeState, verses: VerseIndexEntry[]): string | null {
   const liked = state.likedIds
     .map((id) => verses.find((v) => v.id === id))
-    .filter((v): v is Verse => Boolean(v));
+    .filter((v): v is VerseIndexEntry => Boolean(v));
   if (liked.length === 0) return null;
 
-  let best: Verse | null = null;
+  let best: VerseIndexEntry | null = null;
   let bestKey: [number, number] = [-Infinity, -Infinity];
   liked.forEach((v, order) => {
     const flipped = state.flippedIds.includes(v.id) ? 1 : 0;
@@ -299,7 +299,7 @@ export function pickHeadlineVerse(state: PracticeState, verses: Verse[]): string
 export function finalizePracticeOutcome(
   state: PracticeState,
   stageAfter: Stage,
-  verses: Verse[]
+  verses: VerseIndexEntry[]
 ): PracticeOutcome {
   const headKind = computeHeadKind(state.likedIds.length, state.stageBefore, stageAfter);
   const pickedVerseId = headKind === "none" ? null : pickHeadlineVerse(state, verses);

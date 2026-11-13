@@ -18,7 +18,7 @@ function makeVerse(id: string, overrides: Partial<Verse> = {}): Verse {
     translation: "번역",
     note: "해설",
     tags: { ren: 0.5, xue: 0.5, dao: 0, mou: 0, rou: 0 },
-    pools: ["read", "practice"],
+    pools: ["read", "copy"],
     reviewed: false,
     ...overrides,
   };

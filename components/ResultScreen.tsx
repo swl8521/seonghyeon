@@ -14,7 +14,7 @@ import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
 import { useLive } from "@/lib/live";
 import { activeLocale, localeHref, stageLabel } from "@/lib/locale";
-import { clientLine, clientSage, clientVerse, installContent, type ContentPayload } from "@/lib/client-content";
+import { clientLine, clientSage, clientVerse, installContent, loadContent, type ContentPayload } from "@/lib/client-content";
 
 export function ResultScreen({ sage: initialSage, content }: { sage: Sage; content: ContentPayload }) {
   installContent(content);
@@ -39,6 +39,19 @@ export function ResultScreen({ sage: initialSage, content }: { sage: Sage; conte
   const [moreTalkOpen, setMoreTalkOpen] = useState(false);
   const [moreTalkOptedIn, setMoreTalkOptedIn] = useState(false);
   const trackedRoundIdRef = useRef<string | null>(null);
+  const [, setContentRevision] = useState(0); // 본문이 도착하면 다시 그린다
+
+  // 읽기 풀은 색인만 받아오므로 이번 덱 구절의 본문이 아직 없다.
+  const deckKey = practice?.sage === sageId ? practice.deck.join(",") : "";
+  useEffect(() => {
+    const ids = deckKey.split(",").filter(Boolean);
+    if (ids.length === 0) return;
+    let active = true;
+    loadContent(ids)
+      .then(() => { if (active) setContentRevision((value) => value + 1); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [deckKey]);
 
   useEffect(() => {
     // hasHydrated가 true가 되기 전의 practice === null은 "완료된 수행 없음"이

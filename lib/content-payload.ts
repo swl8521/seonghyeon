@@ -1,6 +1,6 @@
 import "server-only";
 
-import { LINES, PRACTICE_VERSES, SAGES, getSage, getVerse } from "./content";
+import { COPY_VERSES, LINES, SAGES, getSage, getVerse, readIndexFor } from "./content";
 import { localizedLine, localizedSage, localizedVerse } from "./localized-content";
 import type { ContentPayload, LocalizedValue } from "./client-content";
 import type { Sage, SageId, SageLine, Verse } from "./types";
@@ -9,6 +9,8 @@ interface ContentSelection {
   sageIds?: SageId[];
   verseIds?: string[];
   lineSages?: SageId[];
+  /** 이 성현의 읽기 풀 색인을 함께 싣는다 (덱을 고르는 화면에서만 필요). */
+  indexSage?: SageId;
 }
 
 export function contentPayload(selection: ContentSelection): ContentPayload {
@@ -32,21 +34,24 @@ export function contentPayload(selection: ContentSelection): ContentPayload {
       en: { ...line, text: localizedLine(line.id, "en") },
     })
   );
-  return { sages, verses, lines };
+  const verseIndex = selection.indexSage ? readIndexFor(selection.indexSage) : [];
+  return { sages, verses, lines, verseIndex };
 }
 
 /**
  * 구역 화면의 초기 페이로드.
  *
- * 따라쓰기 풀만 보낸다. 홀에서 돌아가는 읽기 풀은 수백 개라 통째로 실으면
- * 클라이언트 번들이 그만큼 커진다. 홀에 뜬 구절은 LiveVerseCard 가
- * loadContent 로 그때그때 가져온다 (/api/content).
+ * 본문은 따라쓰기 풀만 싣는다 (승급 따라쓰기가 번역문을 바로 써야 한다).
+ * 읽기 풀은 본문 없이 색인으로만 보내 덱을 고를 수 있게 하고, 덱에 뽑힌
+ * 구절과 홀에 뜬 구절의 본문은 loadContent 로 그때그때 가져온다
+ * (/api/content). 읽기 풀이 늘어도 이 페이로드는 색인만큼만 커진다.
  */
 export function sageContentPayload(sage: SageId): ContentPayload {
   return contentPayload({
     sageIds: [sage],
-    verseIds: PRACTICE_VERSES.filter((verse) => verse.sage === sage).map((verse) => verse.id),
+    verseIds: COPY_VERSES.filter((verse) => verse.sage === sage).map((verse) => verse.id),
     lineSages: [sage],
+    indexSage: sage,
   });
 }
 

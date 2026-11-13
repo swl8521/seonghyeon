@@ -16,11 +16,12 @@ export interface Sage {
 
 /**
  * 구절이 속한 풀.
- * - read: 1분마다 바뀌는 홀에서 읽히는 풀. 원문 전문 단위가 여기 들어간다.
- * - practice: 따라쓰기·승급에 쓰이는 짧은 격언 풀. 손으로 옮겨 적을 분량이어야 한다.
- * 긴 장(章)은 따라쓰기에 쓸 수 없어서 두 풀을 나눠 둔다.
+ * - read: 읽는 풀. 홀의 1분 교체와 '구절 읽기' 덱이 모두 여기서 뽑는다.
+ *   원문 전문 단위가 여기 들어간다.
+ * - copy: 승급 따라쓰기에서 손으로 옮겨 적는 풀. 번역문을 직접 타이핑하므로
+ *   짧은 격언만 둔다. 읽기 화면은 입력이 없어서 이 제한이 필요 없다.
  */
-export type VersePool = "read" | "practice";
+export type VersePool = "read" | "copy";
 
 export interface Verse {
   id: string; // "confucius-01" 또는 "confucius-01-02a" (성현-편-장[분할])
@@ -34,6 +35,15 @@ export interface Verse {
   pools: VersePool[]; // 최소 하나
   reviewed: boolean; // 사람 검수 여부, 생성 시 false
 }
+
+/**
+ * 덱을 고르는 데 필요한 최소 정보.
+ *
+ * buildPracticeDeck / pickRecommendedVerse / pickHeadlineVerse 는 id, sage,
+ * tags 만 본다. 읽기 풀은 수백 개라 본문까지 실으면 구역 진입 페이로드가
+ * 그만큼 커진다. 색인만 싣고 본문은 덱이 정해진 뒤 받아온다.
+ */
+export type VerseIndexEntry = Pick<Verse, "id" | "sage" | "tags">;
 
 export interface SageLine {
   id: string; // 로드 시 부여 (content/lines.json 자체엔 없음)

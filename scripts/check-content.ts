@@ -77,13 +77,13 @@ const versesTyped = verses as Verse[];
 // (server/src/schedule.js). 광장 풀은 전체 구절이므로 성현별 하한만 보면 된다.
 const MIN_VERSES_PER_SAGE = 3;
 
-const POOLS: VersePool[] = ["read", "practice"];
+const POOLS: VersePool[] = ["read", "copy"];
 
 const verseIds = new Set<string>();
 const countBySage: Record<string, number> = {};
-// 풀별 성현 집계. 홀(read)과 따라쓰기(practice)가 각자 하한을 지켜야 한다.
+// 풀별 성현 집계. 읽기(read)와 따라쓰기(copy)가 각자 하한을 지켜야 한다.
 const readBySage: Record<string, number> = {};
-const practiceBySage: Record<string, number> = {};
+const copyBySage: Record<string, number> = {};
 
 for (const v of versesTyped) {
   if (verseIds.has(v.id)) fail(`verses.json: id 중복 "${v.id}"`);
@@ -101,13 +101,13 @@ for (const v of versesTyped) {
   }
 
   if (!Array.isArray(v.pools) || v.pools.length === 0) {
-    fail(`verses.json[${v.id}]: pools에 "read" 또는 "practice"가 최소 하나는 있어야 함`);
+    fail(`verses.json[${v.id}]: pools에 "read" 또는 "copy"가 최소 하나는 있어야 함`);
   } else {
     for (const pool of v.pools) {
       if (!POOLS.includes(pool)) fail(`verses.json[${v.id}]: 알 수 없는 pool "${pool}"`);
     }
     if (v.pools.includes("read")) readBySage[v.sage] = (readBySage[v.sage] ?? 0) + 1;
-    if (v.pools.includes("practice")) practiceBySage[v.sage] = (practiceBySage[v.sage] ?? 0) + 1;
+    if (v.pools.includes("copy")) copyBySage[v.sage] = (copyBySage[v.sage] ?? 0) + 1;
   }
 
   checkVec(`verses.json[${v.id}].tags`, v.tags);
@@ -122,10 +122,10 @@ for (const id of SAGE_IDS) {
     );
   }
   // 따라쓰기 풀이 비면 승급 따라쓰기가 구절을 못 고른다 (lib/store.ts chooseCopyVerses).
-  const practice = practiceBySage[id] ?? 0;
-  if (practice < MIN_VERSES_PER_SAGE) {
+  const copy = copyBySage[id] ?? 0;
+  if (copy < MIN_VERSES_PER_SAGE) {
     fail(
-      `verses.json: "${id}" 따라쓰기 풀이 최소 ${MIN_VERSES_PER_SAGE}개는 있어야 하는데 ${practice}개임`
+      `verses.json: "${id}" 따라쓰기 풀이 최소 ${MIN_VERSES_PER_SAGE}개는 있어야 하는데 ${copy}개임`
     );
   }
 }

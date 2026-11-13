@@ -16,7 +16,7 @@ import { SwipeCard, type SwipeCardHandle } from "@/components/SwipeCard";
 import { JudgmentCard } from "@/components/JudgmentCard";
 import { Toast } from "@/components/Toast";
 import { TopBar } from "@/components/TopBar";
-import { clientLine, clientSage, clientVerse, installContent, type ContentPayload } from "@/lib/client-content";
+import { clientLine, clientSage, clientVerse, installContent, loadContent, type ContentPayload } from "@/lib/client-content";
 
 export function PracticeScreen({ sage: initialSage, content }: { sage: Sage; content: ContentPayload }) {
   installContent(content);
@@ -46,6 +46,7 @@ export function PracticeScreen({ sage: initialSage, content }: { sage: Sage; con
   const recommendedVerseIdsRef = useRef<Set<string>>(new Set());
   const lastViewedIndexRef = useRef<number | null>(null);
   const [devotionFlash, setDevotionFlash] = useState<{ id: number; delta: number } | null>(null);
+  const [, setContentRevision] = useState(0); // 본문이 도착하면 다시 그린다
   // 지금 카드가 뒷면인지. practice.flippedIds 는 '해설을 읽었다'는 기록이라
   // 되돌릴 수 없어서, 화면 상태는 여기서 따로 들고 양방향으로 뒤집는다.
   const [flipped, setFlipped] = useState(false);
@@ -118,6 +119,20 @@ export function PracticeScreen({ sage: initialSage, content }: { sage: Sage; con
       window.removeEventListener("pagehide", onLeave);
     };
   }, [sageId]);
+
+  // 읽기 풀은 색인만 받아오므로 덱에 뽑힌 구절의 본문이 아직 없다.
+  // 추천 구절도 덱 밖에서 고르기 때문에 같이 받아온다.
+  const deckKey = practice?.sage === sageId ? practice.deck.join(",") : "";
+  const recommendedId = pendingNote?.recommendedVerseId ?? "";
+  useEffect(() => {
+    const ids = [...deckKey.split(","), recommendedId].filter(Boolean);
+    if (ids.length === 0) return;
+    let active = true;
+    loadContent(ids)
+      .then(() => { if (active) setContentRevision((value) => value + 1); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [deckKey, recommendedId]);
 
   if (!practice || practice.sage !== sageId || practice.outcome) return null;
 

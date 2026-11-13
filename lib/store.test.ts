@@ -11,6 +11,8 @@ beforeEach(() => {
     sages: SAGES.map((sage) => ({ ko: sage, en: localizedSage(sage.id, "en")! })),
     verses: VERSES.map((verse) => ({ ko: verse, en: localizedVerse(verse.id, "en")! })),
     lines: LINES.map((line) => ({ ko: line, en: { ...line, text: localizedLine(line.id, "en") } })),
+    // 본문을 전부 설치하므로 색인은 비워 둔다 — clientVerseIndex 가 본문에서 만들어 쓴다.
+    verseIndex: [],
   });
   usePlayStore.setState(usePlayStore.getInitialState(), true);
   vi.clearAllMocks();

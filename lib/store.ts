@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 import { DEVOTION, HEAD_LINE_KIND, NOTE_INDICES, SKIP_REACTION_CHANCE } from "./constants";
 import { activeLocale } from "./locale";
-import { clientLines, clientSage, clientVerse, clientVerses } from "./client-content";
+import { clientLines, clientSage, clientVerse, clientVerseIndex, clientVerses } from "./client-content";
 import { chooseCopyVerses, COPY_COUNTS, matchesCopy, nextGrowthStage, type PromotionChallenge } from "./promotion";
 import { track } from "./analytics";
 import {
@@ -221,7 +221,7 @@ export const usePlayStore = create<PlayStore>()(
         const inventoryVerseIds = inventory.map((i) => i.verseId);
         const deck = buildPracticeDeck(
           sage,
-          clientVerses(sage),
+          clientVerseIndex(sage),
           readVerseIds,
           inventoryVerseIds,
           lastPracticeVerseIds[sage] ?? [],
@@ -264,7 +264,7 @@ export const usePlayStore = create<PlayStore>()(
           const verdict = judgeTeacherNote(next, sageDef.vec);
           const line = pickRandomLine(next.sage, verdict.kind);
           const recommendedVerseId =
-            verdict.kind === "nod" ? pickRecommendedVerse(next, clientVerses(next.sage), get().readVerseIds) : null;
+            verdict.kind === "nod" ? pickRecommendedVerse(next, clientVerseIndex(next.sage), get().readVerseIds) : null;
           if (verdict.kind === "nod") {
             next = { ...next, devotionGain: next.devotionGain + DEVOTION.nod };
           }
@@ -547,7 +547,7 @@ function finishPracticeInternal(
 
   const stageAfter = get().stage[practice.sage];
 
-  let outcome = finalizePracticeOutcome(practice, stageAfter, clientVerses(practice.sage));
+  let outcome = finalizePracticeOutcome(practice, stageAfter, clientVerseIndex(practice.sage));
   const lineKind = HEAD_LINE_KIND[outcome.headKind];
   if (lineKind) {
     const line = pickRandomLine(practice.sage, lineKind);
@@ -596,7 +596,8 @@ function recalcStage(get: () => PlayStore, set: (partial: Partial<PlayStore>) =>
   if (!target || get().promotions[sage]) return;
   const preferred = get().inventory.filter((item) => sageForVerseId(item.verseId) === sage).map((item) => item.verseId);
   const locale = activeLocale();
-  const pool = clientVerses(sage, locale);
+  // 따라쓰기는 번역문을 손으로 옮겨 적으므로 copy 풀의 본문만 쓴다.
+  const pool = clientVerses(sage, locale).filter((verse) => verse.pools.includes("copy"));
   if (pool.length === 0) return;
   const verseIds = chooseCopyVerses(pool, preferred, COPY_COUNTS[target]);
   set({ promotions: { ...get().promotions, [sage]: { target, verseIds, index: 0, draft: "", via, locale } } });

@@ -8,7 +8,7 @@
     "translation": "배운 것을 때맞춰 되새기니, 어찌 기쁘지 않으랴",
     "note": "배움은 반복해서 몸에 새길 때 비로소 기쁨이 된다.",
     "tags": { "ren": 0.3, "xue": 0.9, "dao": 0.1, "mou": 0.1, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -20,7 +20,7 @@
     "translation": "먼 데서 벗이 찾아오니, 어찌 즐겁지 않으랴",
     "note": "먼 길을 마다 않고 온 벗의 존재가 가장 큰 즐거움임을 말한다.",
     "tags": { "ren": 0.8, "xue": 0.3, "dao": 0.1, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -32,7 +32,7 @@
     "translation": "옛것을 되짚어야 새로운 것이 보인다",
     "note": "지난 것을 익히는 과정 없이는 새로움도 설 자리가 없다.",
     "tags": { "ren": 0.2, "xue": 0.9, "dao": 0.2, "mou": 0.2, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -44,7 +44,7 @@
     "translation": "아는 것은 안다 하고 모르는 것은 모른다 하는 것, 그것이 곧 아는 것이다",
     "note": "자신의 무지를 인정하는 태도 자체가 진짜 지식의 출발점이다.",
     "tags": { "ren": 0.3, "xue": 0.8, "dao": 0.3, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -56,7 +56,7 @@
     "translation": "셋이 길을 가면 그 중에 반드시 내 스승이 있다",
     "note": "누구에게서든 배울 점을 찾아내는 태도를 말한다.",
     "tags": { "ren": 0.4, "xue": 0.8, "dao": 0.1, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -68,7 +68,7 @@
     "translation": "내가 바라지 않는 일은 남에게도 시키지 마라",
     "note": "타인을 헤아리는 마음이 도리의 기본이라는 가르침.",
     "tags": { "ren": 0.9, "xue": 0.3, "dao": 0.2, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -80,7 +80,7 @@
     "translation": "남이 나를 몰라줌을 탓하지 말고, 내가 남을 몰라봄을 걱정하라",
     "note": "시선을 밖이 아니라 안으로 돌리라는 권유.",
     "tags": { "ren": 0.6, "xue": 0.5, "dao": 0.3, "mou": 0.1, "rou": 0.4 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -92,7 +92,7 @@
     "translation": "군자는 한 가지 그릇에 머물지 않는다",
     "note": "한 가지 쓰임에만 갇히지 않는 폭넓은 사람됨을 말한다.",
     "tags": { "ren": 0.5, "xue": 0.6, "dao": 0.3, "mou": 0.2, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -104,7 +104,7 @@
     "translation": "나는 하루에 세 번 나 자신을 돌이켜 살핀다",
     "note": "증자의 말로, 날마다 자신을 점검하는 습관을 가리킨다.",
     "tags": { "ren": 0.4, "xue": 0.8, "dao": 0.2, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -116,7 +116,7 @@
     "translation": "날이 추워진 뒤에야 소나무와 잣나무가 끝까지 푸른 줄 안다",
     "note": "어려운 때가 와야 비로소 참된 사람의 됨됨이가 드러난다.",
     "tags": { "ren": 0.5, "xue": 0.5, "dao": 0.4, "mou": 0.2, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -128,7 +128,7 @@
     "translation": "답답해하지 않으면 일러주지 않고, 애태우지 않으면 깨우쳐주지 않는다",
     "note": "스스로 갈구하는 마음이 있어야 가르침이 들어간다는 뜻.",
     "tags": { "ren": 0.3, "xue": 0.9, "dao": 0.1, "mou": 0.2, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -140,7 +140,7 @@
     "translation": "덕이 있는 사람은 외롭지 않으니, 반드시 곁에 함께할 이가 생긴다",
     "note": "바르게 살면 뜻이 맞는 사람이 저절로 모여든다는 믿음.",
     "tags": { "ren": 0.8, "xue": 0.4, "dao": 0.2, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -152,7 +152,7 @@
     "translation": "군자는 마음이 넓고 평온하나, 소인은 늘 근심에 쪼그라든다",
     "note": "마음의 여유가 사람의 그릇을 가른다.",
     "tags": { "ren": 0.5, "xue": 0.4, "dao": 0.5, "mou": 0.1, "rou": 0.4 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -164,7 +164,7 @@
     "translation": "잘못을 하고도 고치지 않는 것, 그것이야말로 진짜 잘못이다",
     "note": "잘못 자체보다 고치지 않는 태도를 더 큰 허물로 본다.",
     "tags": { "ren": 0.4, "xue": 0.6, "dao": 0.2, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -176,7 +176,7 @@
     "translation": "굳세고 꾸밈없이 어눌한 사람이 어짊에 가깝다",
     "note": "말재주보다 꾸밈없는 태도가 어짊에 가깝다는 평가.",
     "tags": { "ren": 0.7, "xue": 0.3, "dao": 0.4, "mou": 0.1, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -188,7 +188,7 @@
     "translation": "자리가 없음을 걱정하지 말고, 그 자리에 설 만한가를 걱정하라",
     "note": "지위보다 자신의 역량과 자격을 먼저 돌보라는 뜻.",
     "tags": { "ren": 0.4, "xue": 0.7, "dao": 0.2, "mou": 0.3, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -200,7 +200,7 @@
     "translation": "멀리까지 헤아리지 않으면, 반드시 가까운 곳에서 걱정이 생긴다",
     "note": "눈앞만 보면 머잖아 발밑이 흔들린다는 경고.",
     "tags": { "ren": 0.3, "xue": 0.5, "dao": 0.3, "mou": 0.6, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -212,7 +212,7 @@
     "translation": "군자는 의로움에서 깨닫고, 소인은 이로움에서 깨닫는다",
     "note": "판단의 기준이 무엇인가로 사람의 그릇이 나뉜다.",
     "tags": { "ren": 0.7, "xue": 0.4, "dao": 0.2, "mou": 0.2, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -224,7 +224,7 @@
     "translation": "어짊을 행할 일이라면 스승에게도 양보하지 않는다",
     "note": "옳은 일 앞에서는 권위에도 주저하지 않는 태도.",
     "tags": { "ren": 0.9, "xue": 0.3, "dao": 0.1, "mou": 0.1, "rou": 0.1 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -236,7 +236,7 @@
     "translation": "도에 뜻을 두고, 덕에 바탕을 두며, 어짊에 의지하고, 예에서 노닌다",
     "note": "삶의 지향을 네 단계로 정리한 공자의 자기 다짐.",
     "tags": { "ren": 0.6, "xue": 0.7, "dao": 0.5, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -248,7 +248,7 @@
     "translation": "말로 풀어낼 수 있는 도는 참된 도가 아니다",
     "note": "언어로 다 담을 수 없는 것이 도의 본질이라는 선언.",
     "tags": { "ren": 0.1, "xue": 0.2, "dao": 0.9, "mou": 0.1, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -260,7 +260,7 @@
     "translation": "남을 아는 것은 지혜이고, 자신을 아는 것은 밝음이다",
     "note": "바깥을 향한 눈보다 안을 향한 눈이 더 귀하다.",
     "tags": { "ren": 0.3, "xue": 0.5, "dao": 0.6, "mou": 0.2, "rou": 0.4 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -272,7 +272,7 @@
     "translation": "가장 좋은 선함은 물을 닮는다",
     "note": "다투지 않으면서 낮은 곳으로 흘러 모두를 이롭게 하는 성질을 닮으라는 말.",
     "tags": { "ren": 0.4, "xue": 0.1, "dao": 0.8, "mou": 0.1, "rou": 0.9 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -284,7 +284,7 @@
     "translation": "천 리 길도 발밑 한 걸음에서 비롯한다",
     "note": "먼 목표도 결국 지금 딛는 걸음에서 시작된다는 말.",
     "tags": { "ren": 0.1, "xue": 0.4, "dao": 0.5, "mou": 0.2, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -296,7 +296,7 @@
     "translation": "만족을 아는 사람이 참으로 부유하다",
     "note": "소유의 크기가 아니라 멈출 줄 아는 마음이 부를 가른다.",
     "tags": { "ren": 0.2, "xue": 0.2, "dao": 0.7, "mou": 0.1, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -308,7 +308,7 @@
     "translation": "부드럽고 약한 것이 결국 굳고 강한 것을 이긴다",
     "note": "맞서지 않는 유연함이 오래 버틴다는 역설.",
     "tags": { "ren": 0.1, "xue": 0.1, "dao": 0.7, "mou": 0.3, "rou": 0.9 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -320,7 +320,7 @@
     "translation": "참으로 뛰어난 솜씨는 오히려 어수룩해 보인다",
     "note": "꾸밈이 사라진 자리에 도달한 솜씨를 말한다.",
     "tags": { "ren": 0.1, "xue": 0.3, "dao": 0.6, "mou": 0.2, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -332,7 +332,7 @@
     "translation": "화 속에는 복이 기대어 있고, 복 속에는 화가 숨어 있다",
     "note": "좋은 일과 나쁜 일은 늘 서로의 안에 깃들어 있다.",
     "tags": { "ren": 0.1, "xue": 0.2, "dao": 0.7, "mou": 0.4, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -344,7 +344,7 @@
     "translation": "진짜 아는 사람은 말을 아끼고, 말이 많은 사람은 제대로 알지 못한다",
     "note": "말수와 앎의 깊이는 반비례한다는 지적.",
     "tags": { "ren": 0.1, "xue": 0.4, "dao": 0.6, "mou": 0.2, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -356,7 +356,7 @@
     "translation": "세상에 물보다 부드럽고 약한 것은 없다",
     "note": "가장 약해 보이는 것이 가장 강한 것을 뚫는다는 비유의 시작.",
     "tags": { "ren": 0.1, "xue": 0.1, "dao": 0.7, "mou": 0.2, "rou": 0.9 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -368,7 +368,7 @@
     "translation": "배움은 날마다 쌓아가는 것이고, 도는 날마다 덜어내는 것이다",
     "note": "채우는 길과 비우는 길은 방향이 다르다는 대비.",
     "tags": { "ren": 0.1, "xue": 0.3, "dao": 0.9, "mou": 0.1, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -380,7 +380,7 @@
     "translation": "아무것도 하지 않는 듯하지만, 못 이루는 일이 없다",
     "note": "억지로 애쓰지 않는 상태가 오히려 모든 것을 이룬다는 역설.",
     "tags": { "ren": 0.1, "xue": 0.1, "dao": 1.0, "mou": 0.3, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -392,7 +392,7 @@
     "translation": "큰 그릇은 늦게 완성된다",
     "note": "크게 쓰일 것일수록 더 오래 걸려 모습을 갖춘다.",
     "tags": { "ren": 0.1, "xue": 0.4, "dao": 0.5, "mou": 0.1, "rou": 0.4 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -404,7 +404,7 @@
     "translation": "말이 많으면 자주 궁해지니, 가운데를 지키는 것이 낫다",
     "note": "넘치는 말보다 중심을 지키는 침묵이 오래간다.",
     "tags": { "ren": 0.1, "xue": 0.2, "dao": 0.6, "mou": 0.2, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -416,7 +416,7 @@
     "translation": "변치 않는 이치를 아는 것을 밝음이라 한다",
     "note": "변화 속에서 변하지 않는 것을 보는 눈을 밝음이라 부른다.",
     "tags": { "ren": 0.1, "xue": 0.4, "dao": 0.8, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -428,7 +428,7 @@
     "translation": "자기 자신을 이기는 사람이 참으로 강하다",
     "note": "밖을 이기는 힘보다 안을 다스리는 힘이 더 크다.",
     "tags": { "ren": 0.2, "xue": 0.4, "dao": 0.5, "mou": 0.1, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -440,7 +440,7 @@
     "translation": "끝맺음을 처음처럼 조심스레 하라",
     "note": "시작의 정성을 끝까지 잃지 않아야 일이 무너지지 않는다.",
     "tags": { "ren": 0.2, "xue": 0.5, "dao": 0.5, "mou": 0.2, "rou": 0.4 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -452,7 +452,7 @@
     "translation": "한아름 되는 나무도 가느다란 싹에서 자라났다",
     "note": "큰 것도 처음엔 눈에 보이지 않을 만큼 작았다는 말.",
     "tags": { "ren": 0.1, "xue": 0.3, "dao": 0.6, "mou": 0.1, "rou": 0.4 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -464,7 +464,7 @@
     "translation": "공을 이루고도 그 자리에 머무르지 않는다",
     "note": "이룬 뒤에 물러날 줄 아는 태도가 도에 가깝다.",
     "tags": { "ren": 0.3, "xue": 0.1, "dao": 0.7, "mou": 0.2, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -476,7 +476,7 @@
     "translation": "스스로를 드러내지 않기에 오히려 밝게 보인다",
     "note": "자기를 앞세우지 않는 태도가 더 또렷이 드러난다는 역설.",
     "tags": { "ren": 0.2, "xue": 0.2, "dao": 0.7, "mou": 0.1, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -488,7 +488,7 @@
     "translation": "적을 알고 나를 알면 백 번 싸워도 위태롭지 않다",
     "note": "정보의 균형이 승패를 가르는 가장 기본적인 조건이다.",
     "tags": { "ren": 0.1, "xue": 0.5, "dao": 0.2, "mou": 0.9, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -500,7 +500,7 @@
     "translation": "싸우지 않고도 적의 군대를 굴복시키는 것이 최선이다",
     "note": "힘을 부딛치기 전에 이기는 방법을 최고로 친다.",
     "tags": { "ren": 0.1, "xue": 0.2, "dao": 0.3, "mou": 0.9, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -512,7 +512,7 @@
     "translation": "싸움이란 속임수로 이루어지는 길이다",
     "note": "정면승부보다 속임수와 변화가 전쟁의 본질임을 짚는다.",
     "tags": { "ren": 0.0, "xue": 0.1, "dao": 0.1, "mou": 1.0, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -524,7 +524,7 @@
     "translation": "적이 대비하지 못한 곳을 치고, 생각지 못한 때에 나선다",
     "note": "예측을 벗어난 지점을 노리는 것이 공격의 핵심이다.",
     "tags": { "ren": 0.0, "xue": 0.2, "dao": 0.1, "mou": 0.9, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -536,7 +536,7 @@
     "translation": "싸움은 빨리 이기는 것이 귀하지, 오래 끄는 것은 귀하지 않다",
     "note": "질질 끄는 싸움은 결국 양쪽 모두를 소모시킨다.",
     "tags": { "ren": 0.1, "xue": 0.3, "dao": 0.2, "mou": 0.7, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -548,7 +548,7 @@
     "translation": "잘 싸우는 자는 적을 끌어들이되, 적에게 끌려가지 않는다",
     "note": "주도권을 쥐는 쪽이 이미 반은 이긴 것이다.",
     "tags": { "ren": 0.1, "xue": 0.2, "dao": 0.2, "mou": 0.9, "rou": 0.4 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -560,7 +560,7 @@
     "translation": "하늘의 때와 땅의 형세까지 알아야 온전히 이긴다",
     "note": "정보의 범위를 적뿐 아니라 환경 전체로 넓혀야 한다.",
     "tags": { "ren": 0.1, "xue": 0.5, "dao": 0.4, "mou": 0.7, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -572,7 +572,7 @@
     "translation": "군대에 정해진 형세가 없듯, 물에도 정해진 모양이 없다",
     "note": "상황에 따라 끊임없이 형태를 바꾸는 유연함을 말한다.",
     "tags": { "ren": 0.1, "xue": 0.2, "dao": 0.5, "mou": 0.7, "rou": 0.7 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -584,7 +584,7 @@
     "translation": "빠를 때는 바람 같고, 느릴 때는 숲처럼 고요하다",
     "note": "속도를 상황에 맞게 완전히 다르게 쓰는 전술의 묘미.",
     "tags": { "ren": 0.0, "xue": 0.2, "dao": 0.3, "mou": 0.6, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -596,7 +596,7 @@
     "translation": "앞일을 미리 아는 것은 귀신에게서 얻어낼 수 없다",
     "note": "운이나 미신이 아니라 사람의 관찰과 정보로 미래를 읽어야 한다.",
     "tags": { "ren": 0.1, "xue": 0.5, "dao": 0.1, "mou": 0.8, "rou": 0.1 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -608,7 +608,7 @@
     "translation": "백 번 싸워 백 번 이기는 것도 최선 중의 최선은 아니다",
     "note": "싸워서 이기는 것보다 싸우지 않고 이기는 쪽이 더 낫다는 발상.",
     "tags": { "ren": 0.1, "xue": 0.2, "dao": 0.3, "mou": 0.8, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -620,7 +620,7 @@
     "translation": "가장 좋은 용병은 적의 계책 자체를 꺾는 것이다",
     "note": "병력을 부딛치기 전에 상대의 전략을 무너뜨리는 것을 최상으로 친다.",
     "tags": { "ren": 0.0, "xue": 0.2, "dao": 0.2, "mou": 1.0, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -632,7 +632,7 @@
     "translation": "전쟁은 나라의 큰일이다",
     "note": "가볍게 결정할 수 없는 무게를 지닌 일이라는 전제.",
     "tags": { "ren": 0.2, "xue": 0.4, "dao": 0.1, "mou": 0.6, "rou": 0.1 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -644,7 +644,7 @@
     "translation": "싸울 수 있을 때와 싸워서는 안 될 때를 아는 자가 이긴다",
     "note": "싸움의 기술보다 싸울지 말지를 가늠하는 판단이 먼저다.",
     "tags": { "ren": 0.1, "xue": 0.4, "dao": 0.2, "mou": 0.8, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -656,7 +656,7 @@
     "translation": "죽을 땅에 던져 넣은 뒤에야 비로소 살아남는다",
     "note": "물러설 곳이 없어야 오히려 전력을 다해 살아남는다는 역설.",
     "tags": { "ren": 0.0, "xue": 0.2, "dao": 0.2, "mou": 0.7, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -668,7 +668,7 @@
     "translation": "용병을 잘하는 자는 적의 날카로운 기세를 피해 간다",
     "note": "정면으로 맞서기보다 기세가 꺾이는 때를 기다리는 전략.",
     "tags": { "ren": 0.0, "xue": 0.2, "dao": 0.2, "mou": 0.8, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -680,7 +680,7 @@
     "translation": "가까운 곳에서 먼 길 온 적을 기다리고, 쉬면서 지친 적을 기다린다",
     "note": "힘을 아끼고 적의 소모를 이용하는 기다림의 전술.",
     "tags": { "ren": 0.0, "xue": 0.1, "dao": 0.2, "mou": 0.8, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -692,7 +692,7 @@
     "translation": "싸움의 본바탕은 속도를 중히 여기는 데 있다",
     "note": "결정과 움직임이 느리면 이미 기회를 놓친다.",
     "tags": { "ren": 0.0, "xue": 0.2, "dao": 0.1, "mou": 0.7, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -704,7 +704,7 @@
     "translation": "장수란 지혜, 믿음, 어짊, 용기, 엄정함을 갖춘 사람이다",
     "note": "손자조차 장수의 자격에 어짊과 믿음을 포함시켰다.",
     "tags": { "ren": 0.5, "xue": 0.3, "dao": 0.1, "mou": 0.6, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -716,7 +716,7 @@
     "translation": "이기는 군대는 먼저 이길 조건을 만들어놓고서야 싸움을 시작한다",
     "note": "싸우기 전에 이미 승패를 결정짓는 준비가 핵심이다.",
     "tags": { "ren": 0.0, "xue": 0.4, "dao": 0.2, "mou": 0.9, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -728,7 +728,7 @@
     "translation": "배우기만 하고 생각하지 않으면 얻는 것이 없고, 생각만 하고 배우지 않으면 위태롭다",
     "note": "받아들이는 일과 스스로 따져보는 일은 어느 한쪽만으로는 부족하다.",
     "tags": { "ren": 0.2, "xue": 1.0, "dao": 0.3, "mou": 0.4, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -740,7 +740,7 @@
     "translation": "아는 사람은 좋아하는 사람만 못하고, 좋아하는 사람은 즐기는 사람만 못하다",
     "note": "같은 일을 대하는 마음에도 깊이의 단계가 있다.",
     "tags": { "ren": 0.3, "xue": 0.9, "dao": 0.4, "mou": 0.1, "rou": 0.4 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -752,7 +752,7 @@
     "translation": "군자는 어울리되 같아지지 않고, 소인은 같아지되 어울리지 못한다",
     "note": "다른 채로 함께 가는 것과, 같은 척하며 겉도는 것은 다르다.",
     "tags": { "ren": 0.8, "xue": 0.3, "dao": 0.4, "mou": 0.2, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -764,7 +764,7 @@
     "translation": "어진 이를 보면 그처럼 되기를 생각하고, 그렇지 못한 이를 보면 스스로를 돌아본다",
     "note": "남을 보는 일이 곧 자기를 고치는 일이 된다.",
     "tags": { "ren": 0.7, "xue": 0.8, "dao": 0.2, "mou": 0.1, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -776,7 +776,7 @@
     "translation": "장인이 일을 잘하려면 반드시 먼저 연장을 벼린다",
     "note": "좋은 결과는 준비에 쓴 시간에서 나온다.",
     "tags": { "ren": 0.2, "xue": 0.7, "dao": 0.2, "mou": 0.6, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -788,7 +788,7 @@
     "translation": "하늘의 그물은 넓고 넓어, 성긴 듯해도 놓치는 것이 없다",
     "note": "당장 드러나지 않을 뿐, 흐름은 제자리를 찾아간다.",
     "tags": { "ren": 0.3, "xue": 0.1, "dao": 0.9, "mou": 0.2, "rou": 0.5 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -800,7 +800,7 @@
     "translation": "미더운 말은 꾸미지 않고, 꾸민 말은 미덥지 않다",
     "note": "듣기 좋은 말과 사실에 맞는 말은 자주 갈라진다.",
     "tags": { "ren": 0.4, "xue": 0.2, "dao": 0.7, "mou": 0.3, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -812,7 +812,7 @@
     "translation": "넉넉함을 알면 욕될 일이 없고, 멈출 데를 알면 위태롭지 않다",
     "note": "어디서 그칠지 아는 것이 스스로를 지키는 힘이 된다.",
     "tags": { "ren": 0.2, "xue": 0.2, "dao": 0.8, "mou": 0.3, "rou": 0.7 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -824,7 +824,7 @@
     "translation": "큰 나라를 다스리는 일은 작은 생선을 굽는 것과 같다",
     "note": "자꾸 뒤집으면 부서진다 — 덜 손대는 것도 다스림이다.",
     "tags": { "ren": 0.3, "xue": 0.1, "dao": 0.9, "mou": 0.3, "rou": 0.8 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -836,7 +836,7 @@
     "translation": "무거움은 가벼움의 뿌리가 되고, 고요함은 조급함의 주인이 된다",
     "note": "흔들리지 않는 쪽이 흔들리는 쪽을 이끈다.",
     "tags": { "ren": 0.2, "xue": 0.2, "dao": 0.8, "mou": 0.2, "rou": 0.7 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -848,7 +848,7 @@
     "translation": "무릇 싸움은 정면으로 맞서되, 뜻밖의 수로 이긴다",
     "note": "기본이 서 있어야 변칙이 힘을 쓴다.",
     "tags": { "ren": 0.0, "xue": 0.3, "dao": 0.2, "mou": 0.9, "rou": 0.4 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -860,7 +860,7 @@
     "translation": "잘 싸우는 이는 형세에서 답을 찾지, 사람을 탓하지 않는다",
     "note": "사람을 탓하고 끝내면 같은 일이 다시 일어난다.",
     "tags": { "ren": 0.4, "xue": 0.4, "dao": 0.3, "mou": 0.8, "rou": 0.3 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -872,7 +872,7 @@
     "translation": "적이 오지 않으리라 믿지 말고, 맞을 준비가 되어 있음을 믿으라",
     "note": "대비는 상대의 선의가 아니라 내 준비 위에 선다.",
     "tags": { "ren": 0.1, "xue": 0.4, "dao": 0.2, "mou": 0.9, "rou": 0.2 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -884,7 +884,7 @@
     "translation": "잘 지키는 이는 아홉 겹 땅 아래 숨듯 드러내지 않는다",
     "note": "지킨다는 것은 보이지 않게 두는 데서 시작한다.",
     "tags": { "ren": 0.1, "xue": 0.2, "dao": 0.3, "mou": 0.8, "rou": 0.6 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {
@@ -896,7 +896,7 @@
     "translation": "싸우기 전 셈에서 이기는 쪽은, 헤아린 것이 많은 쪽이다",
     "note": "승부는 맞붙기 전에 따져본 양에서 이미 기운다.",
     "tags": { "ren": 0.0, "xue": 0.6, "dao": 0.2, "mou": 1.0, "rou": 0.1 },
-    "pools": ["read", "practice"],
+    "pools": ["read", "copy"],
     "reviewed": false
   },
   {

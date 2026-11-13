@@ -1,7 +1,7 @@
 import sagesData from "@/content/sages.json";
 import versesData from "@/content/verses.json";
 import linesData from "@/content/lines.json";
-import type { Sage, SageId, SageLine, Verse, VersePool } from "./types";
+import type { Sage, SageId, SageLine, Verse, VerseIndexEntry, VersePool } from "./types";
 
 export const SAGES = sagesData as Sage[];
 export const VERSES = versesData as Verse[];
@@ -16,10 +16,19 @@ export function versesInPool(pool: VersePool): Verse[] {
   return VERSES.filter((v) => v.pools.includes(pool));
 }
 
-/** 홀에서 읽히는 풀 — 원문 전문 단위를 포함한다. */
+/** 읽는 풀 — 홀의 1분 교체와 '구절 읽기' 덱이 여기서 뽑는다. */
 export const READ_VERSES = versesInPool("read");
-/** 따라쓰기·승급 풀 — 손으로 옮겨 적을 만한 짧은 구절만. */
-export const PRACTICE_VERSES = versesInPool("practice");
+/** 승급 따라쓰기 풀 — 손으로 옮겨 적을 만한 짧은 구절만. */
+export const COPY_VERSES = versesInPool("copy");
+
+/** 읽기 풀의 색인. 본문 없이 덱을 고를 수 있을 만큼만 담는다. */
+export function readIndexFor(sage: SageId): VerseIndexEntry[] {
+  return READ_VERSES.filter((v) => v.sage === sage).map((v) => ({
+    id: v.id,
+    sage: v.sage,
+    tags: v.tags,
+  }));
+}
 
 const verseById = new Map(VERSES.map((v) => [v.id, v]));
 export function getVerse(id: string): Verse | undefined {
