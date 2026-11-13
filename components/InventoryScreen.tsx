@@ -108,13 +108,14 @@ export function InventoryScreen() {
         <p className="font-sans text-sm text-muted">{t("마음에 든 구절을 모아 보세요")}</p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="scrollbar-hidden flex w-full min-w-0 flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1">
         {FILTERS.map((f) => (
           <button
             key={f.id}
             type="button"
             onClick={() => setFilter(f.id)}
-            className={`rounded-full border px-4 py-1.5 font-sans text-sm ${
+            aria-pressed={filter === f.id}
+            className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 font-sans text-sm ${
               filter === f.id
                 ? "border-accent bg-accent text-accent-foreground"
                 : "border-border text-muted"

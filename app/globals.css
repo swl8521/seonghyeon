@@ -68,6 +68,19 @@ html {
   overscroll-behavior-x: none;
 }
 
+/* Keep native scrolling while hiding page and filter scrollbars. */
+html,
+body,
+.scrollbar-hidden {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
