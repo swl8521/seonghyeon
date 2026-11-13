@@ -121,6 +121,11 @@ export function applyPracticeSwipe(
   };
 }
 
+/**
+ * 해설을 읽은 구절을 기록한다. 되돌리지 않는다 — 성장 단계가 이 개수를 세기
+ * 때문이다 (store.ts flippedCountFor). 카드가 지금 앞면인지 뒷면인지는
+ * 화면이 따로 들고 있다 (PracticeScreen).
+ */
 export function flipPracticeCard(state: PracticeState, verseId: string): PracticeState {
   if (state.flippedIds.includes(verseId)) return state;
   return { ...state, flippedIds: [...state.flippedIds, verseId] };

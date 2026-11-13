@@ -46,6 +46,9 @@ export function PracticeScreen({ sage: initialSage, content }: { sage: Sage; con
   const recommendedVerseIdsRef = useRef<Set<string>>(new Set());
   const lastViewedIndexRef = useRef<number | null>(null);
   const [devotionFlash, setDevotionFlash] = useState<{ id: number; delta: number } | null>(null);
+  // 지금 카드가 뒷면인지. practice.flippedIds 는 '해설을 읽었다'는 기록이라
+  // 되돌릴 수 없어서, 화면 상태는 여기서 따로 들고 양방향으로 뒤집는다.
+  const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
     if (!hasHydrated || !ready) return;
@@ -75,6 +78,7 @@ export function PracticeScreen({ sage: initialSage, content }: { sage: Sage; con
     if (lastViewedIndexRef.current === practice.index) return;
     lastViewedIndexRef.current = practice.index;
     cardShownAtRef.current = Date.now();
+    setFlipped(false); // 다음 카드는 원문부터 보여준다
 
     const verseId = practice.deck[practice.index];
     track("verse_view", {
@@ -195,8 +199,12 @@ export function PracticeScreen({ sage: initialSage, content }: { sage: Sage; con
             verse={verse}
             sageName={sage.name}
             isFirstTime={!readVerseIds.includes(verse.id)}
-            flipped={practice.flippedIds.includes(verse.id)}
-            onFlip={() => flipPracticeCard(verse.id)}
+            flipped={flipped}
+            onFlip={() => {
+              const next = !flipped;
+              setFlipped(next);
+              if (next) flipPracticeCard(verse.id);
+            }}
             onSwipe={(dir, method) =>
               swipePractice(dir, method, Date.now() - cardShownAtRef.current)
             }
