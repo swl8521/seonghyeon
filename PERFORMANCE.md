@@ -128,7 +128,7 @@ compare the median and the individual LCP values rather than trusting one run.
 
 ## Still unverified
 
-Functional checks have not been run against this deployment: KakaoTalk sharing,
+Functional checks have not been run against this deployment:
 send, the live verse changing on the minute, shared bows and the singing bowl,
 Korean/English switching, the Samsung Internet layout, and GA4 DebugView. The
 build warns that the `@firebase/*` packages want Node >= 24.12.0 while the server

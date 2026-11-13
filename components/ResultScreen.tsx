@@ -10,7 +10,6 @@ import { track } from "@/lib/analytics";
 import type { Sage } from "@/lib/types";
 import { StageCard } from "@/components/StageCard";
 import { Icon } from "./Icon";
-import { KakaoShareButton } from "@/components/KakaoShareButton";
 import { MoreTalkSheet } from "@/components/MoreTalkSheet";
 import { Toast } from "@/components/Toast";
 import { useLive } from "@/lib/live";
@@ -154,19 +153,11 @@ export function ResultScreen({ sage: initialSage, content }: { sage: Sage; conte
         )}
 
         {pickedVerse && (
-          <div className={`mt-3 grid w-full items-stretch gap-2 ${process.env.NEXT_PUBLIC_KAKAO_JS_KEY ? "grid-cols-2" : "grid-cols-1"}`}>
-            <KakaoShareButton
-              fullWidth
-              title={t("{name}와 함께 읽은 구절", { name: sage.name })}
-              description={pickedVerse.translation}
-              imagePath={`/s/${sageId}/${pickedVerse.id}/opengraph-image`}
-              sharePath={`/s/${sageId}/${pickedVerse.id}?ref=share`}
-              onShared={() => track("share_click", { kind: "sage_verse", sage: sageId, verse_id: pickedVerse.id, method: "kakao" })}
-            />
+          <div className="mt-3 w-full">
             <button
               type="button"
               onClick={handleShare}
-              className="row-start-1 min-h-12 w-full min-w-0 rounded-full bg-accent px-2 py-3 font-sans text-sm font-bold text-accent-foreground"
+              className="min-h-12 w-full min-w-0 rounded-full bg-accent px-2 py-3 font-sans text-sm font-bold text-accent-foreground"
             >
               {t("보내기")}
             </button>

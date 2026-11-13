@@ -27,7 +27,6 @@ cp server/.env.example server/.env
 ```dotenv
 NEXT_PUBLIC_SITE_URL=https://munha.yeoul.dev
 NEXT_PUBLIC_LIVE_URL=https://live-munha.yeoul.dev
-NEXT_PUBLIC_KAKAO_JS_KEY=카카오_JavaScript_키
 ```
 
 `server/.env`에서는 `ALLOWED_ORIGINS=https://munha.yeoul.dev`를 사용한다.
@@ -57,13 +56,11 @@ curl http://127.0.0.1:4000/healthz
 - 로컬 `/` 응답이 200이고 `/opengraph-image`가 `image/png`
 - 로컬 실시간 `/healthz`, `/now?zone=hall`이 200
 - 임시 Tunnel 주소 또는 hosts 우회로 한국어·영어, 읽기, 따라쓰기 확인
-- 카카오톡 공유 카드의 제목·설명·이미지·링크 확인
 - 두 브라우저에서 같은 구절, 접속자 수, 합장, 1분 전환 확인
 
 모두 통과한 뒤 Cloudflare DNS의 `munha.yeoul.dev` 연결만 새 터널로 전환한다.
 `live-munha.yeoul.dev`가 이미 같은 서버 터널을 사용한다면 해당 항목은 그대로
-유지한다. 도메인이 같으므로 카카오 JavaScript SDK 도메인과 공유 링크 설정은
-바꿀 필요가 없다.
+유지한다. 도메인이 같으므로 공유 링크 설정은 바꿀 필요가 없다.
 
 ## 3. 이후 배포
 
