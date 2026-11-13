@@ -12,5 +12,5 @@ it("carries locale into metadata, canonical links and image URLs", () => {
   expect(metadata.description).not.toMatch(/[가-힣]/);
   expect(metadata.alternates?.canonical).toBe("/s/laozi/laozi-03?lang=en");
   expect(metadata.openGraph?.images).toEqual([{ url: "/s/laozi/laozi-03/opengraph-image?lang=en", width: 1200, height: 630, alt: metadata.title }]);
-  expect(shareMetadata("laozi-03", "ko").title).toBe("성현 문하");
+  expect(shareMetadata("laozi-03", "ko").title).toBe("CommonLeaf");
 });

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { localizedSage, localizedVerse } from "./localized-content";
 import { localeHref, translate, type Locale } from "./locale";
 import type { SageId } from "./types";
+import { BRAND } from "./constants";
 
 export function resolveShare(verseId: string, locale: Locale, sageId?: string) {
   const verse = localizedVerse(verseId, locale);
@@ -13,7 +14,7 @@ export function shareMetadata(verseId: string, locale: Locale, sageId?: string):
   const data = resolveShare(verseId, locale, sageId);
   if (!data) return {};
   const { verse, sage } = data;
-  const title = sageId ? translate(locale, "{name}와 함께 읽은 구절", { name: sage.name }) : translate(locale, "성현 문하");
+  const title = sageId ? translate(locale, "{name}와 함께 읽은 구절", { name: sage.name }) : BRAND;
   const description = `${verse.translation} · ${verse.source}`;
   const path = sageId ? `/s/${sage.id}/${verse.id}` : `/v/${verse.id}`;
   const image = localeHref(`${path}/opengraph-image`, locale);

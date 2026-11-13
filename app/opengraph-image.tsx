@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { loadOgFont } from "@/lib/og-font";
 
-export const alt = "성현 문하 — 사이버 법당에서 함께 고전을 읽습니다";
+export const alt = "CommonLeaf — 사이버 법당에서 함께 고전을 읽습니다";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -32,7 +32,7 @@ export default async function Image() {
             marginTop: 20,
           }}
         >
-          성현 문하
+          CommonLeaf
         </p>
       </div>
     ),

@@ -2,7 +2,7 @@
   "name": "seonghyeon-live",
   "version": "1.0.0",
   "private": true,
-  "description": "성현 문하 실시간 서버: 구절 방송, 구역별 접속자 수, 합장",
+  "description": "CommonLeaf 실시간 서버: 구절 방송, 구역별 접속자 수, 합장",
   "type": "module",
   "main": "src/index.js",
   "engines": {

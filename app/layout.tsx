@@ -4,6 +4,7 @@ import { PageViewTracker } from "@/components/PageViewTracker";
 import { LocaleProvider, LanguagePicker } from "@/components/LocaleProvider";
 import "./globals.css";
 import "./pretendard-subset.css";
+import { BRAND } from "@/lib/constants";
 
 // UI는 기본 굵기 고딕, 구절·제목은 Noto 명조를 쓴다. 한문 원문과 한국어 본문을
 // 같은 패밀리로 그리므로 받아오는 폰트가 한 벌로 끝나고, 유니코드 레인지 분할은
@@ -24,7 +25,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "성현 문하",
+  title: BRAND,
   description: "모두가 같은 구절을 함께 읽고, 마음에 든 구절을 따라 쓰며 씨앗에서 고목으로 자라요.",
 };
 

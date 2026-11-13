@@ -12,6 +12,7 @@ import { usePlayStore } from "@/lib/store";
 import { track } from "@/lib/analytics";
 import type { SageId, Verse } from "@/lib/types";
 import { Toast } from "@/components/Toast";
+import { BRAND } from "@/lib/constants";
 
 const FILTERS: { id: SageId | "all"; label: string }[] = [
   { id: "all", label: "전체" },
@@ -65,7 +66,7 @@ export function InventoryScreen() {
   async function handleShare(verseId: string, translation: string) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
     const url = `${siteUrl}/v/${verseId}?ref=share&lang=${locale}`;
-    const shareData = { title: t("성현 문하"), text: translation, url };
+    const shareData = { title: BRAND, text: translation, url };
 
     if (typeof navigator.share === "function") {
       try {

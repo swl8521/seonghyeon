@@ -1,5 +1,8 @@
 // 튜닝 가능한 숫자는 전부 여기에 모아둔다 (SPEC §5).
 
+/** 서비스 이름. 번역하지 않는다 — 한국어·영문 화면에서 같은 이름을 쓴다. */
+export const BRAND = "CommonLeaf";
+
 export const PRACTICE_DECK_SIZE = 10;
 export const NOTE_INDICES = [4, 8]; // 수행 4, 8장째 직후 스승의 평
 

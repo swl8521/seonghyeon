@@ -1,3 +1,4 @@
+import { BRAND } from "./constants";
 import { translate, type Locale } from "./locale";
 import type { SageId } from "./types";
 
@@ -15,7 +16,7 @@ const sageLabels: Record<Locale, Record<SageId, { name: string; hall: string }>>
 };
 
 export function pageTitle(pathname: string, locale: Locale): string {
-  const brand = translate(locale, "성현 문하");
+  const brand = BRAND;
   let label = "";
   if (pathname === "/privacy") label = translate(locale, "개인정보처리방침");
   if (pathname === "/inventory") label = translate(locale, "모아둔 구절");
