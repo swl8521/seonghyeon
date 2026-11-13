@@ -3,7 +3,7 @@ import { SAGES, VERSES, LINES } from "./content";
 import { localizedSage, localizedVerse, localizedLine } from "./localized-content";
 import verseText from "@/content/en/verses.json";
 import lineText from "@/content/en/lines.json";
-it("covers all 3 sages, 60 quotes and 72 teacher lines without changing quote identity", () => {
+it("covers all 3 sages, every quote and all teacher lines without changing quote identity", () => {
   expect(Object.keys(verseText).sort()).toEqual(VERSES.map((v) => v.id).sort());
   expect(lineText).toHaveLength(LINES.length);
   for (const sage of SAGES) expect(localizedSage(sage.id, "en")?.hall).toMatch(/^Learn with/);

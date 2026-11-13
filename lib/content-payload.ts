@@ -1,6 +1,6 @@
 import "server-only";
 
-import { LINES, SAGES, VERSES, getSage, getVerse } from "./content";
+import { LINES, PRACTICE_VERSES, SAGES, getSage, getVerse } from "./content";
 import { localizedLine, localizedSage, localizedVerse } from "./localized-content";
 import type { ContentPayload, LocalizedValue } from "./client-content";
 import type { Sage, SageId, SageLine, Verse } from "./types";
@@ -35,10 +35,17 @@ export function contentPayload(selection: ContentSelection): ContentPayload {
   return { sages, verses, lines };
 }
 
+/**
+ * 구역 화면의 초기 페이로드.
+ *
+ * 따라쓰기 풀만 보낸다. 홀에서 돌아가는 읽기 풀은 수백 개라 통째로 실으면
+ * 클라이언트 번들이 그만큼 커진다. 홀에 뜬 구절은 LiveVerseCard 가
+ * loadContent 로 그때그때 가져온다 (/api/content).
+ */
 export function sageContentPayload(sage: SageId): ContentPayload {
   return contentPayload({
     sageIds: [sage],
-    verseIds: VERSES.filter((verse) => verse.sage === sage).map((verse) => verse.id),
+    verseIds: PRACTICE_VERSES.filter((verse) => verse.sage === sage).map((verse) => verse.id),
     lineSages: [sage],
   });
 }

@@ -14,6 +14,7 @@ import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import type { SwipeDirection } from "@/lib/practice";
 import type { Verse } from "@/lib/types";
 import { getVersePose } from "@/lib/monkey";
+import { originalTextClass, translationTextClass } from "@/lib/verse-layout";
 import { MonkeyCharacter } from "@/components/MonkeyCharacter";
 
 const SWIPE_THRESHOLD = 60;
@@ -156,10 +157,14 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
             <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
               <MonkeyCharacter pose={getVersePose(verse)} size={72} />
               <div className="flex flex-col gap-1.5">
-                <p className="font-original text-3xl leading-snug tracking-wide">{verse.original}</p>
+                <p className={`font-original ${originalTextClass(verse.original)} leading-snug tracking-wide`}>
+                  {verse.original}
+                </p>
                 {verse.reading && <p className="font-sans text-sm text-muted">{verse.reading}</p>}
               </div>
-              <p className="font-serif text-lg leading-relaxed">{verse.translation}</p>
+              <p className={`font-serif ${translationTextClass(verse.translation)} leading-relaxed`}>
+                {verse.translation}
+              </p>
             </div>
 
             <p className="text-right text-xs text-muted">{verse.source}</p>

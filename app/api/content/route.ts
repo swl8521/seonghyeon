@@ -1,6 +1,7 @@
 import { contentPayload } from "@/lib/content-payload";
 
-const VERSE_ID = /^(confucius|laozi|sunzi)-\d{2}$/;
+// "confucius-01" (기존) 과 "confucius-01-02a" (편-장-분할) 를 모두 받는다.
+const VERSE_ID = /^(confucius|laozi|sunzi)-\d{2}(-\d{2}[a-z]?)?$/;
 
 export async function GET(request: Request) {
   const ids = new URL(request.url).searchParams.get("ids")?.split(",") ?? [];

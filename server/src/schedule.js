@@ -36,6 +36,8 @@ export function seededShuffle(items, seed) {
  * @param {{id:string, sage:string}[]} verses
  */
 export function buildPools(verses) {
+  // 홀은 읽기 풀만 돌린다. pools 가 없는 예전 데이터는 읽기 풀로 본다.
+  verses = verses.filter((v) => !v.pools || v.pools.includes("read"));
   if (!Array.isArray(verses) || verses.length === 0) throw new Error("verses must be a non-empty array");
   const ids = new Set();
   const pools = { hall: [], confucius: [], laozi: [], sunzi: [] };

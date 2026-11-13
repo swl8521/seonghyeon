@@ -6,7 +6,7 @@ import englishVerses from "../content/en/verses.json" with { type: "json" };
 import englishLines from "../content/en/lines.json" with { type: "json" };
 import englishUi from "../content/i18n/en.json" with { type: "json" };
 import { readFileSync, readdirSync } from "node:fs";
-import type { Axis, SageId, SageLine, Sage, Verse } from "../lib/types";
+import type { Axis, Sage, SageId, SageLine, Verse, VersePool } from "../lib/types";
 
 const AXES: Axis[] = ["ren", "xue", "dao", "mou", "rou"];
 const SAGE_IDS: SageId[] = ["confucius", "laozi", "sunzi"];
@@ -77,8 +77,13 @@ const versesTyped = verses as Verse[];
 // (server/src/schedule.js). 광장 풀은 전체 구절이므로 성현별 하한만 보면 된다.
 const MIN_VERSES_PER_SAGE = 3;
 
+const POOLS: VersePool[] = ["read", "practice"];
+
 const verseIds = new Set<string>();
 const countBySage: Record<string, number> = {};
+// 풀별 성현 집계. 홀(read)과 따라쓰기(practice)가 각자 하한을 지켜야 한다.
+const readBySage: Record<string, number> = {};
+const practiceBySage: Record<string, number> = {};
 
 for (const v of versesTyped) {
   if (verseIds.has(v.id)) fail(`verses.json: id 중복 "${v.id}"`);
@@ -95,15 +100,32 @@ for (const v of versesTyped) {
     fail(`verses.json[${v.id}]: reviewed는 생성 시 false여야 함 (현재 ${v.reviewed})`);
   }
 
+  if (!Array.isArray(v.pools) || v.pools.length === 0) {
+    fail(`verses.json[${v.id}]: pools에 "read" 또는 "practice"가 최소 하나는 있어야 함`);
+  } else {
+    for (const pool of v.pools) {
+      if (!POOLS.includes(pool)) fail(`verses.json[${v.id}]: 알 수 없는 pool "${pool}"`);
+    }
+    if (v.pools.includes("read")) readBySage[v.sage] = (readBySage[v.sage] ?? 0) + 1;
+    if (v.pools.includes("practice")) practiceBySage[v.sage] = (practiceBySage[v.sage] ?? 0) + 1;
+  }
+
   checkVec(`verses.json[${v.id}].tags`, v.tags);
 }
 
 for (const id of SAGE_IDS) {
-  const count = countBySage[id] ?? 0;
-  if (count < MIN_VERSES_PER_SAGE) {
+  const read = readBySage[id] ?? 0;
+  if (read < MIN_VERSES_PER_SAGE) {
     fail(
-      `verses.json: "${id}" 구절이 최소 ${MIN_VERSES_PER_SAGE}개는 있어야 하는데 ${count}개임 ` +
+      `verses.json: "${id}" 읽기 풀이 최소 ${MIN_VERSES_PER_SAGE}개는 있어야 하는데 ${read}개임 ` +
         `(실시간 서버가 구역당 3개 미만이면 기동하지 못함)`
+    );
+  }
+  // 따라쓰기 풀이 비면 승급 따라쓰기가 구절을 못 고른다 (lib/store.ts chooseCopyVerses).
+  const practice = practiceBySage[id] ?? 0;
+  if (practice < MIN_VERSES_PER_SAGE) {
+    fail(
+      `verses.json: "${id}" 따라쓰기 풀이 최소 ${MIN_VERSES_PER_SAGE}개는 있어야 하는데 ${practice}개임`
     );
   }
 }

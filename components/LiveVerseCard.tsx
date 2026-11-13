@@ -9,6 +9,7 @@ import { CountdownRing } from "@/components/CountdownRing";
 import { MonkeyCharacter } from "@/components/MonkeyCharacter";
 import { getVersePose } from "@/lib/monkey";
 import { clientSage, clientVerse, loadContent } from "@/lib/client-content";
+import { originalTextClass, translationTextClass } from "@/lib/verse-layout";
 
 interface LiveVerseCardProps {
   verseState: VerseState;
@@ -73,9 +74,13 @@ export function LiveVerseCard({ verseState, remainingMs, flipped, onFlip }: Live
                 </p>
                 <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
                   <MonkeyCharacter pose={getVersePose(verse)} size={72} />
-                  <p className="font-original text-3xl leading-snug tracking-wide">{verse.original}</p>
+                  <p className={`font-original ${originalTextClass(verse.original)} leading-snug tracking-wide`}>
+                    {verse.original}
+                  </p>
                   {verse.reading && <p className="font-sans text-sm text-muted">{verse.reading}</p>}
-                  <p className="font-serif text-lg leading-relaxed">{verse.translation}</p>
+                  <p className={`font-serif ${translationTextClass(verse.translation)} leading-relaxed`}>
+                    {verse.translation}
+                  </p>
                 </div>
                 <p className="text-right text-xs text-muted">{verse.source}</p>
               </div>

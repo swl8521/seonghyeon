@@ -14,8 +14,16 @@ export interface Sage {
   vec: Vec;
 }
 
+/**
+ * 구절이 속한 풀.
+ * - read: 1분마다 바뀌는 홀에서 읽히는 풀. 원문 전문 단위가 여기 들어간다.
+ * - practice: 따라쓰기·승급에 쓰이는 짧은 격언 풀. 손으로 옮겨 적을 분량이어야 한다.
+ * 긴 장(章)은 따라쓰기에 쓸 수 없어서 두 풀을 나눠 둔다.
+ */
+export type VersePool = "read" | "practice";
+
 export interface Verse {
-  id: string; // "confucius-01"
+  id: string; // "confucius-01" 또는 "confucius-01-02a" (성현-편-장[분할])
   sage: SageId;
   source: string; // "논어 · 위정편"
   original: string; // 한문 원문
@@ -23,6 +31,7 @@ export interface Verse {
   translation: string; // 직접 번역
   note: string; // 한두 문장 해설 (카드 뒷면)
   tags: Vec; // 각 0~1
+  pools: VersePool[]; // 최소 하나
   reviewed: boolean; // 사람 검수 여부, 생성 시 false
 }
 
