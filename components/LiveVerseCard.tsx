@@ -5,7 +5,7 @@ import { useLocale } from "@/components/LocaleProvider";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { TICK_MS, type VerseState } from "@/lib/live";
-import { CountdownRing } from "@/components/CountdownRing";
+import { CountdownProgress } from "@/components/CountdownProgress";
 import { MonkeyCharacter } from "@/components/MonkeyCharacter";
 import { getVersePose } from "@/lib/monkey";
 import { clientSage, clientVerse, loadContent } from "@/lib/client-content";
@@ -38,7 +38,14 @@ export function LiveVerseCard({ verseState, remainingMs, flipped, onFlip }: Live
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
-      <div className="lantern-glow w-full max-w-[320px] overflow-hidden rounded-2xl [perspective:1200px]">
+      <CountdownProgress
+        remainingMs={remainingMs}
+        periodMs={verseState.periodMs}
+        slot={verseState.slot}
+        tickMs={TICK_MS}
+      />
+
+      <div className="lantern-glow w-full overflow-hidden rounded-2xl [perspective:1200px]">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
             key={verseState.slot}
@@ -97,12 +104,6 @@ export function LiveVerseCard({ verseState, remainingMs, flipped, onFlip }: Live
         </AnimatePresence>
       </div>
 
-      <CountdownRing
-        remainingMs={remainingMs}
-        periodMs={verseState.periodMs}
-        slot={verseState.slot}
-        tickMs={TICK_MS}
-      />
     </div>
   );
 }

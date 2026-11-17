@@ -1,6 +1,6 @@
 import "server-only";
 
-import { COPY_VERSES, LINES, SAGES, getSage, getVerse, readIndexFor } from "./content";
+import { COPY_VERSES, LINES, getSage, getVerse, readIndexFor } from "./content";
 import { localizedLine, localizedSage, localizedVerse } from "./localized-content";
 import type { ContentPayload, LocalizedValue } from "./client-content";
 import type { Sage, SageId, SageLine, Verse } from "./types";
@@ -53,9 +53,5 @@ export function sageContentPayload(sage: SageId): ContentPayload {
     lineSages: [sage],
     indexSage: sage,
   });
-}
-
-export function squareSagesPayload(): ContentPayload {
-  return contentPayload({ sageIds: SAGES.map((sage) => sage.id) });
 }
 

@@ -3,9 +3,8 @@
 import { useLocale } from "@/components/LocaleProvider";
 
 import { useEffect, useRef, useState } from "react";
-import { useShareVerseId } from "@/lib/useShareVerseId";
 import Link from "@/components/LocaleLink";
-import { clientSage, installContent, type ContentPayload } from "@/lib/client-content";
+import { installContent, type ContentPayload } from "@/lib/client-content";
 import { useLive } from "@/lib/live";
 import { Toast } from "@/components/Toast";
 import { usePlayStore } from "@/lib/store";
@@ -16,28 +15,21 @@ import { SoundToggle } from "@/components/SoundToggle";
 import { InventoryLink } from "@/components/InventoryLink";
 import { LiveVerseCard } from "@/components/LiveVerseCard";
 import { LiveActions } from "@/components/LiveActions";
-import { StageBadge } from "@/components/StageBadge";
 import { InfoSheet } from "@/components/InfoSheet";
 import { Icon } from "./Icon";
-import { SAGE_BORDER_CLASS } from "@/lib/sageColors";
 import type { VerseState } from "@/lib/live-state";
 
 const BOW_BATCH_MS = 5000;
 
-const SAGE_IDS = ["confucius", "laozi", "sunzi"] as const;
-
 export function SquareScreen({ initialVerse, content }: { initialVerse: VerseState | null; content: ContentPayload }) {
   installContent(content);
-  const shareVerseId = useShareVerseId();
-  const { locale, t } = useLocale();
+  const { t } = useLocale();
   const { status, verse, remainingMs, presence, bows, bow } = useLive("hall");
   const soundOn = usePlayStore((s) => s.soundOn);
   const toast = usePlayStore((s) => s.toast);
   const dismissToast = usePlayStore((s) => s.dismissToast);
   const seenIntro = usePlayStore((s) => s.seenIntro);
   const dismissIntro = usePlayStore((s) => s.dismissIntro);
-  const stage = usePlayStore((s) => s.stage);
-  const promotions = usePlayStore((s) => s.promotions);
   const inventory = usePlayStore((s) => s.inventory);
   const addToInventory = usePlayStore((s) => s.addToInventory);
   const flipLiveVerse = usePlayStore((s) => s.flipLiveVerse);
@@ -65,7 +57,7 @@ export function SquareScreen({ initialVerse, content }: { initialVerse: VerseSta
     joinedRef.current = true;
     lastTrackedSlot.current = verse.slot;
     if (firstJoin) {
-      track("zone_enter", { zone: "hall", presence: presence?.total ?? 0, from_share: shareVerseId ? 1 : 0 });
+      track("zone_enter", { zone: "hall", presence: presence?.total ?? 0, from_share: 0 });
     }
     track("live_verse_view", { zone: "hall", verse_id: verse.verseId, slot: verse.slot, late_join: 0 });
     setFlipped(false);
@@ -107,7 +99,7 @@ export function SquareScreen({ initialVerse, content }: { initialVerse: VerseSta
 
       <div className="relative flex flex-col items-center gap-6">
         {!seenIntro && (
-          <div className="flex w-full max-w-[320px] shrink-0 items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2 text-center font-sans text-xs leading-relaxed text-muted">
+          <div className="flex w-full shrink-0 items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2 text-center font-sans text-xs leading-relaxed text-muted">
             <span className="min-w-0 flex-1">{t("고전이 어렵다면, 한 구절부터. 마음에 드는 문장을 모으고 따라 써 보세요.")}</span>
             <button type="button" onClick={dismissIntro} aria-label={t("닫기")} className="flex h-8 w-8 shrink-0 items-center justify-center text-base">
               <Icon name="close" width={16} height={16} />
@@ -115,15 +107,15 @@ export function SquareScreen({ initialVerse, content }: { initialVerse: VerseSta
           </div>
         )}
 
-        <div className="flex min-h-[652px] w-full shrink-0 flex-col items-center gap-6">
+        <div className="flex w-full shrink-0 flex-col items-center gap-6">
         {!activeVerse && status !== "closed" && (
-          <div className="flex min-h-[580px] w-full max-w-[320px] animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
+          <div className="flex min-h-[480px] w-full animate-pulse items-center justify-center rounded-2xl border border-border bg-card">
             <p className="font-sans text-sm text-muted">{t("함께 읽을 구절을 불러오는 중…")}</p>
           </div>
         )}
 
         {status === "closed" && !activeVerse && (
-          <div className="flex aspect-[3/4] w-full max-w-[320px] flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-card p-6 text-center">
+          <div className="flex min-h-[480px] w-full flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-card p-6 text-center">
             <p className="font-sans text-sm text-muted">
               {t("실시간 구절을 잠시 불러올 수 없어요.")}
               <br />
@@ -154,25 +146,6 @@ export function SquareScreen({ initialVerse, content }: { initialVerse: VerseSta
         )}
 
         </div>
-        <div className="grid w-full grid-cols-3 gap-3">
-          {SAGE_IDS.map((id) => clientSage(id, locale)!).map((sage) => (
-            <Link
-              key={sage.id}
-              href={shareVerseId ? `/z/${sage.id}?from=share&id=${shareVerseId}` : `/z/${sage.id}`}
-              className={`flex flex-col items-center gap-1 rounded-xl border p-3 text-center ${SAGE_BORDER_CLASS[sage.id]} bg-card`}
-            >
-              <span className="font-serif text-xl">{sage.hanja[0]}</span>
-              <span className="font-sans text-xs text-foreground">{sage.hall}</span>
-              {status !== "fallback" && status !== "closed" && (
-                <span className="font-sans text-[11px] text-muted">
-                  {t("지금 {count}명", { count: presence?.[sage.id] ?? 0 })}
-                </span>
-              )}
-              <StageBadge stage={stage[sage.id]} />
-              {promotions[sage.id] && <span className="font-sans text-[11px] text-accent">{t("따라쓰기 준비 완료")}</span>}
-            </Link>
-          ))}
-        </div>
       </div>
 
       <div className="flex items-center justify-center gap-4 font-sans text-xs text-muted underline underline-offset-4">
@@ -186,7 +159,7 @@ export function SquareScreen({ initialVerse, content }: { initialVerse: VerseSta
         <p className="text-center font-serif text-lg leading-relaxed">
           {t("고전 구절을 함께 읽고, 마음에 드는 문장을 모으는 공간입니다.")}
           <br />
-          {t("광장에서는 1분마다 새로운 구절을 함께 읽어요. 성현을 선택하면 그 성현의 구절을 읽고, 마음에 드는 문장을 모으며 따라 쓸 수 있어요.")}
+          {t("1분마다 새로운 구절을 함께 읽고, 마음에 드는 문장은 모아둘 수 있어요.")}
         </p>
       </InfoSheet>
     </main>

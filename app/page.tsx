@@ -1,14 +1,11 @@
 import { SquareScreen } from "@/components/SquareScreen";
 import { getInitialVerse } from "@/lib/live-server";
 import { Suspense } from "react";
-import { contentPayload, squareSagesPayload } from "@/lib/content-payload";
-
-const SAGE_IDS = ["confucius", "laozi", "sunzi"] as const;
+import { contentPayload } from "@/lib/content-payload";
 
 async function CurrentSquare() {
   const initialVerse = await getInitialVerse("hall");
   const content = contentPayload({
-    sageIds: [...SAGE_IDS],
     verseIds: initialVerse ? [initialVerse.verseId] : [],
   });
   return <SquareScreen initialVerse={initialVerse} content={content} />;
@@ -19,7 +16,7 @@ async function CurrentSquare() {
 // /now를 당겨오고(lib/live.ts primeVerse), 이후 갱신은 소켓이 맡는다.
 export default function SquarePage() {
   return (
-    <Suspense fallback={<SquareScreen initialVerse={null} content={squareSagesPayload()} />}>
+    <Suspense fallback={<SquareScreen initialVerse={null} content={{ sages: [], verses: [], lines: [], verseIndex: [] }} />}>
       <CurrentSquare />
     </Suspense>
   );

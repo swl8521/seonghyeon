@@ -21,7 +21,6 @@
   --sage-laozi: #4fb3a0;
   --sage-sunzi: #e0b84a;
 }
-
 @media (prefers-color-scheme: light) {
   :root {
     /* 새벽 법당: 기존 한지 톤 */
@@ -162,23 +161,5 @@ select:disabled,
   .lantern-glow {
     animation: none !important;
     box-shadow: 0 0 20px 2px color-mix(in srgb, var(--lantern-glow) 30%, transparent) !important;
-  }
-}
-
-/* 구절 카운트다운 링 (§4.2).
-   링과 시계 텍스트는 같은 remainingMs 에서 나온다. React 가 1초마다 주는
-   값으로 stroke-dashoffset 이 정해지고, 그 사이를 이 transition 이 메운다.
-   예전처럼 링을 별도 키프레임 애니메이션에 맡기면 애니메이션이 제 시간을
-   따로 세기 때문에 숫자와 어긋날 수 있다. duration 은 틱 주기에 맞춰
-   인라인 style 로 들어온다 (components/CountdownRing.tsx). */
-.countdown-ring {
-  transition-property: stroke-dashoffset;
-  transition-timing-function: linear;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* 전환을 끄면 1초마다 한 칸씩 끊겨 움직인다. 값 자체는 늘 정확하다. */
-  .countdown-ring {
-    transition: none !important;
   }
 }

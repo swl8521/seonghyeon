@@ -31,7 +31,7 @@ const LATE_SWITCH_MS = 1500;
 const FALLBACK_POLL_FAILURE_MS = 30_000;
 const MAX_SOCKET_RETRIES = 3;
 // 시계 텍스트는 초 단위라 1초면 충분하다. 링은 CSS 애니메이션이 맡으므로
-// 더 잦은 틱이 필요 없다 (components/CountdownRing.tsx).
+// 더 잦은 틱이 필요 없다 (components/CountdownProgress.tsx).
 export const TICK_MS = 1000;
 
 function nowMs(): number {
