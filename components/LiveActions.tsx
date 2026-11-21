@@ -5,8 +5,8 @@ import { useLocale } from "@/components/LocaleProvider";
 import { useEffect, useState } from "react";
 import { usePlayStore } from "@/lib/store";
 import { playSingingBowl, stopSingingBowl } from "@/lib/sound";
-import { Icon } from "./Icon";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
 
 interface LiveActionsProps {
   bows: number;
@@ -49,7 +49,14 @@ export function LiveActions({
         disabled={disabled}
         className="relative flex items-center gap-2 rounded-full border border-border px-5 py-2 font-sans text-sm text-foreground disabled:opacity-50"
       >
-        <Icon name="bow" />
+        <Image
+          src="/characters/monkey-v2/monkey-13-praying.webp"
+          alt=""
+          aria-hidden="true"
+          width={28}
+          height={28}
+          className="-my-1 h-7 w-7 shrink-0 object-contain"
+        />
         <span>{t("함께 합장")} {bows}</span>
         <AnimatePresence>
           {sparks.map((id) => (

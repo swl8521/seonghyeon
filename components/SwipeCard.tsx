@@ -171,7 +171,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
           </div>
 
           <div aria-hidden={!flipped} inert={!flipped} className="relative flex min-w-0 flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-card p-6 text-center shadow-lg shadow-black/10 [grid-area:1/1] [backface-visibility:hidden] [transform:rotateY(180deg)]">
-            <MonkeyCharacter pose="think" size={96} />
+            <MonkeyCharacter pose={getVersePose(verse)} size={96} />
             <p className="font-sans text-sm text-muted">{sageName}</p>
             <p className="font-sans text-lg leading-relaxed">{verse.note}</p>
           </div>
