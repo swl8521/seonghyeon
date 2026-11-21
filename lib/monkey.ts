@@ -1,8 +1,9 @@
-import type { SageId, Verse } from "./types";
+import type { Verse } from "./types";
 
 export const MONKEY_POSES = [
   "read", "think", "wave", "meditate", "rest", "point", "grow", "shrug",
   "hug", "explore", "stretch", "bow", "surprise", "listen", "cheer", "sleep",
+  "bananaEat", "bananaBunch", "bananaPeel",
 ] as const;
 
 export type MonkeyPose = (typeof MONKEY_POSES)[number];
@@ -25,17 +26,27 @@ export const MONKEY_IMAGE_BY_POSE: Record<MonkeyPose, string> = {
   listen: "/characters/monkey-v2/monkey-02-thinking.webp",
   cheer: "/characters/monkey-v2/monkey-08-celebrating.webp",
   sleep: "/characters/monkey-v2/monkey-05-sleepy.webp",
+  bananaEat: "/characters/monkey-v2/monkey-10-banana-eating.webp",
+  bananaBunch: "/characters/monkey-v2/monkey-11-banana-bunch.webp",
+  bananaPeel: "/characters/monkey-v2/monkey-12-banana-peel.webp",
 };
 
-// Each entry follows the corresponding verse number, so a quote keeps its pose
-// across shuffled rounds and the saved matching cards.
-const VERSE_POSES: Record<SageId, readonly MonkeyPose[]> = {
-  confucius: ["read", "wave", "explore", "shrug", "listen", "hug", "listen", "stretch", "think", "grow", "surprise", "hug", "meditate", "think", "bow", "stretch", "explore", "bow", "point", "cheer"],
-  laozi: ["meditate", "think", "rest", "stretch", "meditate", "rest", "shrug", "surprise", "listen", "meditate", "read", "rest", "grow", "listen", "meditate", "cheer", "bow", "grow", "sleep", "meditate"],
-  sunzi: ["explore", "meditate", "point", "think", "stretch", "point", "explore", "shrug", "stretch", "explore", "think", "point", "think", "explore", "surprise", "bow", "rest", "stretch", "bow", "cheer"],
-};
+// These twelve entries point to twelve distinct drawings. Hashing the complete
+// id also supports split ids such as `confucius-12-21b` and `sunzi-11-j`.
+const VERSE_POSES = [
+  "read", "think", "wave", "hug", "rest", "surprise",
+  "point", "cheer", "explore", "bananaEat", "bananaBunch", "bananaPeel",
+] as const satisfies readonly MonkeyPose[];
+
+function stableHash(value: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
 
 export function getVersePose(verse: Verse): MonkeyPose {
-  const number = Number(verse.id.split("-").at(-1));
-  return VERSE_POSES[verse.sage][number - 1] ?? "think";
+  return VERSE_POSES[stableHash(verse.id) % VERSE_POSES.length];
 }
