@@ -1,4 +1,5 @@
-import { MONKEY_POSES, type MonkeyPose } from "@/lib/monkey";
+import Image from "next/image";
+import { MONKEY_IMAGE_BY_POSE, type MonkeyPose } from "@/lib/monkey";
 
 interface MonkeyCharacterProps {
   pose: MonkeyPose;
@@ -6,22 +7,17 @@ interface MonkeyCharacterProps {
   className?: string;
 }
 
-/** Decorative atlas sprite; transparent padding keeps every pose in its cell. */
+/** Decorative sticker image; every source asset has the same square canvas. */
 export function MonkeyCharacter({ pose, size = 88, className = "" }: MonkeyCharacterProps) {
-  const index = MONKEY_POSES.indexOf(pose);
-
   return (
-    <span
+    <Image
+      src={MONKEY_IMAGE_BY_POSE[pose]}
+      alt=""
       aria-hidden="true"
-      className={`pointer-events-none inline-block shrink-0 select-none ${className}`}
-      style={{
-        width: size,
-        height: size,
-        backgroundImage: "url('/characters/monkey-poses-v1.webp')",
-        backgroundSize: "400% 400%",
-        backgroundPosition: `${(index % 4) * 100 / 3}% ${Math.floor(index / 4) * 100 / 3}%`,
-        backgroundRepeat: "no-repeat",
-      }}
+      width={size}
+      height={size}
+      sizes={`${size}px`}
+      className={`pointer-events-none inline-block shrink-0 select-none object-contain ${className}`}
     />
   );
 }
